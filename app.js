@@ -1,12 +1,6 @@
-/*======================================================
-    HITO STUDIO
-    Panorama Viewer v1.0
-======================================================*/
+//   Panorama Viewer v1.0
 
-
-//------------------------------------------------------
 // ELEMENTOS
-//------------------------------------------------------
 
 const panoElement = document.getElementById("pano");
 
@@ -60,7 +54,7 @@ const geometry = new Marzipano.EquirectGeometry([
 
 const source = Marzipano.ImageUrlSource.fromString(
 
-    "panoramas/Panoramabaño.jpg"
+    "panoramas/Panorama(1).jpg"
 
 );
 
