@@ -1,117 +1,235 @@
 //   Panorama Viewer v1.0
 
+//======================================================
 // ELEMENTOS
+//======================================================
 
 const panoElement = document.getElementById("pano");
-
 const loader = document.getElementById("loader");
-
 const btnAutorotate = document.getElementById("btnAutorotate");
-
 const btnFullscreen = document.getElementById("btnFullscreen");
-
 const volverBtn = document.getElementById("volverBtn");
 
 volverBtn.addEventListener("click", () => {
     window.location.href = "index.html";
 });
 
-
-//------------------------------------------------------
+//======================================================
 // VISOR
-//------------------------------------------------------
+//======================================================
 
 const viewer = new Marzipano.Viewer(panoElement, {
-
     controls: {
-
         mouseViewMode: "drag"
-
     }
-
 });
 
-
-//------------------------------------------------------
+//======================================================
 // GEOMETRÍA
-//------------------------------------------------------
+//======================================================
 
 const geometry = new Marzipano.EquirectGeometry([
-
     {
-
         width: 4000
-
     }
-
 ]);
 
-
-
-//------------------------------------------------------
-// IMAGEN
-//------------------------------------------------------
-
-const source = Marzipano.ImageUrlSource.fromString(
-
-    "panoramas/Panorama(1).jpg"
-
-);
-
-
-
-//------------------------------------------------------
-// CÁMARA
-//------------------------------------------------------
+//======================================================
+// LIMITADOR DE CÁMARA
+//======================================================
 
 const limiter = Marzipano.RectilinearView.limit.traditional(
-
     4096,
-
     120 * Math.PI / 180
-
 );
 
-const view = new Marzipano.RectilinearView(
+//======================================================
+// TOUR
+//======================================================
 
-    {
+const tour = {
 
-        yaw: 0,
+    living: {
 
-        pitch: 0,
+        image: "panoramas/Panorama(2).jpg",
 
-        fov: Math.PI / 1 // 60°
+        hotspots: [
+
+            {
+                target: "bano",
+                yaw: -1.1,
+                pitch: -0.10
+            },
+            {
+                target: "habitacion1",
+                yaw: -0.5,
+                pitch: -0.05
+            },
+            {
+                target: "cocina",
+                yaw: -2.1,
+                pitch: -0.05
+            }
+        ]
 
     },
 
-    limiter
+    bano: {
 
-);
+        image: "panoramas/Panoramabaño1.jpg",
 
+        hotspots: [
 
-//------------------------------------------------------
-// ESCENA
-//------------------------------------------------------
+            {
+                target: "living",
+                yaw: 1.5,
+                pitch: -0.15
+            }
 
-const scene = viewer.createScene({
+        ]
 
-    source,
+    },
 
-    geometry,
+    habitacion1: {
 
-    view,
+        image: "panoramas/Panorama(3).jpg",
 
-    pinFirstLevel: true
+        hotspots: [
 
-});
+            {
+                target: "living",
+                yaw: 4,
+                pitch: -0.15
+            }
 
-scene.switchTo();
+        ]
 
+    },
 
+    cocina: {
 
-//------------------------------------------------------
+        image: "panoramas/Panorama(4).jpg",
+        hotspots: [
+
+            {
+                target: "living",
+                yaw: 2.5,
+                pitch: -0.15
+            }
+
+        ]
+
+    }
+
+    // Agregar nuevas escenas aquí
+
+    /*
+    cocina: {
+
+        image: "panoramas/PanoramaCocina.jpg",
+
+        hotspots: [
+
+            {
+                target:"living",
+                yaw:0.8,
+                pitch:-0.12
+            }
+
+        ]
+
+    }
+    */
+
+};
+
+//======================================================
+// CREAR ESCENAS
+//======================================================
+
+const scenes = {};
+
+for (const id in tour) {
+
+    const data = tour[id];
+
+    const source = Marzipano.ImageUrlSource.fromString(data.image);
+
+    const view = new Marzipano.RectilinearView(
+        {
+            yaw: 0,
+            pitch: 0,
+            fov: Math.PI / 1
+        },
+        limiter
+    );
+
+    scenes[id] = viewer.createScene({
+        source,
+        geometry,
+        view,
+        pinFirstLevel: true
+    });
+
+}
+
+//======================================================
+// CAMBIO DE ESCENA
+//======================================================
+
+let currentScene = scenes.living;
+
+currentScene.switchTo();
+
+function changeScene(id) {
+
+    currentScene = scenes[id];
+
+    currentScene.switchTo({
+        transitionDuration: 1000
+    });
+
+}
+
+//======================================================
+// CREAR HOTSPOTS
+//======================================================
+
+for (const id in tour) {
+
+    const scene = scenes[id];
+
+    tour[id].hotspots.forEach(h => {
+
+        const hotspot = document.createElement("div");
+
+        hotspot.className = "hotspot";
+
+        hotspot.innerHTML = `
+            <div class="hotspot-dot"></div>
+        `;
+
+        hotspot.onclick = () => {
+
+            changeScene(h.target);
+
+        };
+
+        scene.hotspotContainer().createHotspot(
+            hotspot,
+            {
+                yaw: h.yaw,
+                pitch: h.pitch
+            }
+        );
+
+    });
+
+}
+
+//======================================================
 // LOADER
-//------------------------------------------------------
+//======================================================
 
 window.addEventListener("load", () => {
 
@@ -123,11 +241,9 @@ window.addEventListener("load", () => {
 
 });
 
-
-
-//------------------------------------------------------
+//======================================================
 // AUTOROTACIÓN
-//------------------------------------------------------
+//======================================================
 
 const autorotate = Marzipano.autorotate({
 
@@ -142,37 +258,30 @@ const autorotate = Marzipano.autorotate({
 let autoEnabled = true;
 
 viewer.setIdleMovement(
-
     2500,
-
     autorotate
-
 );
 
+viewer.startMovement(autorotate);
 
-
-//------------------------------------------------------
+//======================================================
 // BOTÓN AUTOROTACIÓN
-//------------------------------------------------------
+//======================================================
 
 btnAutorotate.addEventListener("click", () => {
 
     if (autoEnabled) {
 
         viewer.stopMovement();
-
         viewer.setIdleMovement(Infinity);
 
         btnAutorotate.innerHTML = "Girar";
 
         autoEnabled = false;
 
-    }
-
-    else {
+    } else {
 
         viewer.startMovement(autorotate);
-
         viewer.setIdleMovement(2500, autorotate);
 
         btnAutorotate.innerHTML = "Detener";
@@ -183,11 +292,9 @@ btnAutorotate.addEventListener("click", () => {
 
 });
 
-
-
-//------------------------------------------------------
+//======================================================
 // FULLSCREEN
-//------------------------------------------------------
+//======================================================
 
 btnFullscreen.addEventListener("click", () => {
 
@@ -195,9 +302,7 @@ btnFullscreen.addEventListener("click", () => {
 
         document.documentElement.requestFullscreen();
 
-    }
-
-    else {
+    } else {
 
         document.exitFullscreen();
 
@@ -205,100 +310,29 @@ btnFullscreen.addEventListener("click", () => {
 
 });
 
-
-
-//------------------------------------------------------
-// HOTSPOT
-//------------------------------------------------------
-
-const hotspotElement = document.createElement("div");
-
-hotspotElement.className = "hotspot";
-
-hotspotElement.innerHTML =
-
-`
-
-<div class="hotspot-dot"></div>
-
-`;
-
-hotspotElement.onclick = () => {
-
-    alert(
-
-`Revestimiento:
-
-Porcelanato simil mármol
-
-120x60 cm
-
-Terminación mate.`
-
-    );
-
-};
-
-scene.hotspotContainer().createHotspot(
-
-    hotspotElement,
-
-    {
-
-        yaw: 1.1,
-
-        pitch: -0.15
-
-    }
-
-);
-
-
-
-//------------------------------------------------------
+//======================================================
 // DOBLE CLICK PARA CENTRAR
-//------------------------------------------------------
+//======================================================
 
 panoElement.addEventListener("dblclick", () => {
 
-    scene.lookTo(
-
+    currentScene.lookTo(
         {
-
             yaw: 0,
-
             pitch: 0,
-
             fov: Math.PI / 2
-
         },
-
         {
-
             transitionDuration: 1000
-
         }
-
     );
 
 });
 
-
-
-//------------------------------------------------------
-// EFECTO SUAVE
-//------------------------------------------------------
-
-viewer.startMovement(autorotate);
-
-
-
-//------------------------------------------------------
+//======================================================
 // DEBUG
-//------------------------------------------------------
+//======================================================
 
 window.viewer = viewer;
-
-window.scene = scene;
-
-window.view = view;
+window.scenes = scenes;
+window.tour = tour;
