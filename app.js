@@ -4,25 +4,74 @@
 // ELEMENTOS
 //======================================================
 
+const intro = document.getElementById("intro");
 const panoElement = document.getElementById("pano");
 const loader = document.getElementById("loader");
 const btnAutorotate = document.getElementById("btnAutorotate");
 const btnFullscreen = document.getElementById("btnFullscreen");
 const volverBtn = document.getElementById("volverBtn");
-
-volverBtn.addEventListener("click", () => {
-    window.location.href = "index.html";
-});
-
-//======================================================
-// VISOR
-//======================================================
-
+const enterButton = document.getElementById("enterButton");
+const model = document.getElementById("modelo");
+const viewerContainer = document.getElementById("viewer-container");
 const viewer = new Marzipano.Viewer(panoElement, {
     controls: {
         mouseViewMode: "drag"
     }
 });
+const indicator = document.querySelector(".scroll-indicator");
+const topbar = document.querySelector(".topbar");
+
+volverBtn.addEventListener("click", () => {
+    window.location.href = "index.html";
+});
+
+/* =======================================================
+   modelo
+======================================================= */
+
+
+
+viewerContainer.style.display = "none";
+
+window.addEventListener("load",()=>{
+
+    loader.style.display = "none";
+
+    topbar.style.display="none";
+
+    indicator.style.display="none";
+
+});
+
+enterButton.addEventListener("click", () => {
+
+    intro.classList.add("fade");
+
+    setTimeout(() => {
+
+        intro.style.display = "none";
+
+        loader.style.display = "flex";
+
+        setTimeout(() => {
+
+            loader.style.display = "none";
+
+            viewerContainer.style.display = "block";
+
+            topbar.style.display = "flex";
+
+            indicator.style.display = "block";
+
+            currentScene.switchTo();
+
+        }, 1500);
+
+    }, 700);
+
+});
+
+viewerContainer.style.display = "block";
 
 //======================================================
 // OCULTAR MENU
@@ -32,7 +81,6 @@ const menuToggle = document.getElementById("menuToggle");
 const actions = document.querySelector(".actions");
 
 menuToggle.addEventListener("click", () => {
-    
     actions.classList.toggle("open");
 
 });
@@ -44,9 +92,15 @@ menuToggle.addEventListener("click", () => {
 
 const geometry = new Marzipano.EquirectGeometry([
     {
-        width: 4000
+        width: 6000
     }
 ]);
+
+// Esperar un frame para que el navegador calcule el tamaño
+requestAnimationFrame(() => {
+    viewer.updateSize();
+    currentScene.switchTo();
+});
 
 //======================================================
 // LIMITADOR DE CÁMARA
@@ -65,7 +119,7 @@ const tour = {
 
     living: {
 
-        image: "panoramas/Panorama(1).png",
+        image: "panoramas/Panorama(1).jpg",
 
         hotspots: [
 
@@ -172,7 +226,7 @@ for (const id in tour) {
         {
             yaw: 0,
             pitch: 0,
-            fov: Math.PI / 1
+            fov: Math.PI / 2
         },
         limiter
     );
@@ -191,8 +245,6 @@ for (const id in tour) {
 //======================================================
 
 let currentScene = scenes.living;
-
-currentScene.switchTo();
 
 function changeScene(id) {
 

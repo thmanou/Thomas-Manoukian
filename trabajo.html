@@ -16,9 +16,32 @@
 </head>
 
 <body>
+    
 
     <!-- ========================= -->
-    <!-- Pantalla de carga -->
+    <!-- Intro -->
+    <!-- ========================= -->
+
+    <section id="intro">
+        <model-viewer
+            id="modelo"
+            src="modelo1.glb"
+            camera-controls
+            auto-rotate
+            auto-rotate-delay="0"
+            rotation-per-second="14deg"
+            shadow-intensity="1"
+            exposure="0.8"
+            touch-action="pan-y">
+        </model-viewer>
+
+        <button id="enterButton">
+            Ingresar al recorrido
+        </button>
+    </section>
+
+    <!-- ========================= -->
+    <!-- Loader -->
     <!-- ========================= -->
 
     <div id="loader">
@@ -39,13 +62,11 @@
     <!-- Viewer -->
     <!-- ========================= -->
 
-    <main id="viewer-container">
+    <main id="viewer-container" style="display:none;">
 
         <div id="pano"></div>
 
     </main>
-
-
 
     <!-- ========================= -->
     <!-- Barra superior -->
@@ -117,8 +138,6 @@
 
     </div>
 
-
-
     <!-- ========================= -->
     <!-- Hotspots -->
     <!-- ========================= -->
@@ -138,10 +157,11 @@
     <!-- ========================= -->
     <!-- Scripts -->
     <!-- ========================= -->
-
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script src="marzipano.js"></script>
-
     <script src="app.js"></script>
+
+    
 
 </body>
 
