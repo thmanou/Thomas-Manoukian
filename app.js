@@ -25,6 +25,20 @@ const viewer = new Marzipano.Viewer(panoElement, {
 });
 
 //======================================================
+// OCULTAR MENU
+//======================================================
+
+const menuToggle = document.getElementById("menuToggle");
+const actions = document.querySelector(".actions");
+
+menuToggle.addEventListener("click", () => {
+    
+    actions.classList.toggle("open");
+
+});
+
+
+//======================================================
 // GEOMETRÍA
 //======================================================
 
@@ -51,23 +65,23 @@ const tour = {
 
     living: {
 
-        image: "panoramas/Panorama(2).jpg",
+        image: "panoramas/Panorama(1).png",
 
         hotspots: [
 
             {
                 target: "bano",
-                yaw: -1.1,
+                yaw: -2,
                 pitch: -0.10
             },
             {
                 target: "habitacion1",
-                yaw: -0.5,
+                yaw: -1.5,
                 pitch: -0.05
             },
             {
                 target: "cocina",
-                yaw: -2.1,
+                yaw: -15.5,
                 pitch: -0.05
             }
         ]
@@ -92,13 +106,13 @@ const tour = {
 
     habitacion1: {
 
-        image: "panoramas/Panorama(3).jpg",
+        image: "panoramas/Panorama(6).jpg",
 
         hotspots: [
 
             {
                 target: "living",
-                yaw: 4,
+                yaw: 1.5,
                 pitch: -0.15
             }
 
@@ -108,12 +122,11 @@ const tour = {
 
     cocina: {
 
-        image: "panoramas/Panorama(4).jpg",
+        image: "panoramas/Panorama(5).jpg",
         hotspots: [
-
             {
                 target: "living",
-                yaw: 2.5,
+                yaw: 4.5,
                 pitch: -0.15
             }
 
