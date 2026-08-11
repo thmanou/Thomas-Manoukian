@@ -75,7 +75,7 @@ body{
 
 .hide{
 
-    opacity:0;
+    opacity:0;nnerHTML
 
     transition:opacity .6s;
 
@@ -419,6 +419,72 @@ body{
 
 }
 
+/* =======================================================
+   INDICADOR DE NAVEGACIÓN
+======================================================= */
+
+#navigation-indicator{
+    position:fixed;
+
+    left:50%;
+    bottom:100px;
+
+    transform:translateX(-50%);
+
+    z-index:200;
+
+    display:none;
+
+    flex-direction:column;
+    align-items:center;
+
+    pointer-events:none;
+
+    transition:opacity .25s ease;
+}
+
+.navigation-arrow{
+    width:55px;
+    height:55px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:rgba(0,0,0,.45);
+
+    border:1px solid rgba(255,255,255,.35);
+
+    backdrop-filter:blur(12px);
+
+    color:white;
+
+    font-size:32px;
+
+    line-height:1;
+
+    transition:transform .2s ease;
+}
+
+.navigation-label{
+    margin-top:8px;
+
+    padding:5px 10px;
+
+    border-radius:8px;
+
+    background:rgba(0,0,0,.45);
+
+    backdrop-filter:blur(10px);
+
+    color:white;
+
+    font-size:12px;
+
+    letter-spacing:1px;
+}
 
 /* =======================================================
    HOTSPOTS
@@ -440,15 +506,23 @@ body{
 
 }
 
+.hotspot-arrow{
+    position:absolute;
+    font-size:28px;
+    color:white;
+    text-shadow:0 2px 8px rgba(0,0,0,.5);
+    transform-origin:center;
+}
+
 .hotspot-dot{
 
-    width:16px;
+    width:30px;
 
-    height:16px;
+    height:15px;
 
     border-radius:50%;
 
-    background:white;
+    background:rgba(255, 255, 255, 0.5);
 
     position:relative;
 
@@ -462,7 +536,7 @@ body{
 
     inset:-12px;
 
-    border:2px solid white;
+    border:2px solid rgba(255, 255, 255, 0.5);
 
     border-radius:50%;
 

@@ -20,6 +20,14 @@ const viewer = new Marzipano.Viewer(panoElement, {
 });
 const indicator = document.querySelector(".scroll-indicator");
 const topbar = document.querySelector(".topbar");
+const navigationIndicator =
+    document.getElementById("navigation-indicator");
+
+const navigationArrow =
+    document.querySelector(".navigation-arrow");
+
+const navigationLabel =
+    document.querySelector(".navigation-label");
 
 volverBtn.addEventListener("click", () => {
     window.location.href = "index.html";
@@ -126,17 +134,17 @@ const tour = {
             {
                 target: "bano",
                 yaw: -2,
-                pitch: -0.10
+                pitch: 0.45
             },
             {
                 target: "habitacion1",
                 yaw: -1.5,
-                pitch: -0.05
+                pitch: 0.50
             },
             {
                 target: "cocina",
                 yaw: -15.5,
-                pitch: -0.05
+                pitch: 0.35
             }
         ]
 
@@ -151,7 +159,7 @@ const tour = {
             {
                 target: "living",
                 yaw: 1.5,
-                pitch: -0.15
+                pitch: 0.35
             }
 
         ]
@@ -167,7 +175,7 @@ const tour = {
             {
                 target: "living",
                 yaw: 1.5,
-                pitch: -0.15
+                pitch: 0.35
             }
 
         ]
@@ -181,7 +189,7 @@ const tour = {
             {
                 target: "living",
                 yaw: 4.5,
-                pitch: -0.15
+                pitch: 0.35
             }
 
         ]
@@ -260,6 +268,8 @@ function changeScene(id) {
 // CREAR HOTSPOTS
 //======================================================
 
+const navigationHotspots = [];
+
 for (const id in tour) {
 
     const scene = scenes[id];
@@ -288,10 +298,138 @@ for (const id in tour) {
             }
         );
 
+        navigationHotspots.push({
+            sceneId: id,
+            target: h.target,
+            yaw: h.yaw,
+            pitch: h.pitch
+        });
+
     });
 
 }
 
+function updateNavigationIndicator(){
+
+    if(!currentScene){
+        return;
+    }
+
+    const currentView = currentScene.view();
+
+    const cameraYaw = currentView.yaw();
+
+    const availableHotspots =
+        navigationHotspots.filter(
+            hotspot => hotspot.sceneId === getCurrentSceneId()
+        );
+
+    if(availableHotspots.length === 0){
+
+        navigationIndicator.style.display = "none";
+
+        return;
+
+    }
+
+    // Buscar el hotspot más cercano a la dirección actual
+    let closestHotspot = null;
+    let smallestAngle = Infinity;
+
+    availableHotspots.forEach(hotspot => {
+
+        let difference =
+            normalizeAngle(hotspot.yaw - cameraYaw);
+
+        const absoluteDifference =
+            Math.abs(difference);
+
+        if(absoluteDifference < smallestAngle){
+
+            smallestAngle = absoluteDifference;
+
+            closestHotspot = hotspot;
+
+        }
+
+    });
+
+    if(!closestHotspot){
+        return;
+    }
+
+    let angle =
+        normalizeAngle(
+            closestHotspot.yaw - cameraYaw
+        );
+
+    // Si está prácticamente enfrente,
+    // la flecha apunta hacia arriba.
+    const rotation =
+        angle * 180 / Math.PI;
+
+    navigationArrow.style.transform =
+        `rotate(${rotation}deg)`;
+
+    navigationLabel.textContent =
+        getSceneName(closestHotspot.target);
+
+    navigationIndicator.style.display =
+        "flex";
+}
+
+function normalizeAngle(angle){
+
+    while(angle > Math.PI){
+        angle -= Math.PI * 2;
+    }
+
+    while(angle < -Math.PI){
+        angle += Math.PI * 2;
+    }
+
+    return angle;
+}
+
+function getCurrentSceneId(){
+
+    for(const id in scenes){
+
+        if(scenes[id] === currentScene){
+            return id;
+        }
+
+    }
+
+    return null;
+}
+
+function getSceneName(id){
+
+    const names = {
+
+        living: "Living",
+
+        bano: "Baño",
+
+        habitacion1: "Habitación",
+
+        cocina: "Cocina"
+
+    };
+
+    return names[id] || id;
+
+}
+
+function navigationLoop(){
+
+    updateNavigationIndicator();
+
+    requestAnimationFrame(navigationLoop);
+}
+
+navigationLoop();
 //======================================================
 // LOADER
 //======================================================

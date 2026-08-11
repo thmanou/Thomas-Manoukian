@@ -27,9 +27,11 @@
             id="modelo"
             src="modelo2.glb"
             camera-controls
+            camera-orbit="0deg 50deg auto"
+            max-camera-orbit="auto 90deg auto"
             auto-rotate
             auto-rotate-delay="0"
-            rotation-per-second="14deg"
+            rotation-per-second="12deg"
             shadow-intensity="1"
             exposure="0.8"
             touch-action="pan-y">
@@ -66,6 +68,10 @@
 
         <div id="pano"></div>
 
+        <div id="navigation-indicator">
+            <div class="navigation-arrow">↑</div>
+            <span class="navigation-label">Ir</span>
+        </div>
     </main>
 
     <!-- ========================= -->
