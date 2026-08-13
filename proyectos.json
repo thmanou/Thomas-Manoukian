@@ -189,5 +189,152 @@
       "images/proyecto7-34.jpg",
       "images/proyecto7-35.jpg"
     ]
+  },
+
+  {
+    "id": "proyecto8",
+    "titulo": "Departamento",
+    "subtitulo": "Departamento",
+
+    "imagenPrincipal": "images/proyecto8-2.png",
+
+    "descripcion": "El proyecto es una previsualización de un departamento",
+
+    "anio": "2026",
+    "ubicacion": "Haedo, Buenos Aires",
+    "programa": "Departamento de 3 ambientes",
+    "superficie": "200 m²",
+
+    "galeria": [
+        "images/proyecto8-1.png",
+        "images/proyecto8-2.png",
+        "images/proyecto8-3.jpg"
+    ],
+
+    "modelo3D": {
+        "archivo": "modelos/proyecto8.glb"
+    },
+
+    "recorrido360": {
+
+        "activo": true,
+
+        "panoramaInicial": "living",
+
+        "panoramas": {
+
+            "living": {
+
+                "nombre": "Living",
+
+                "imagen": "panoramas/proyecto8/living.jpg",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "bano",
+                        "yaw": -2,
+                        "pitch": 0.45,
+                        "nombre": "Baño"
+                    },
+
+                    {
+                        "target": "habitacion1",
+                        "yaw": -1.5,
+                        "pitch": 0.50,
+                        "nombre": "Habitación"
+                    },
+
+                    {
+                        "target": "cocina",
+                        "yaw": -2.93,
+                        "pitch": 0.35,
+                        "nombre": "Cocina"
+                    }
+
+                ]
+
+            },
+
+
+            "bano": {
+
+                "nombre": "Baño",
+
+                "imagen": "panoramas/proyecto8/bano1.jpg",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "living",
+                        "yaw": 1.5,
+                        "pitch": 0.35,
+                        "nombre": "Living"
+                    }
+
+                ]
+
+            },
+
+
+            "habitacion1": {
+
+                "nombre": "Habitación",
+
+                "imagen": "panoramas/proyecto8/habitacion1.jpg",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "living",
+                        "yaw": 1.5,
+                        "pitch": 0.35,
+                        "nombre": "Living"
+                    }
+
+                ]
+
+            },
+
+
+            "cocina": {
+
+                "nombre": "Cocina",
+
+                "imagen": "panoramas/proyecto8/cocina.jpg",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "living",
+                        "yaw": 4.5,
+                        "pitch": 0.35,
+                        "nombre": "Living"
+                    }
+
+                ]
+
+            }
+
+        }
+
+    }
   }
+
 ]

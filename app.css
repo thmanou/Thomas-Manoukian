@@ -3,13 +3,13 @@
 ======================================================= */
 
 *{
-    margin:0;
-    padding:0;
     box-sizing:border-box;
 }
 
 html,
 body{
+    margin:0;
+    padding:0;
 
     width:100%;
     height:100%;
@@ -22,9 +22,9 @@ body{
         Arial,
         sans-serif;
 
-    background:#111;
+    background:#747474;
 
-    color:white;
+    color:rgb(71, 71, 71);
 
 }
 
@@ -35,17 +35,18 @@ body{
 
 #modelo{
 
-    position:fixed;
+    position: absolute;
 
-    inset:0;
+    top: 0;
+    left: 0;
 
-    width:100%;
+    width: 100vw !important;
+    height: 100vh !important;
 
-    height:100%;
+    margin: 0;
+    padding: 0;
 
-    background:#1b1b1b;
-
-    z-index:1;
+    display: block;
 
 }
 
@@ -91,11 +92,22 @@ body{
 
 #intro{
 
-    position:fixed;
+     position: fixed;
 
-    inset:0;
+    top: 0;
+    left: 0;
 
-    z-index:500;
+    width: 100vw;
+    height: 100vh;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+
+    z-index: 1;
+
+    background: #263438;
 
 }
 
@@ -234,101 +246,294 @@ body{
    TOPBAR
 ======================================================= */
 
-.topbar{
+.topbar {
+    position: fixed;
 
-    position:fixed;
+    top: 0;
+    left: 0;
 
-    top:30px;
+    width: 100%;
 
-    left:30px;
+    height: 70px;
 
-    right:30px;
+    padding: 0 35px;
 
-    display:none;
+    display: grid;
 
-    justify-content:space-between;
+    grid-template-columns: 1fr auto 1fr;
 
-    align-items:center;
+    align-items: center;
 
-    z-index:50;
+    z-index: 1000;
+
+    color: hsl(0, 0%, 100%);
+    
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(71, 71, 71, 0.55) 0%,
+            rgba(110, 110, 110, 0) 100%
+        );
+
+    backdrop-filter: blur(8px);
+
+    -webkit-backdrop-filter: blur(8px);
+
+    box-sizing: border-box;
+
+    pointer-events: none;
+}
+
+.topbar button,
+.topbar a,
+.topbar .project {
+    pointer-events: auto;
+}
+
+.project {
+     justify-self: start;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    pointer-events: auto;
+}
+
+
+.project h1 {
+    margin: 0;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+}
+
+
+.project span {
+    font-size: 9px;
+
+    letter-spacing: 0.12em;
+
+    text-transform: uppercase;
+
+    opacity: 0.55;
+}
+
+/* ======================================================
+   NAV CENTRAL
+====================================================== */
+
+.main-nav {
+
+    justify-self: center;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 32px;
+
+    pointer-events: auto;
+}
+
+
+.main-nav button {
+
+    position: relative;
+
+    border: none;
+
+    padding: 6px 0;
+
+    background: transparent;
+
+    color: inherit;
+
+    font-family: inherit;
+
+    font-size: 10px;
+
+    font-weight: 400;
+
+    letter-spacing: 0.14em;
+
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+.main-nav button:hover {
+
+    opacity: 0.5;
+
+    transform: translateY(-1px);
 
 }
 
-.project{
+.main-nav button.active::after {
 
-    backdrop-filter:blur(20px);
+    content: "";
 
-    background:rgba(255,255,255,.05);
+    position: absolute;
 
-    border:1px solid rgba(255,255,255,.08);
+    left: 0;
+    right: 0;
 
-    padding:18px 24px;
+    bottom: -7px;
 
-    border-radius:16px;
+    height: 1px;
 
-    pointer-events:auto;
-
-}
-
-.project h1{
-
-    font-size:24px;
-
-    font-weight:500;
+    background: currentColor;
 
 }
 
-.project span{
+/* Hover */
 
-    color:#aaa;
+.main-nav .nav-link:hover {
+    opacity: 1;
+}
 
-    font-size:13px;
+
+/* BOTÓN ACTIVO */
+
+.main-nav .nav-link.active {
+    opacity: 1;
+}
+
+
+/* Línea */
+
+.main-nav .nav-link.active::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    bottom: -4px;
+
+    height: 1px;
+
+    background: currentColor;
 
 }
+
+/* ======================================================
+   ACCIONES DERECHA
+====================================================== */
+
+.header-actions {
+
+    justify-self: end;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 22px;
+
+    pointer-events: auto;
+}
+
+
+.header-actions button {
+
+    border: none;
+
+    padding: 0;
+
+    background: transparent;
+
+    color: inherit;
+
+    font-family: inherit;
+
+    font-size: 10px;
+
+    letter-spacing: 0.12em;
+
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition: opacity 0.25s ease;
+}
+
+
+.header-actions button:hover {
+
+    opacity: 0.5;
+
+}
+
+
+.fullscreen-btn {
+
+    font-size: 19px !important;
+
+    line-height: 1;
+
+    letter-spacing: 0 !important;
+
+}
+
 
 
 /* =======================================================
    BUTTONS
 ======================================================= */
 
-.actions{
+.actions {
+    display: flex;
 
-    display:flex;
+    align-items: center;
 
-    gap:10px;
-
-    pointer-events:auto;
-
+    gap: 28px;
 }
 
-.actions button{
+.actions button {
+    border: none;
 
-    background:rgba(255,255,255,.08);
+    background: transparent;
 
-    border:1px solid rgba(255,255,255,.12);
+    padding: 0;
 
-    color:white;
+    font-family: inherit;
 
-    padding:14px 22px;
+    font-size: 10px;
 
-    border-radius:14px;
+    letter-spacing: 0.12em;
 
-    cursor:pointer;
+    text-transform: uppercase;
 
-    backdrop-filter:blur(20px);
+    color: inherit;
 
-    transition:.35s;
+    cursor: pointer;
 
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
 }
 
-.actions button:hover{
 
-    background:white;
+.actions button:hover {
+    opacity: 0.5;
 
-    color:black;
-
-    transform:translateY(-2px);
-
+    transform: translateY(-1px);
 }
 
 
@@ -596,55 +801,84 @@ body{
    MOBILE
 ======================================================= */
 
-@media(max-width:900px){
+@media (max-width: 700px) {
 
-    .topbar{
+    .topbar {
 
-        top:15px;
+        height: 75px;
 
-        left:15px;
+        padding: 0 20px;
 
-        right:15px;
+        display: flex;
 
-        flex-direction:column;
-
-        align-items:flex-start;
-
-        gap:15px;
+        justify-content: space-between;
 
     }
 
-    .project{
 
-        width:100%;
+    .project h1 {
 
-    }
-
-    .actions{
-
-        width:100%;
+        font-size: 11px;
 
     }
 
-    .actions button{
 
-        flex:1;
+    .project span {
 
-    }
-
-    .info-panel{
-
-        width:calc(100% - 30px);
-
-        left:15px;
-
-        bottom:15px;
+        font-size: 8px;
 
     }
 
-    .project h1{
 
-        font-size:20px;
+    .main-nav,
+    .header-actions {
+
+        display: none;
+
+    }
+
+
+    .menu-toggle {
+
+        display: block;
+
+        border: none;
+
+        background: transparent;
+
+        color: inherit;
+
+        font-size: 21px;
+
+        cursor: pointer;
+
+        pointer-events: auto;
+
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .main-nav.open {
+
+        position: absolute;
+
+        top: 70px;
+
+        right: 20px;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: flex-end;
+
+        gap: 20px;
+
+        padding: 20px 0;
+
+        background: transparent;
 
     }
 
@@ -656,49 +890,264 @@ body{
 
 .menu-toggle{
 
-    display:none;
+     display: none;
 
-    background:rgba(255,255,255,.08);
-    border:1px solid rgba(255,255,255,.12);
+    border: none;
 
-    color:white;
+    background: transparent;
 
-    padding:14px 18px;
+    font-size: 20px;
 
-    border-radius:14px;
+    cursor: pointer;
 
-    cursor:pointer;
-
-    backdrop-filter:blur(20px);
+    color: inherit;
 
 }
 
-@media(max-width:900px){
+@media (max-width: 700px) {
 
-    .menu-toggle{
+    .topbar {
+        height: 70px;
 
-        display:block;
+        padding: 0 20px;
+    }
 
-        width:100%;
+
+    .project h1 {
+        font-size: 12px;
+    }
+
+
+    .project span {
+        font-size: 8px;
+    }
+
+
+    .menu-toggle {
+        display: block;
+
+        order: 2;
+    }
+
+
+    /* =======================================================
+   MENU MOBILE
+======================================================= */
+
+.menu-toggle {
+    display: none;
+
+    border: none;
+
+    background: transparent;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    color: inherit;
+
+    padding: 0;
+
+    pointer-events: auto;
+}
+
+
+@media (max-width: 700px) {
+
+    /* HEADER */
+
+    .topbar {
+
+        position: fixed;
+
+        top: 0;
+        left: 0;
+
+        width: 100vw;
+
+        height: 70px;
+
+        padding: 0 20px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        z-index: 1000;
+
+        background:
+            linear-gradient(
+                to bottom,
+                rgba(38, 52, 56, 0.90),
+                rgba(38, 52, 56, 0)
+            );
 
     }
 
-    .actions{
 
-        display:none;
+    /* PROYECTO */
 
-        width:100%;
+    .project {
 
-        flex-direction:column;
+        display: flex;
 
-        gap:10px;
+        flex-direction: column;
+
+        gap: 4px;
+
+    }
+
+
+    .project h1 {
+
+        margin: 0;
+
+        font-size: 12px;
+
+        letter-spacing: 0.08em;
 
     }
 
-    .actions.open{
 
-        display:flex;
+    .project span {
+
+        font-size: 8px;
+
+        letter-spacing: 0.10em;
+
+        opacity: 0.5;
 
     }
+
+
+    /* HAMBURGUESA */
+
+    .menu-toggle {
+
+        display: block !important;
+
+        position: relative;
+
+        z-index: 1100;
+
+        margin-left: auto;
+
+        padding: 5px;
+
+        border: none;
+
+        background: transparent;
+
+        color: #111;
+
+        font-size: 20px;
+
+        cursor: pointer;
+
+    }
+
+
+    /* ==================================================
+       MENÚ DESPLEGABLE
+    ================================================== */
+
+    .main-nav {
+
+        position: fixed;
+
+        top: 70px;
+
+        right: 15px;
+
+        width: 180px;
+
+        padding: 22px;
+
+        display: none;
+
+        flex-direction: column;
+
+        align-items: flex-end;
+
+        gap: 20px;
+
+        background: rgba(245, 245, 243, 0.90);
+
+        backdrop-filter: blur(18px);
+
+        -webkit-backdrop-filter: blur(18px);
+
+        z-index: 1050;
+
+    }
+
+
+    .main-nav.open {
+
+        display: flex;
+
+    }
+
+
+    /* BOTONES DEL MENÚ */
+
+    .main-nav .nav-link {
+
+        display: block;
+
+        width: 100%;
+
+        text-align: right;
+
+        padding: 4px 0;
+
+        font-size: 10px;
+
+    }
+
+
+    /* ==================================================
+       ACCIONES DERECHA
+    ================================================== */
+
+    .header-actions {
+
+        position: fixed;
+
+        top: 70px;
+
+        right: 15px;
+
+        display: none;
+
+        z-index: 1050;
+
+        flex-direction: column;
+
+        align-items: flex-end;
+
+        gap: 18px;
+
+        padding: 20px;
+
+
+
+        backdrop-filter: blur(18px);
+
+        -webkit-backdrop-filter: blur(18px);
+
+    }
+
+
+    .header-actions.open {
+
+        display: flex;
+
+    }
+
+}
 
 }

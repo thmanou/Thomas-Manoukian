@@ -17,7 +17,65 @@
 
 <body>
     
+<!-- ========================= -->
+    <!-- Barra superior -->
+    <!-- ========================= -->
+<header class="topbar">
 
+    <!-- IZQUIERDA -->
+    <div class="project">
+
+        <h1>Departamento Residencial</h1>
+
+        <span>
+            Unidad tipo A · 4 ambientes
+        </span>
+
+    </div>
+
+
+    <!-- CENTRO -->
+    <nav class="main-nav">
+
+        <button id="btnModelo">
+            3D
+        </button>
+
+        <button id="btnRecorrido">
+            360°
+        </button>
+
+        <button id="btnGaleria">
+            Galería
+        </button>
+
+        <button id="btnPlanos">
+            Planos
+        </button>
+
+    </nav>
+
+
+    <!-- DERECHA -->
+    <div class="header-actions">
+
+        <button id="volverBtn">
+            Volver
+        </button>
+
+        <button id="btnFullscreen" class="fullscreen-btn">
+            ⛶
+        </button>
+
+    </div>
+
+
+    <!-- MOBILE -->
+    <button id="menuToggle" class="menu-toggle">
+        ☰
+    </button>
+
+</header>
     <!-- ========================= -->
     <!-- Intro -->
     <!-- ========================= -->
@@ -25,15 +83,15 @@
     <section id="intro">
         <model-viewer
             id="modelo"
-            src="modelo2.glb"
+            src="modelos/proyecto8.glb"
             camera-controls
-            camera-orbit="0deg 50deg auto"
+            camera-orbit="0deg 50deg 70%"
             max-camera-orbit="auto 90deg auto"
             auto-rotate
             auto-rotate-delay="0"
             rotation-per-second="12deg"
             shadow-intensity="1"
-            exposure="0.8"
+            exposure=".9"
             touch-action="pan-y">
         </model-viewer>
 
@@ -73,47 +131,6 @@
             <span class="navigation-label">Ir</span>
         </div>
     </main>
-
-    <!-- ========================= -->
-    <!-- Barra superior -->
-    <!-- ========================= -->
-
-    <header class="topbar">
-
-        <button id="menuToggle" class="menu-toggle">
-            ☰
-        </button>
-
-        <div class="actions">
-            <div class="project">
-
-                <h1>Departamento Residencial</h1>
-
-                <span>Unidad tipo A | 4 ambientes</span>
-
-            </div>
-
-            <button id="volverBtn">
-
-                Volver
-
-            </button>
-
-            <button id="btnAutorotate">
-
-                Girar
-
-            </button>
-
-            <button id="btnFullscreen">
-
-                Pantalla Completa
-
-            </button>
-
-        </div>
-
-    </header>
 
     <!-- ========================= -->
     <!-- Información -->

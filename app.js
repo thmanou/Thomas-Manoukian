@@ -1,541 +1,1049 @@
-//   Panorama Viewer v1.0
+// ======================================================
+// PANORAMA VIEWER
+// Sistema escalable mediante proyectos.json
+// ======================================================
 
-//======================================================
-// ELEMENTOS
-//======================================================
+
+// ======================================================
+// ELEMENTOS HTML
+// ======================================================
 
 const intro = document.getElementById("intro");
 const panoElement = document.getElementById("pano");
 const loader = document.getElementById("loader");
-const btnAutorotate = document.getElementById("btnAutorotate");
-const btnFullscreen = document.getElementById("btnFullscreen");
-const volverBtn = document.getElementById("volverBtn");
-const enterButton = document.getElementById("enterButton");
-const model = document.getElementById("modelo");
-const viewerContainer = document.getElementById("viewer-container");
-const viewer = new Marzipano.Viewer(panoElement, {
-    controls: {
-        mouseViewMode: "drag"
-    }
-});
-const indicator = document.querySelector(".scroll-indicator");
-const topbar = document.querySelector(".topbar");
+
+const btnAutorotate =
+    document.getElementById("btnAutorotate");
+
+const btnFullscreen =
+    document.getElementById("btnFullscreen");
+
+const volverBtn =
+    document.getElementById("volverBtn");
+
+const enterButton =
+    document.getElementById("enterButton");
+
+const model =
+    document.getElementById("modelo");
+
+const viewerContainer =
+    document.getElementById("viewer-container");
+
+const indicator =
+    document.querySelector(".scroll-indicator");
+
+const topbar =
+    document.querySelector(".topbar");
+
+const menuToggle =
+    document.getElementById("menuToggle");
+
+const mainNav =
+    document.querySelector(".main-nav");
+
+const headerActions =
+    document.querySelector(".header-actions");
+
+const params = new URLSearchParams(window.location.search);
+
+const proyectoId = params.get("id");
+
+console.log("Proyecto solicitado:", proyectoId);
+
+// ======================================================
+// INDICADOR DE NAVEGACIÓN
+// ======================================================
+
 const navigationIndicator =
-    document.getElementById("navigation-indicator");
+    document.getElementById(
+        "navigation-indicator"
+    );
 
 const navigationArrow =
-    document.querySelector(".navigation-arrow");
+    document.querySelector(
+        ".navigation-arrow"
+    );
 
 const navigationLabel =
-    document.querySelector(".navigation-label");
-
-volverBtn.addEventListener("click", () => {
-    window.location.href = "index.html";
-});
-
-/* =======================================================
-   modelo
-======================================================= */
+    document.querySelector(
+        ".navigation-label"
+    );
 
 
+// ======================================================
+// MARZIPANO VIEWER
+// ======================================================
+
+const viewer =
+    new Marzipano.Viewer(
+        panoElement,
+        {
+            controls: {
+                mouseViewMode: "drag"
+            }
+        }
+    );
+
+
+// ======================================================
+// VARIABLES DEL PROYECTO
+// ======================================================
+
+let proyectoActual = null;
+
+let tour = {};
+
+let scenes = {};
+
+let currentScene = null;
+
+let navigationHotspots = [];
+
+
+// ======================================================
+// GEOMETRÍA
+// ======================================================
+
+const geometry =
+    new Marzipano.EquirectGeometry([
+        {
+            width: 6000
+        }
+    ]);
+
+
+// ======================================================
+// LIMITADOR DE CÁMARA
+// ======================================================
+
+const limiter =
+    Marzipano.RectilinearView.limit.traditional(
+        4096,
+        120 * Math.PI / 180
+    );
+
+
+// ======================================================
+// ESTADO INICIAL
+// ======================================================
 
 viewerContainer.style.display = "none";
 
-window.addEventListener("load",()=>{
+loader.style.display = "none";
 
-    loader.style.display = "none";
+if (indicator) {
+    indicator.style.display = "none";
+}
 
-    topbar.style.display="none";
+if (navigationIndicator) {
+    navigationIndicator.style.display = "none";
+}
 
-    indicator.style.display="none";
 
-});
+// ======================================================
+// BOTÓN VOLVER
+// ======================================================
 
-enterButton.addEventListener("click", () => {
+if (volverBtn) {
 
+    volverBtn.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "index.html";
+
+        }
+    );
+
+}
+
+
+// ======================================================
+// BOTÓN INGRESAR
+// ======================================================
+
+if (enterButton) {
+
+    enterButton.addEventListener(
+        "click",
+        iniciarRecorrido
+    );
+
+}
+
+
+// ======================================================
+// INICIAR RECORRIDO
+// ======================================================
+
+function iniciarRecorrido() {
+
+    // Ocultar botón / intro
     intro.classList.add("fade");
+
 
     setTimeout(() => {
 
         intro.style.display = "none";
 
+
+        // Mostrar loader
         loader.style.display = "flex";
 
-        setTimeout(() => {
 
-            loader.style.display = "none";
+        // Esperamos un poco para
+        // que termine la transición
+        setTimeout(async () => {
 
-            viewerContainer.style.display = "block";
+            try {
 
-            topbar.style.display = "flex";
+                // Mostrar viewer
+                viewerContainer.style.display =
+                    "block";
 
-            indicator.style.display = "block";
 
-            currentScene.switchTo();
+                // Mostrar interfaz
 
-        }, 1500);
+
+                if (indicator) {
+                    indicator.style.display =
+                        "block";
+                }
+
+
+                // MUY IMPORTANTE:
+                // actualizar tamaño de Marzipano
+                viewer.updateSize();
+
+
+                // Cargar proyecto
+                await cargarProyecto();
+
+
+                // Ocultar loader
+                loader.classList.add("hidden");
+
+
+                // Pequeño retraso para asegurar
+                // que el contenedor tenga tamaño
+                requestAnimationFrame(() => {
+
+                    viewer.updateSize();
+
+                    if (currentScene) {
+
+                        currentScene.switchTo();
+
+                    }
+
+                });
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error iniciando recorrido:",
+                    error
+                );
+
+            }
+
+        }, 500);
 
     }, 700);
 
-});
-
-viewerContainer.style.display = "block";
-
-//======================================================
-// OCULTAR MENU
-//======================================================
-
-const menuToggle = document.getElementById("menuToggle");
-const actions = document.querySelector(".actions");
-
-menuToggle.addEventListener("click", () => {
-    actions.classList.toggle("open");
-
-});
-
-
-//======================================================
-// GEOMETRÍA
-//======================================================
-
-const geometry = new Marzipano.EquirectGeometry([
-    {
-        width: 6000
-    }
-]);
-
-// Esperar un frame para que el navegador calcule el tamaño
-requestAnimationFrame(() => {
-    viewer.updateSize();
-    currentScene.switchTo();
-});
-
-//======================================================
-// LIMITADOR DE CÁMARA
-//======================================================
-
-const limiter = Marzipano.RectilinearView.limit.traditional(
-    4096,
-    120 * Math.PI / 180
-);
-
-//======================================================
-// TOUR
-//======================================================
-
-const tour = {
-
-    living: {
-
-        image: "panoramas/Panorama(1).jpg",
-
-        hotspots: [
-
-            {
-                target: "bano",
-                yaw: -2,
-                pitch: 0.45
-            },
-            {
-                target: "habitacion1",
-                yaw: -1.5,
-                pitch: 0.50
-            },
-            {
-                target: "cocina",
-                yaw: -15.5,
-                pitch: 0.35
-            }
-        ]
-
-    },
-
-    bano: {
-
-        image: "panoramas/Panoramabaño1.jpg",
-
-        hotspots: [
-
-            {
-                target: "living",
-                yaw: 1.5,
-                pitch: 0.35
-            }
-
-        ]
-
-    },
-
-    habitacion1: {
-
-        image: "panoramas/Panorama(6).jpg",
-
-        hotspots: [
-
-            {
-                target: "living",
-                yaw: 1.5,
-                pitch: 0.35
-            }
-
-        ]
-
-    },
-
-    cocina: {
-
-        image: "panoramas/Panorama(5).jpg",
-        hotspots: [
-            {
-                target: "living",
-                yaw: 4.5,
-                pitch: 0.35
-            }
-
-        ]
-
-    }
-
-    // Agregar nuevas escenas aquí
-
-    /*
-    cocina: {
-
-        image: "panoramas/PanoramaCocina.jpg",
-
-        hotspots: [
-
-            {
-                target:"living",
-                yaw:0.8,
-                pitch:-0.12
-            }
-
-        ]
-
-    }
-    */
-
-};
-
-//======================================================
-// CREAR ESCENAS
-//======================================================
-
-const scenes = {};
-
-for (const id in tour) {
-
-    const data = tour[id];
-
-    const source = Marzipano.ImageUrlSource.fromString(data.image);
-
-    const view = new Marzipano.RectilinearView(
-        {
-            yaw: 0,
-            pitch: 0,
-            fov: Math.PI / 2
-        },
-        limiter
-    );
-
-    scenes[id] = viewer.createScene({
-        source,
-        geometry,
-        view,
-        pinFirstLevel: true
-    });
-
 }
 
-//======================================================
-// CAMBIO DE ESCENA
-//======================================================
 
-let currentScene = scenes.living;
+// ======================================================
+// CARGAR PROYECTO DESDE JSON
+// ======================================================
 
-function changeScene(id) {
+async function cargarProyecto() {
 
-    currentScene = scenes[id];
+    console.log("Cargando proyecto...");
+    console.log("ID recibido desde URL:", proyectoId);
 
-    currentScene.switchTo({
-        transitionDuration: 1000
-    });
+    try {
 
-}
+        // Cargar proyectos.json
+        const response = await fetch("proyectos.json");
 
-//======================================================
-// CREAR HOTSPOTS
-//======================================================
+        if (!response.ok) {
+            throw new Error(
+                `No se pudo cargar proyectos.json (${response.status})`
+            );
+        }
 
-const navigationHotspots = [];
+        const proyectos = await response.json();
 
-for (const id in tour) {
-
-    const scene = scenes[id];
-
-    tour[id].hotspots.forEach(h => {
-
-        const hotspot = document.createElement("div");
-
-        hotspot.className = "hotspot";
-
-        hotspot.innerHTML = `
-            <div class="hotspot-dot"></div>
-        `;
-
-        hotspot.onclick = () => {
-
-            changeScene(h.target);
-
-        };
-
-        scene.hotspotContainer().createHotspot(
-            hotspot,
-            {
-                yaw: h.yaw,
-                pitch: h.pitch
-            }
+        // Buscar el proyecto según ?id=
+        proyectoActual = proyectos.find(
+            proyecto => proyecto.id === proyectoId
         );
 
-        navigationHotspots.push({
-            sceneId: id,
-            target: h.target,
-            yaw: h.yaw,
-            pitch: h.pitch
-        });
+        // Verificar que exista
+        if (!proyectoActual) {
 
-    });
-
-}
-
-function updateNavigationIndicator(){
-
-    if(!currentScene){
-        return;
-    }
-
-    const currentView = currentScene.view();
-
-    const cameraYaw = currentView.yaw();
-
-    const availableHotspots =
-        navigationHotspots.filter(
-            hotspot => hotspot.sceneId === getCurrentSceneId()
-        );
-
-    if(availableHotspots.length === 0){
-
-        navigationIndicator.style.display = "none";
-
-        return;
-
-    }
-
-    // Buscar el hotspot más cercano a la dirección actual
-    let closestHotspot = null;
-    let smallestAngle = Infinity;
-
-    availableHotspots.forEach(hotspot => {
-
-        let difference =
-            normalizeAngle(hotspot.yaw - cameraYaw);
-
-        const absoluteDifference =
-            Math.abs(difference);
-
-        if(absoluteDifference < smallestAngle){
-
-            smallestAngle = absoluteDifference;
-
-            closestHotspot = hotspot;
+            throw new Error(
+                `No existe el proyecto: ${proyectoId}`
+            );
 
         }
 
-    });
-
-    if(!closestHotspot){
-        return;
-    }
-
-    let angle =
-        normalizeAngle(
-            closestHotspot.yaw - cameraYaw
+        console.log(
+            "Proyecto encontrado:",
+            proyectoActual
         );
 
-    // Si está prácticamente enfrente,
-    // la flecha apunta hacia arriba.
+        // Verificar recorrido 360
+        if (
+            !proyectoActual.recorrido360 ||
+            !proyectoActual.recorrido360.activo
+        ) {
+
+            throw new Error(
+                "Este proyecto no tiene recorrido 360 activo."
+            );
+
+        }
+
+        // Obtener panoramas
+        tour =
+            proyectoActual.recorrido360.panoramas;
+
+        if (!tour) {
+
+            throw new Error(
+                "El proyecto no contiene panoramas."
+            );
+
+        }
+
+        // Crear escenas
+        crearEscenas();
+
+        // Crear hotspots
+        crearHotspots();
+
+        // Panorama inicial
+        const panoramaInicial =
+            proyectoActual.recorrido360.panoramaInicial;
+
+        if (!scenes[panoramaInicial]) {
+
+            throw new Error(
+                `No existe el panorama inicial: ${panoramaInicial}`
+            );
+
+        }
+
+        currentScene =
+            scenes[panoramaInicial];
+
+        // Mostrar escena
+        requestAnimationFrame(() => {
+
+            viewer.updateSize();
+
+            currentScene.switchTo();
+
+        });
+
+        console.log(
+            "Recorrido iniciado correctamente."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Error cargando proyecto:",
+            error
+        );
+
+    }
+
+}
+
+
+// ======================================================
+// CREAR ESCENAS
+// ======================================================
+
+function crearEscenas() {
+
+    scenes = {};
+
+
+    for (const id in tour) {
+
+        const data =
+            tour[id];
+
+
+        // ----------------------------------------------
+        // Imagen
+        // ----------------------------------------------
+
+        const source =
+            Marzipano.ImageUrlSource
+                .fromString(
+                    data.imagen
+                );
+
+
+        // ----------------------------------------------
+        // Cámara
+        // ----------------------------------------------
+
+        const view =
+            new Marzipano.RectilinearView(
+                {
+
+                    yaw:
+                        data.yawInicial ||
+                        0,
+
+                    pitch:
+                        data.pitchInicial ||
+                        0,
+
+                    fov:
+                        (data.fov || 90)
+                        * Math.PI / 180
+
+                },
+
+                limiter
+
+            );
+
+
+        // ----------------------------------------------
+        // Crear escena
+        // ----------------------------------------------
+
+        scenes[id] =
+            viewer.createScene({
+
+                source: source,
+
+                geometry: geometry,
+
+                view: view,
+
+                pinFirstLevel: true
+
+            });
+
+    }
+
+
+    console.log(
+        "Escenas creadas:",
+        scenes
+    );
+
+}
+
+
+// ======================================================
+// CREAR HOTSPOTS
+// ======================================================
+
+function crearHotspots() {
+
+    navigationHotspots = [];
+
+
+    for (const id in tour) {
+
+        const escena =
+            scenes[id];
+
+
+        const hotspots =
+            tour[id].hotspots ||
+            [];
+
+
+        hotspots.forEach(
+            hotspotData => {
+
+
+                // --------------------------------------
+                // Crear elemento
+                // --------------------------------------
+
+                const hotspot =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                hotspot.className =
+                    "hotspot";
+
+
+                hotspot.innerHTML = `
+                    <div class="hotspot-dot"></div>
+                `;
+
+
+                // --------------------------------------
+                // Click
+                // --------------------------------------
+
+                hotspot.addEventListener(
+                    "click",
+                    () => {
+
+                        changeScene(
+                            hotspotData.target
+                        );
+
+                    }
+                );
+
+
+                // --------------------------------------
+                // Agregar a Marzipano
+                // --------------------------------------
+
+                escena
+                    .hotspotContainer()
+                    .createHotspot(
+
+                        hotspot,
+
+                        {
+
+                            yaw:
+                                hotspotData.yaw,
+
+                            pitch:
+                                hotspotData.pitch
+
+                        }
+
+                    );
+
+
+                // --------------------------------------
+                // Guardar para flecha
+                // --------------------------------------
+
+                navigationHotspots.push({
+
+                    sceneId:
+                        id,
+
+                    target:
+                        hotspotData.target,
+
+                    yaw:
+                        hotspotData.yaw,
+
+                    pitch:
+                        hotspotData.pitch,
+
+                    nombre:
+                        hotspotData.nombre ||
+                        hotspotData.target
+
+                });
+
+            }
+        );
+
+    }
+
+
+    console.log(
+        "Hotspots creados:",
+        navigationHotspots
+    );
+
+}
+
+
+// ======================================================
+// CAMBIAR DE ESCENA
+// ======================================================
+
+function changeScene(id) {
+
+    if (!scenes[id]) {
+
+        console.error(
+            `No existe la escena: ${id}`
+        );
+
+        return;
+
+    }
+
+
+    currentScene =
+        scenes[id];
+
+
+    currentScene.switchTo({
+
+        transitionDuration: 1000
+
+    });
+
+}
+
+
+// ======================================================
+// OBTENER ID DE ESCENA ACTUAL
+// ======================================================
+
+function getCurrentSceneId() {
+
+    for (
+        const id in scenes
+    ) {
+
+        if (
+            scenes[id] ===
+            currentScene
+        ) {
+
+            return id;
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+// ======================================================
+// NORMALIZAR ÁNGULO
+// ======================================================
+
+function normalizeAngle(angle) {
+
+    while (
+        angle > Math.PI
+    ) {
+
+        angle -=
+            Math.PI * 2;
+
+    }
+
+
+    while (
+        angle < -Math.PI
+    ) {
+
+        angle +=
+            Math.PI * 2;
+
+    }
+
+
+    return angle;
+
+}
+
+
+// ======================================================
+// ACTUALIZAR FLECHA
+// ======================================================
+
+function updateNavigationIndicator() {
+
+    if (
+        !currentScene ||
+        !navigationIndicator
+    ) {
+
+        return;
+
+    }
+
+
+    const currentView =
+        currentScene.view();
+
+
+    const cameraYaw =
+        currentView.yaw();
+
+
+    const currentSceneId =
+        getCurrentSceneId();
+
+
+    const availableHotspots =
+        navigationHotspots.filter(
+            hotspot =>
+                hotspot.sceneId ===
+                currentSceneId
+        );
+
+
+    if (
+        availableHotspots.length === 0
+    ) {
+
+        navigationIndicator.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    // ----------------------------------------------
+    // Buscar hotspot más cercano
+    // ----------------------------------------------
+
+    let closestHotspot = null;
+
+    let smallestAngle =
+        Infinity;
+
+
+    availableHotspots.forEach(
+        hotspot => {
+
+            const difference =
+                normalizeAngle(
+                    hotspot.yaw -
+                    cameraYaw
+                );
+
+
+            const absoluteDifference =
+                Math.abs(
+                    difference
+                );
+
+
+            if (
+                absoluteDifference <
+                smallestAngle
+            ) {
+
+                smallestAngle =
+                    absoluteDifference;
+
+                closestHotspot =
+                    hotspot;
+
+            }
+
+        }
+    );
+
+
+    if (!closestHotspot) {
+
+        return;
+
+    }
+
+
+    // ----------------------------------------------
+    // Dirección
+    // ----------------------------------------------
+
+    const angle =
+        normalizeAngle(
+
+            closestHotspot.yaw -
+            cameraYaw
+
+        );
+
+
     const rotation =
-        angle * 180 / Math.PI;
+        angle *
+        180 /
+        Math.PI;
+
 
     navigationArrow.style.transform =
         `rotate(${rotation}deg)`;
 
+
     navigationLabel.textContent =
-        getSceneName(closestHotspot.target);
+        closestHotspot.nombre;
+
 
     navigationIndicator.style.display =
         "flex";
-}
-
-function normalizeAngle(angle){
-
-    while(angle > Math.PI){
-        angle -= Math.PI * 2;
-    }
-
-    while(angle < -Math.PI){
-        angle += Math.PI * 2;
-    }
-
-    return angle;
-}
-
-function getCurrentSceneId(){
-
-    for(const id in scenes){
-
-        if(scenes[id] === currentScene){
-            return id;
-        }
-
-    }
-
-    return null;
-}
-
-function getSceneName(id){
-
-    const names = {
-
-        living: "Living",
-
-        bano: "Baño",
-
-        habitacion1: "Habitación",
-
-        cocina: "Cocina"
-
-    };
-
-    return names[id] || id;
 
 }
 
-function navigationLoop(){
+
+// ======================================================
+// LOOP DE NAVEGACIÓN
+// ======================================================
+
+function navigationLoop() {
 
     updateNavigationIndicator();
 
-    requestAnimationFrame(navigationLoop);
+
+    requestAnimationFrame(
+        navigationLoop
+    );
+
 }
 
+
 navigationLoop();
-//======================================================
-// LOADER
-//======================================================
 
-window.addEventListener("load", () => {
 
-    setTimeout(() => {
+// ======================================================
+// MENÚ MOBILE
+// ======================================================
 
-        loader.classList.add("hidden");
+if (menuToggle) {
 
-    }, 400);
+    menuToggle.addEventListener("click", () => {
 
-});
+        if (mainNav) {
+            mainNav.classList.toggle("open");
+        }
 
-//======================================================
-// AUTOROTACIÓN
-//======================================================
+        if (headerActions) {
+            headerActions.classList.toggle("open");
+        }
 
-const autorotate = Marzipano.autorotate({
+        menuToggle.classList.toggle("active");
 
-    yawSpeed: 0.03,
+    });
 
-    targetPitch: 0,
+}
 
-    targetFov: Math.PI / 1
 
-});
+// ======================================================
+// AUTORROTACIÓN
+// ======================================================
 
-let autoEnabled = true;
+const autorotate =
+    Marzipano.autorotate({
+
+        yawSpeed:
+            0.03,
+
+        targetPitch:
+            0,
+
+        targetFov:
+            Math.PI / 1
+
+    });
+
+
+let autoEnabled =
+    true;
+
 
 viewer.setIdleMovement(
     2500,
     autorotate
 );
 
-viewer.startMovement(autorotate);
 
-//======================================================
-// BOTÓN AUTOROTACIÓN
-//======================================================
+// ======================================================
+// BOTÓN AUTORROTACIÓN
+// ======================================================
 
-btnAutorotate.addEventListener("click", () => {
+if (btnAutorotate) {
 
-    if (autoEnabled) {
+    btnAutorotate.addEventListener(
+        "click",
+        () => {
 
-        viewer.stopMovement();
-        viewer.setIdleMovement(Infinity);
+            if (autoEnabled) {
 
-        btnAutorotate.innerHTML = "Girar";
+                viewer.stopMovement();
 
-        autoEnabled = false;
+                viewer.setIdleMovement(
+                    Infinity
+                );
 
-    } else {
 
-        viewer.startMovement(autorotate);
-        viewer.setIdleMovement(2500, autorotate);
+                btnAutorotate.innerHTML =
+                    "Girar";
 
-        btnAutorotate.innerHTML = "Detener";
 
-        autoEnabled = true;
+                autoEnabled =
+                    false;
 
-    }
+            } else {
 
-});
+                viewer.startMovement(
+                    autorotate
+                );
 
-//======================================================
-// FULLSCREEN
-//======================================================
 
-btnFullscreen.addEventListener("click", () => {
+                viewer.setIdleMovement(
+                    2500,
+                    autorotate
+                );
 
-    if (!document.fullscreenElement) {
 
-        document.documentElement.requestFullscreen();
+                btnAutorotate.innerHTML =
+                    "Detener";
 
-    } else {
 
-        document.exitFullscreen();
+                autoEnabled =
+                    true;
 
-    }
+            }
 
-});
-
-//======================================================
-// DOBLE CLICK PARA CENTRAR
-//======================================================
-
-panoElement.addEventListener("dblclick", () => {
-
-    currentScene.lookTo(
-        {
-            yaw: 0,
-            pitch: 0,
-            fov: Math.PI / 2
-        },
-        {
-            transitionDuration: 1000
         }
     );
 
-});
+}
 
-//======================================================
+
+// ======================================================
+// FULLSCREEN
+// ======================================================
+
+if (btnFullscreen) {
+
+    btnFullscreen.addEventListener(
+        "click",
+        () => {
+
+            if (
+                !document.fullscreenElement
+            ) {
+
+                document.documentElement
+                    .requestFullscreen();
+
+            } else {
+
+                document.exitFullscreen();
+
+            }
+
+        }
+    );
+
+}
+
+
+// ======================================================
+// DOBLE CLICK → CENTRAR
+// ======================================================
+
+if (panoElement) {
+
+    panoElement.addEventListener(
+        "dblclick",
+        () => {
+
+            if (!currentScene) {
+                return;
+            }
+
+
+            currentScene.lookTo(
+
+                {
+
+                    yaw: 0,
+
+                    pitch: 0,
+
+                    fov:
+                        Math.PI / 2
+
+                },
+
+                {
+
+                    transitionDuration:
+                        1000
+
+                }
+
+            );
+
+        }
+    );
+
+}
+// ======================================================
+// VOLVER AL MODELO
+// ======================================================
+const btnModelo = document.getElementById("btnModelo");
+
+if (btnModelo) {
+
+    btnModelo.addEventListener("click", () => {
+
+        viewerContainer.style.display = "none";
+
+        intro.style.display = "block";
+
+        intro.classList.remove("fade");
+
+    });
+
+}
+// ======================================================
+// VOLVER A GALERIA
+// ======================================================
+const btnGaleria = document.getElementById("btnGaleria");
+
+if (btnGaleria) {
+
+    btnGaleria.addEventListener("click", () => {
+
+        window.location.href =
+            `galeria.html?id=${proyectoId}`;
+
+    });
+
+}
+// ======================================================
+// VOLVER A PLANOS
+// ======================================================
+const btnPlanos = document.getElementById("btnPlanos");
+
+if (btnPlanos) {
+
+    btnPlanos.addEventListener("click", () => {
+
+        window.location.href =
+            `planos.html?id=${proyectoId}`;
+
+    });
+
+}
+
+// ======================================================
 // DEBUG
-//======================================================
+// ======================================================
 
-window.viewer = viewer;
-window.scenes = scenes;
-window.tour = tour;
+window.viewer =
+    viewer;
+
+window.scenes =
+    scenes;
+
+window.tour =
+    tour;
+
+window.proyectoActual =
+    proyectoActual;
