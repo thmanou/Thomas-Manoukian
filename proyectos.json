@@ -254,6 +254,13 @@
                         "yaw": -2.93,
                         "pitch": 0.35,
                         "nombre": "Cocina"
+                    },
+
+                    {
+                        "target": "habitacion2",
+                        "yaw": -4.93,
+                        "pitch": 0.35,
+                        "nombre": "Habitacion"
                     }
 
                 ]
@@ -326,6 +333,92 @@
                         "yaw": 4.5,
                         "pitch": 0.35,
                         "nombre": "Living"
+                    }
+
+                ]
+
+            },
+
+
+            "habitacion2": {
+
+                "nombre": "Habitación principal",
+
+                "imagen": "panoramas/proyecto8/habitacion2.jpg",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "living",
+                        "yaw": -3.5,
+                        "pitch": 0.35,
+                        "nombre": "Living"
+                    },
+
+                    {
+                        "target": "Vestidor",
+                        "yaw": 1.5,
+                        "pitch": 0.75,
+                        "nombre": "Vestidor"
+                    }
+
+                ]
+
+            },
+
+
+            "Vestidor": {
+
+                "nombre": "Vestidor",
+
+                "imagen": "panoramas/proyecto8/vestidor.jpg",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "habitacion2",
+                        "yaw": -3.5,
+                        "pitch": 0.75,
+                        "nombre": "Habitacion principal"
+                    },
+
+                    {
+                        "target": "Bano2",
+                        "yaw": -0.1,
+                        "pitch": 0.65,
+                        "nombre": "Baño 2"
+                    }
+
+                ]
+
+            },
+
+
+            "Bano2": {
+
+                "nombre": "Baño 2",
+
+                "imagen": "panoramas/proyecto8/Baño2.jpg",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "Vestidor",
+                        "yaw": 3,
+                        "pitch": 0.25,
+                        "nombre": "Ventidor"
                     }
 
                 ]
