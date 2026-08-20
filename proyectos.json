@@ -226,7 +226,7 @@
             "living": {
 
                 "nombre": "Living",
-
+                "miniatura": "images/proyecto8-4.jpg",
                 "imagen": "panoramas/proyecto8/living.jpg",
 
                 "yawInicial": 0,
@@ -258,8 +258,8 @@
 
                     {
                         "target": "habitacion2",
-                        "yaw": -4.93,
-                        "pitch": 0.35,
+                        "yaw": -4.83,
+                        "pitch": 0.55,
                         "nombre": "Habitacion"
                     }
 
@@ -271,7 +271,7 @@
             "bano": {
 
                 "nombre": "Baño",
-
+                "miniatura": "images/proyecto8-5.jpg",
                 "imagen": "panoramas/proyecto8/bano1.jpg",
 
                 "yawInicial": 0,
@@ -295,7 +295,7 @@
             "habitacion1": {
 
                 "nombre": "Habitación",
-
+                "miniatura": "images/proyecto8-6.jpg",
                 "imagen": "panoramas/proyecto8/habitacion1.jpg",
 
                 "yawInicial": 0,
@@ -319,7 +319,7 @@
             "cocina": {
 
                 "nombre": "Cocina",
-
+                "miniatura": "images/proyecto8-7.jpg",
                 "imagen": "panoramas/proyecto8/cocina.jpg",
 
                 "yawInicial": 0,
@@ -343,7 +343,7 @@
             "habitacion2": {
 
                 "nombre": "Habitación principal",
-
+                "miniatura": "images/proyecto8-8.jpg",
                 "imagen": "panoramas/proyecto8/habitacion2.jpg",
 
                 "yawInicial": 0,
@@ -354,8 +354,8 @@
 
                     {
                         "target": "living",
-                        "yaw": -3.5,
-                        "pitch": 0.35,
+                        "yaw": -3.3,
+                        "pitch": 0.55,
                         "nombre": "Living"
                     },
 
@@ -374,7 +374,7 @@
             "Vestidor": {
 
                 "nombre": "Vestidor",
-
+                "miniatura": "images/proyecto8-8.jpg",
                 "imagen": "panoramas/proyecto8/vestidor.jpg",
 
                 "yawInicial": 0,
@@ -405,7 +405,7 @@
             "Bano2": {
 
                 "nombre": "Baño 2",
-
+                "miniatura": "images/proyecto8-3.jpg",
                 "imagen": "panoramas/proyecto8/Baño2.jpg",
 
                 "yawInicial": 0,
@@ -417,8 +417,8 @@
                     {
                         "target": "Vestidor",
                         "yaw": 3,
-                        "pitch": 0.25,
-                        "nombre": "Ventidor"
+                        "pitch": 0.55,
+                        "nombre": "Vestidor"
                     }
 
                 ]

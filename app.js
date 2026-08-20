@@ -45,6 +45,13 @@ const mainNav =
 const headerActions =
     document.querySelector(".header-actions");
 
+const panoramaGallery =
+    document.getElementById("panorama-gallery");
+
+
+const panoramaGalleryTrack =
+    document.getElementById("panorama-gallery-track");
+
 const params = new URLSearchParams(window.location.search);
 
 const proyectoId = params.get("id");
@@ -328,6 +335,9 @@ async function cargarProyecto() {
         // Crear hotspots
         crearHotspots();
 
+        // Crear galería de panorámicas
+        createPanoramaGallery(tour);
+
         // Panorama inicial
         const panoramaInicial =
             proyectoActual.recorrido360.panoramaInicial;
@@ -596,9 +606,317 @@ function changeScene(id) {
 
     });
 
+     updateActiveGalleryItem(id);
+}
+
+function updateActiveGalleryItem(id) {
+
+    const cards =
+        document.querySelectorAll(".panorama-card");
+
+    cards.forEach(card => {
+
+        card.classList.remove("active");
+
+    });
+
+    const activeCard =
+        document.querySelector(
+            `.panorama-card[data-scene="${id}"]`
+        );
+
+    if (activeCard) {
+
+        activeCard.classList.add("active");
+
+        activeCard.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+            inline: "center"
+        });
+
+    }
+
+}
+
+function createPanoramaGallery(panoramas) {
+
+    panoramaGalleryTrack.innerHTML = "";
+
+    for (const id in panoramas) {
+
+        const panorama = panoramas[id];
+
+        console.log("Creando tarjeta:", id);
+        console.log("Imagen:", panorama.imagen);
+        console.log("Miniatura:", panorama.miniatura);
+
+        const card = document.createElement("div");
+
+        card.className = "panorama-card";
+
+        card.dataset.scene = id;
+
+        const imagePath =
+            panorama.miniatura || panorama.imagen;
+
+        card.innerHTML = `
+            <img 
+                src="${imagePath}"
+                alt="${panorama.nombre || id}"
+            >
+
+            <span>
+                ${panorama.nombre || id}
+            </span>
+        `;
+
+        card.addEventListener("click", () => {
+
+            if (galleryMoved) {
+                event.preventDefault();
+                event.stopPropagation();
+                return;
+            }
+
+            changeScene(id);
+
+        });
+
+        panoramaGalleryTrack.appendChild(card);
+
+    }
+}
+
+// ======================================================
+// CARRUSEL ARRASTRABLE
+// ======================================================
+
+const gallery =
+    document.getElementById("panorama-gallery");
+
+const galleryTrack =
+    document.getElementById("panorama-gallery-track");
+
+let isDraggingGallery = false;
+
+let galleryStartX = 0;
+let galleryCurrentX = 0;
+let galleryStartOffset = 0;
+
+let galleryMoved = false;
+
+
+// ------------------------------------------------------
+// OBTENER POSICIÓN ACTUAL
+// ------------------------------------------------------
+
+function getGalleryOffset() {
+
+    const transform =
+        window.getComputedStyle(galleryTrack)
+            .transform;
+
+    if (transform === "none") {
+        return 0;
+    }
+
+    const matrix =
+        new DOMMatrix(transform);
+
+    return matrix.m41;
 }
 
 
+// ------------------------------------------------------
+// LIMITAR MOVIMIENTO
+// ------------------------------------------------------
+
+function limitGalleryOffset(offset) {
+
+    const containerWidth =
+        panoramaGallery.getBoundingClientRect().width;
+
+    const trackWidth =
+        panoramaGalleryTrack.getBoundingClientRect().width;
+
+    // Hasta dónde podemos desplazar hacia la izquierda
+    const maxOffset =
+        containerWidth - trackWidth;
+
+    // Si el contenido entra completo, no desplazamos
+    if (maxOffset >= 0) {
+        return 0;
+    }
+
+    return Math.max(
+        maxOffset,
+        Math.min(0, offset)
+    );
+}
+
+
+// ------------------------------------------------------
+// MOVER GALERÍA
+// ------------------------------------------------------
+
+function moveGallery(offset) {
+
+    const limitedOffset =
+        limitGalleryOffset(offset);
+
+    panoramaGalleryTrack.style.transform =
+        `translate3d(${limitedOffset}px, 0, 0)`;
+
+}
+
+
+// ======================================================
+// MOUSE
+// ======================================================
+
+gallery.addEventListener("mousedown", (event) => {
+
+    isDraggingGallery = true;
+
+    galleryMoved = false;
+
+    galleryStartX = event.clientX;
+
+    galleryStartOffset =
+        getGalleryOffset();
+
+    gallery.classList.add("dragging");
+
+});
+
+
+document.addEventListener("mousemove", (event) => {
+
+    if (!isDraggingGallery) {
+        return;
+    }
+
+    const difference =
+        event.clientX - galleryStartX;
+
+    if (Math.abs(difference) > 5) {
+        galleryMoved = true;
+    }
+
+    moveGallery(
+        galleryStartOffset + difference
+    );
+
+});
+
+
+document.addEventListener("mouseup", () => {
+
+    if (!isDraggingGallery) {
+        return;
+    }
+
+    isDraggingGallery = false;
+
+    gallery.classList.remove("dragging");
+
+});
+
+
+// ======================================================
+// TOUCH
+// ======================================================
+
+gallery.addEventListener("touchstart", (event) => {
+
+    const touch =
+        event.touches[0];
+
+    isDraggingGallery = true;
+
+    galleryMoved = false;
+
+    galleryStartX =
+        touch.clientX;
+
+    galleryStartOffset =
+        getGalleryOffset();
+
+}, {
+    passive: true
+});
+
+
+gallery.addEventListener("touchmove", (event) => {
+
+    if (!isDraggingGallery) {
+        return;
+    }
+
+    const touch =
+        event.touches[0];
+
+    const difference =
+        touch.clientX - galleryStartX;
+
+    if (Math.abs(difference) > 5) {
+        galleryMoved = true;
+    }
+
+    moveGallery(
+        galleryStartOffset + difference
+    );
+
+}, {
+    passive: true
+});
+
+
+gallery.addEventListener("touchend", () => {
+
+    isDraggingGallery = false;
+
+});
+
+
+// ======================================================
+// EVITAR CLICK AL ARRASTRAR
+// ======================================================
+
+gallery.addEventListener("click", (event) => {
+
+    if (galleryMoved) {
+
+        event.preventDefault();
+
+        event.stopPropagation();
+
+    }
+
+}, true);
+
+function updateGalleryBounds() {
+
+    const containerWidth =
+        panoramaGallery.getBoundingClientRect().width;
+
+    const trackWidth =
+        panoramaGalleryTrack.getBoundingClientRect().width;
+
+    console.log(
+        "Galería:",
+        containerWidth,
+        "Track:",
+        trackWidth
+    );
+
+    const currentOffset =
+        getGalleryOffset();
+
+    moveGallery(currentOffset);
+
+}
 // ======================================================
 // OBTENER ID DE ESCENA ACTUAL
 // ======================================================
@@ -1031,6 +1349,26 @@ if (btnPlanos) {
     });
 
 }
+
+// ======================================================
+// ACTUALIZAR GALERIA
+// ======================================================
+
+window.addEventListener("load", () => {
+
+    setTimeout(() => {
+
+        updateGalleryBounds();
+
+    }, 300);
+
+});
+
+window.addEventListener("resize", () => {
+
+    updateGalleryBounds();
+
+});
 
 // ======================================================
 // DEBUG
