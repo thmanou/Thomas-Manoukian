@@ -25,7 +25,64 @@
       "images/proyecto1-13.jpg",
       "images/proyecto1-14.jpg",
       "images/proyecto1-15.jpg"
+    ],
+        "presentacion": {
+    "imagen": "images/proyecto1-8.jpg",
+    "gif": "videos/proyecto1-general.gif",
+    "texto": "El proyecto se desarrolla un terreno irregular del barrio de Palermo, en una zona urbana caracterizada por una alta densidad edilicia y escasa presencia de espacios verdes accesibles. A partir de esta lectura contextual, una de las decisiones fundamentales del proyecto fue liberar la planta baja y destinarla a un espacio verde público. Esta operación no solo responde a una necesidad urbana, sino que también busca integrar la clínica con el entorno y fomentar el bienestar físico y emocional de los usuarios.\n\nMorfológicamente, el edificio se resuelve a partir de un volumen rectangular elevado, sostenido por dos núcleos estructurales verticales. Esta configuración permitió liberar completamente la planta baja, generando una plaza accesible y permeable que funciona como antesala del edificio, y donde se ubican usos flexibles como la cafetería y áreas de espera. \n\n La barra elevada aloja el programa repetitivo de la clínica, organizado de manera clara y funcional. Consultorios, salas de terapia, núcleos sanitarios y áreas de administración se disponen de forma eficiente, favoreciendo recorridos simples, buena iluminación natural y ventilación cruzada. La estructura permite una modulación regular que optimiza la construcción y permite flexibilidad futura. \n\nLa clínica no se concibe como un edificio aislado, sino como un espacio de salud integrado al tejido urbano. La apertura de la planta baja, sumada a los espacios verdes, invita a la comunidad a apropiarse del lugar y a convivir con la arquitectura desde lo cotidiano."
+},
+
+"plantas": [
+    {
+        "nombre": "Primer Subsuelo",
+        "imagen": "images/proyecto1-14.jpg",
+        "escala": "1:100",
+        "descripcion": "Programa privado, laboratorio de investigación, auditorio y talleres"
+    },
+    {
+        "nombre": "Planta Baja",
+        "imagen": "images/proyecto1-13.jpg",
+        "escala": "1:100",
+        "descripcion": "Programa privado, laboratorio de investigación"
+    },
+    {
+        "nombre": "Primera Planta",
+        "imagen": "images/proyecto1-12.jpg",
+        "escala": "1:100",
+        "descripcion": "Planta libre, y acceso al edificio"
+    },
+    {
+        "nombre": "Segunda Planta",
+        "imagen": "images/proyecto1-11.jpg",
+        "escala": "1:100",
+        "descripcion": "Programa cultural y áreas de exposición."
+    }
+],
+
+"corte": {
+    "imagen": "images/proyecto1-10.jpg",
+    "descripcion": "",
+    "hotspots": [
+        {
+            "x": 61,
+            "y": 28,
+            "titulo": "Programa repetitivo",
+            "texto": "Habitaciones para pacientes, administración y zonas de rehabilitación"
+        },
+        {
+            "x": 40,
+            "y": 95,
+            "titulo": "Espacio público",
+            "texto": "Cafeteria, plaza seca para el barrio y accesos hacia el edificio"
+        },
+        {
+            "x": 50,
+            "y": 50,
+            "titulo": "Zona privada",
+            "texto": "Programas de estudios clinicos para pacientes"
+        }
     ]
+}
   },
   {
     "id": "proyecto2",
@@ -64,7 +121,82 @@
       "images/proyecto2-8.jpg",
       "images/proyecto2-15.jpg"
       
+    ],
+        "presentacion": {
+    "imagen": "images/proyecto2-8.jpg",
+    "gif": "videos/proyecto2-general.gif",
+    "texto": "El proyecto se implanta en la ciudad de Haedo, en una zona urbana céntrica a menos de 500 metros de la estación de tren. En este lote se encuentra abandonada la infraestructura de la tuneladora del soterramiento del Ferrocarril Sarmiento. Este plan iba a enterrar las vías a lo largo de 30 kilómetros desde Caballito hasta Moreno, pero tras casi dos décadas fue cancelado definitivamente, habiéndo construido solo 8 kilómetros de túnel desde Haedo hasta Liniers. El proyecto toma este pozo y esta estructura abandonada como punto de partida \n\n Con el objetivo de refuncionalizar esta infraestructura obsoleta, el proyecto propone convertir el soterramiento en un reservorio hídrico. El pozo dejado por la tuneladora funcionará como un espacio de almacenamiento de agua de lluvia. De esta manera, ante fuertes tormentas, el sistema actuará como un aliviador para evitar inundaciones en la zona. Una vez que las lluvias cesen, el agua acumulada se distribuirá hacia los lugares que la necesiten. \n\n La arquitectura del proyecto consiste en un volumen prismático suspendido en el aire, sostenido por dos grúas pórtico ya existentes en el lugar. El acceso a este cuerpo elevado se realiza a través de núcleos de circulación vertical (escaleras y ascensores). Dentro de este edificio flotante se desarrollan actividades públicas y culturales, albergando una biblioteca, un bar y salas de exposición. Al elevar el edificio, la planta baja queda totalmente liberada y el volumen funciona como un techo. Esto genera una gran plaza protegida abajo para realizar actividades libres, ferias o eventos comunitarios. \n\n Este proyecto demuestra cómo una infraestructura fallida y abandonada puede transformarse en una solución para la ciudad. Al unir la gestión del agua con la creación de espacios públicos y culturales, la propuesta resuelve el problema de las inundaciones locales y, al mismo tiempo, le devuelve a los vecinos de Haedo un lugar de encuentro sustentable y con identidad propia."
+},
+
+"plantas": [
+    {
+        "nombre": "Subsuelo",
+        "imagen": "images/proyecto2-12.jpg",
+        "escala": "1:100",
+        "descripcion": "Relación con el espacio centrico de la obra"
+    },
+    {
+        "nombre": "Planta Baja",
+        "imagen": "images/proyecto2-4.jpg",
+        "escala": "1:100",
+        "descripcion": "Relación del edificio con la planta baja"
+    },
+    {
+        "nombre": "Primera Planta",
+        "imagen": "images/proyecto2-5.jpg",
+        "escala": "1:100",
+        "descripcion": "Unidades de viviendas variadas."
+    },
+    {
+        "nombre": "Segunda Planta",
+        "imagen": "images/proyecto2-14.jpg",
+        "escala": "1:100",
+        "descripcion": "Unidades de viviendas variadas."
+    },
+    {
+        "nombre": "Tercera Planta",
+        "imagen": "images/proyecto2-28.jpg",
+        "escala": "1:100",
+        "descripcion": "Unidades de viviendas variadas."
+    },
+    {
+        "nombre": "Cuarta Planta",
+        "imagen": "images/proyecto2-29.jpg",
+        "escala": "1:100",
+        "descripcion": "Viviendas con accesos a terrazas."
+    },
+    {
+        "nombre": "Terraza",
+        "imagen": "images/proyecto2-13.jpg",
+        "escala": "1:100",
+        "descripcion": "Espacios accesibles."
+    }
+],
+
+"corte": {
+    "imagen": "images/proyecto2-10.jpg",
+    "descripcion": "",
+    "hotspots": [
+        {
+            "x": 67,
+            "y": 30,
+            "titulo": "Elemento de circulación",
+            "texto": "Placas de policarbonato que diferencian los pasillos y genera espacios comunes."
+        },
+        {
+            "x": 45,
+            "y": 49,
+            "titulo": "Programa privado",
+            "texto": "Espacio para oficinas."
+        },
+        {
+            "x": 64,
+            "y": 58,
+            "titulo": "Espacio común del edificio",
+            "texto": "Programa publico para los vecinos."
+        }
     ]
+}
   },
   {
     "id": "proyecto3",
@@ -111,7 +243,64 @@
       "images/proyecto6-12.jpg",
       "images/proyecto6-13.jpg",
       "images/proyecto6-14.jpg"
+    ],
+        "presentacion": {
+    "imagen": "images/proyecto6-5.jpg",
+    "gif": "videos/proyecto6-general.gif",
+    "texto": "El proyecto se implanta en la ciudad de Haedo, en una zona urbana céntrica a menos de 500 metros de la estación de tren. En este lote se encuentra abandonada la infraestructura de la tuneladora del soterramiento del Ferrocarril Sarmiento. Este plan iba a enterrar las vías a lo largo de 30 kilómetros desde Caballito hasta Moreno, pero tras casi dos décadas fue cancelado definitivamente, habiéndo construido solo 8 kilómetros de túnel desde Haedo hasta Liniers. El proyecto toma este pozo y esta estructura abandonada como punto de partida \n\n Con el objetivo de refuncionalizar esta infraestructura obsoleta, el proyecto propone convertir el soterramiento en un reservorio hídrico. El pozo dejado por la tuneladora funcionará como un espacio de almacenamiento de agua de lluvia. De esta manera, ante fuertes tormentas, el sistema actuará como un aliviador para evitar inundaciones en la zona. Una vez que las lluvias cesen, el agua acumulada se distribuirá hacia los lugares que la necesiten. \n\n La arquitectura del proyecto consiste en un volumen prismático suspendido en el aire, sostenido por dos grúas pórtico ya existentes en el lugar. El acceso a este cuerpo elevado se realiza a través de núcleos de circulación vertical (escaleras y ascensores). Dentro de este edificio flotante se desarrollan actividades públicas y culturales, albergando una biblioteca, un bar y salas de exposición. Al elevar el edificio, la planta baja queda totalmente liberada y el volumen funciona como un techo. Esto genera una gran plaza protegida abajo para realizar actividades libres, ferias o eventos comunitarios. \n\n Este proyecto demuestra cómo una infraestructura fallida y abandonada puede transformarse en una solución para la ciudad. Al unir la gestión del agua con la creación de espacios públicos y culturales, la propuesta resuelve el problema de las inundaciones locales y, al mismo tiempo, le devuelve a los vecinos de Haedo un lugar de encuentro sustentable y con identidad propia."
+},
+
+"plantas": [
+    {
+        "nombre": "Planta Baja",
+        "imagen": "images/proyecto6-6.jpg",
+        "escala": "1:100",
+        "descripcion": "Como se relacionan las celulas y el ingreso al proyecto."
+    },
+    {
+        "nombre": "Primera Planta",
+        "imagen": "images/proyecto6-7.jpg",
+        "escala": "1:100",
+        "descripcion": "Relación entre viviendas y terrazas."
+    },
+    {
+        "nombre": "Segunda Planta",
+        "imagen": "images/proyecto6-8.jpg",
+        "escala": "1:100",
+        "descripcion": "Relación entre viviendas y terrazas."
+    },
+    {
+        "nombre": "Terraza",
+        "imagen": "images/proyecto6-9.jpg",
+        "escala": "1:100",
+        "descripcion": "Visión aerea del proyecto."
+    }
+],
+
+"corte": {
+    "imagen": "images/proyecto6-11.jpg",
+    "descripcion": "",
+    "hotspots": [
+        {
+            "x": 66,
+            "y": 28,
+            "titulo": "Terrazas verdes",
+            "texto": "Posibilidad de que cada vivienda tenga un espacio de terraza."
+        },
+        {
+            "x": 52,
+            "y": 43,
+            "titulo": "Espacio común",
+            "texto": "Espacio libre para actividades y eventos."
+        },
+        {
+            "x": 50,
+            "y": 86,
+            "titulo": "Zona publica",
+            "texto": "Muelle de acceso"
+        }
     ]
+}
   },
   {
     "id": "proyecto5",
@@ -140,7 +329,58 @@
       "images/proyecto5-14.jpg",
       "images/proyecto5-15.jpg",
       "images/proyecto5-16.jpg"
+    ],
+        "presentacion": {
+    "imagen": "images/proyecto5-1.jpg",
+    "gif": "videos/proyecto5-general.gif",
+    "texto": "El proyecto se implanta en la ciudad de Haedo, en una zona urbana céntrica a menos de 500 metros de la estación de tren. En este lote se encuentra abandonada la infraestructura de la tuneladora del soterramiento del Ferrocarril Sarmiento. Este plan iba a enterrar las vías a lo largo de 30 kilómetros desde Caballito hasta Moreno, pero tras casi dos décadas fue cancelado definitivamente, habiéndo construido solo 8 kilómetros de túnel desde Haedo hasta Liniers. El proyecto toma este pozo y esta estructura abandonada como punto de partida \n\n Con el objetivo de refuncionalizar esta infraestructura obsoleta, el proyecto propone convertir el soterramiento en un reservorio hídrico. El pozo dejado por la tuneladora funcionará como un espacio de almacenamiento de agua de lluvia. De esta manera, ante fuertes tormentas, el sistema actuará como un aliviador para evitar inundaciones en la zona. Una vez que las lluvias cesen, el agua acumulada se distribuirá hacia los lugares que la necesiten. \n\n La arquitectura del proyecto consiste en un volumen prismático suspendido en el aire, sostenido por dos grúas pórtico ya existentes en el lugar. El acceso a este cuerpo elevado se realiza a través de núcleos de circulación vertical (escaleras y ascensores). Dentro de este edificio flotante se desarrollan actividades públicas y culturales, albergando una biblioteca, un bar y salas de exposición. Al elevar el edificio, la planta baja queda totalmente liberada y el volumen funciona como un techo. Esto genera una gran plaza protegida abajo para realizar actividades libres, ferias o eventos comunitarios. \n\n Este proyecto demuestra cómo una infraestructura fallida y abandonada puede transformarse en una solución para la ciudad. Al unir la gestión del agua con la creación de espacios públicos y culturales, la propuesta resuelve el problema de las inundaciones locales y, al mismo tiempo, le devuelve a los vecinos de Haedo un lugar de encuentro sustentable y con identidad propia."
+},
+
+"plantas": [
+    {
+        "nombre": "Planta Baja",
+        "imagen": "images/proyecto5-5.jpg",
+        "escala": "1:100",
+        "descripcion": "Relacion con el entorno y acceso al edificio."
+    },
+    {
+        "nombre": "Primera Planta",
+        "imagen": "images/proyecto5-7.jpg",
+        "escala": "1:100",
+        "descripcion": "Primer espacio de exposición y espacio de cafeteria."
+    },
+    {
+        "nombre": "Segunda Planta",
+        "imagen": "images/proyecto5-9.jpg",
+        "escala": "1:100",
+        "descripcion": "Espacio de exposición cerrado."
+    }
+],
+
+"corte": {
+    "imagen": "images/proyecto5-11.jpg",
+    "descripcion": "",
+    "hotspots": [
+        {
+            "x": 38,
+            "y": 15,
+            "titulo": "Espacio de exposición",
+            "texto": ""
+        },
+        {
+            "x": 10,
+            "y": 26,
+            "titulo": "Plaza pública",
+            "texto": "Relación con el entorno existente."
+        },
+        {
+            "x": 50,
+            "y": 80,
+            "titulo": "Parasoles",
+            "texto": ""
+        }
     ]
+}
   },
   {
     "id": "proyecto7",
@@ -188,7 +428,70 @@
       "images/proyecto7-33.jpg",
       "images/proyecto7-34.jpg",
       "images/proyecto7-35.jpg"
+    ],
+        "presentacion": {
+    "imagen": "images/proyecto7-9.jpg",
+    "gif": "videos/proyecto7-general.gif",
+    "texto": "El proyecto se implanta en la ciudad de Haedo, en una zona urbana céntrica a menos de 500 metros de la estación de tren. En este lote se encuentra abandonada la infraestructura de la tuneladora del soterramiento del Ferrocarril Sarmiento. Este plan iba a enterrar las vías a lo largo de 30 kilómetros desde Caballito hasta Moreno, pero tras casi dos décadas fue cancelado definitivamente, habiéndo construido solo 8 kilómetros de túnel desde Haedo hasta Liniers. El proyecto toma este pozo y esta estructura abandonada como punto de partida \n\n Con el objetivo de refuncionalizar esta infraestructura obsoleta, el proyecto propone convertir el soterramiento en un reservorio hídrico. El pozo dejado por la tuneladora funcionará como un espacio de almacenamiento de agua de lluvia. De esta manera, ante fuertes tormentas, el sistema actuará como un aliviador para evitar inundaciones en la zona. Una vez que las lluvias cesen, el agua acumulada se distribuirá hacia los lugares que la necesiten. \n\n La arquitectura del proyecto consiste en un volumen prismático suspendido en el aire, sostenido por dos grúas pórtico ya existentes en el lugar. El acceso a este cuerpo elevado se realiza a través de núcleos de circulación vertical (escaleras y ascensores). Dentro de este edificio flotante se desarrollan actividades públicas y culturales, albergando una biblioteca, un bar y salas de exposición. Al elevar el edificio, la planta baja queda totalmente liberada y el volumen funciona como un techo. Esto genera una gran plaza protegida abajo para realizar actividades libres, ferias o eventos comunitarios. \n\n Este proyecto demuestra cómo una infraestructura fallida y abandonada puede transformarse en una solución para la ciudad. Al unir la gestión del agua con la creación de espacios públicos y culturales, la propuesta resuelve el problema de las inundaciones locales y, al mismo tiempo, le devuelve a los vecinos de Haedo un lugar de encuentro sustentable y con identidad propia."
+},
+
+"plantas": [
+    {
+        "nombre": "Primer Subsuelo",
+        "imagen": "images/proyecto7-23.jpg",
+        "escala": "1:100",
+        "descripcion": "Programa privado, laboratorio de investigación, auditorio y talleres"
+    },
+    {
+        "nombre": "Segundo Subsuelo",
+        "imagen": "images/proyecto7-22.jpg",
+        "escala": "1:100",
+        "descripcion": "Programa privado, laboratorio de investigación"
+    },
+    {
+        "nombre": "Planta baja",
+        "imagen": "images/proyecto7-26.jpg",
+        "escala": "1:100",
+        "descripcion": "Planta libre, y acceso al edificio"
+    },
+    {
+        "nombre": "Primera Planta",
+        "imagen": "images/proyecto7-28.jpg",
+        "escala": "1:100",
+        "descripcion": "Programa cultural y áreas de exposición."
+    },
+    {
+        "nombre": "Segunda Planta",
+        "imagen": "images/proyecto7-31.jpg",
+        "escala": "1:100",
+        "descripcion": "Programa cultural y áreas de exposición."
+    }
+],
+
+"corte": {
+    "imagen": "images/proyecto7-17.jpg",
+    "descripcion": "",
+    "hotspots": [
+        {
+            "x": 61,
+            "y": 28,
+            "titulo": "Centro de exposición",
+            "texto": "Espacio destinado a exposiciones."
+        },
+        {
+            "x": 48,
+            "y": 48,
+            "titulo": "Plaza pública",
+            "texto": "Espacio libre para actividades y eventos."
+        },
+        {
+            "x": 50,
+            "y": 60,
+            "titulo": "Zona privada",
+            "texto": "Programa privado, laboratorio de investigación."
+        }
     ]
+}
   },
 
   {
@@ -333,6 +636,12 @@
                         "yaw": 4.5,
                         "pitch": 0.35,
                         "nombre": "Living"
+                    },
+                    {
+                        "target": "HallP",
+                        "yaw": 2,
+                        "pitch": 0,
+                        "nombre": "HallP"
                     }
 
                 ]
@@ -423,7 +732,352 @@
 
                 ]
 
+            },
+
+
+            "Exterior": {
+
+                "nombre": "Exterior",
+                "miniatura": "images/proyecto8-3.jpg",
+                "imagen": "panoramas/proyecto8/Exterior.png",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "Cafeteria",
+                        "yaw": -0.5,
+                        "pitch": 0,
+                        "nombre": "Cafeteria"
+                    },
+                    {
+                        "target": "Tienda",
+                        "yaw": 0.5,
+                        "pitch": 0,
+                        "nombre": "Tienda"
+                    },
+                    {
+                        "target": "HallPB",
+                        "yaw": -0.1,
+                        "pitch": 0,
+                        "nombre": "HallPB"
+                    }
+
+                ]
+
+            },
+
+
+            "Cafeteria": {
+
+                "nombre": "Cafeteria",
+                "miniatura": "images/proyecto8-3.jpg",
+                "imagen": "panoramas/proyecto8/Cafeteria.png",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "Exterior",
+                        "yaw": 2.75,
+                        "pitch": 0,
+                        "nombre": "Exterior"
+                    }
+
+                ]
+
+            },
+
+
+            "Tienda": {
+
+                "nombre": "Tienda",
+                "miniatura": "images/proyecto8-3.jpg",
+                "imagen": "panoramas/proyecto8/Tienda.png",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "Exterior",
+                        "yaw": -2.75,
+                        "pitch": 0.0,
+                        "nombre": "Exterior"
+                    }
+
+                ]
+
+            },
+
+
+            "HallT": {
+
+                "nombre": "HallT",
+                "miniatura": "images/proyecto8-3.jpg",
+                "imagen": "panoramas/proyecto8/hall t.png",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "HallPB",
+                        "yaw": -1.6,
+                        "pitch": 0.55,
+                        "nombre": "HallPB"
+                    },
+                    {
+                        "target": "HallP",
+                        "yaw": -1.6,
+                        "pitch": 0,
+                        "nombre": "HallP"
+                    },
+                    {
+                        "target": "Terraza",
+                        "yaw": -3,
+                        "pitch": 0,
+                        "nombre": "Terraza"
+                    },
+                    {
+                        "target": "SUM",
+                        "yaw": 2.7,
+                        "pitch": 0,
+                        "nombre": "SUM"
+                    }
+
+                ]
+
+            },
+
+
+            "HallPB": {
+
+                "nombre": "HallPB",
+                "miniatura": "images/proyecto8-3.jpg",
+                "imagen": "panoramas/proyecto8/hall pb.png",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "Exterior",
+                        "yaw": 3,
+                        "pitch": 0,
+                        "nombre": "Exterior"
+                    },
+                    {
+                        "target": "HallT",
+                        "yaw": 1.3,
+                        "pitch": -0.2,
+                        "nombre": "HallT"
+                    },
+                    {
+                        "target": "HallP",
+                        "yaw": 1.3,
+                        "pitch": 0,
+                        "nombre": "HallP"
+                    },
+                    {
+                        "target": "Garaje",
+                        "yaw": -0.1,
+                        "pitch": 0,
+                        "nombre": "Garaje"
+                    }
+
+                ]
+
+            },
+
+            "HallP": {
+
+                "nombre": "HallP",
+                "miniatura": "images/proyecto8-3.jpg",
+                "imagen": "panoramas/proyecto8/hall p.png",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "HallT",
+                        "yaw": -0.7,
+                        "pitch": -0.5,
+                        "nombre": "HallT"
+                    },
+                    {
+                        "target": "HallPB",
+                        "yaw": -0.7,
+                        "pitch": 0,
+                        "nombre": "HallPB"
+                    },
+                    {
+                        "target": "cocina",
+                        "yaw": -1.65,
+                        "pitch": 0,
+                        "nombre": "cocina"
+                    }
+
+                ]
+
+            },
+
+            "Terraza": {
+
+                "nombre": "Terraza",
+                "miniatura": "images/proyecto8-3.jpg",
+                "imagen": "panoramas/proyecto8/Terraza.png",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "HallT",
+                        "yaw": 2.5,
+                        "pitch": 0,
+                        "nombre": "HallT"
+                    },
+                    {
+                        "target": "pileta",
+                        "yaw": 1.9,
+                        "pitch": -0.1,
+                        "nombre": "pileta"
+                    },
+                    {
+                        "target": "SUM",
+                        "yaw": -2.7,
+                        "pitch": 0,
+                        "nombre": "SUM"
+                    }
+
+                ]
+
+            },
+
+            "SUM": {
+
+                "nombre": "SUM",
+                "miniatura": "images/proyecto8-3.jpg",
+                "imagen": "panoramas/proyecto8/SUM.png",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "HallT",
+                        "yaw": 2.7,
+                        "pitch": 0,
+                        "nombre": "HallT"
+                    },
+                    {
+                        "target": "solarium",
+                        "yaw": 0,
+                        "pitch": 0,
+                        "nombre": "solarium"
+                    },
+                    {
+                        "target": "Terraza",
+                        "yaw": 1.75,
+                        "pitch": 0,
+                        "nombre": "Terraza"
+                    }
+
+                ]
+
+            },
+
+            "solarium": {
+
+                "nombre": "solarium",
+                "miniatura": "images/proyecto8-3.jpg",
+                "imagen": "panoramas/proyecto8/solarium.png",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "SUM",
+                        "yaw": 3,
+                        "pitch": 0,
+                        "nombre": "SUM"
+                    }
+
+                ]
+
+            },
+
+            "pileta": {
+
+                "nombre": "pileta",
+                "miniatura": "images/proyecto8-3.jpg",
+                "imagen": "panoramas/proyecto8/pileta.png",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "Terraza",
+                        "yaw": 2.5,
+                        "pitch": 0,
+                        "nombre": "Terraza"
+                    }
+
+                ]
+
+            },
+
+            "Garaje": {
+
+                "nombre": "Garaje",
+                "miniatura": "images/proyecto8-3.jpg",
+                "imagen": "panoramas/proyecto8/Garaje.png",
+
+                "yawInicial": 0,
+                "pitchInicial": 0,
+                "fov": 90,
+
+                "hotspots": [
+
+                    {
+                        "target": "HallPB",
+                        "yaw": 3,
+                        "pitch": 0,
+                        "nombre": "HallPB"
+                    }
+
+                ]
+
             }
+
+
+
 
         }
 

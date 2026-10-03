@@ -1,0 +1,682 @@
+/* =========================================================
+   PLANTAS / DOCUMENTACIÓN — EXTENSIÓN DEL STYLE.CSS ACTUAL
+   No reemplaza tu CSS: se carga después de style.css.
+========================================================= */
+
+.project-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 5%;
+    color: #eaeaea;
+    background: rgba(0,0,0,0);
+}
+
+.project-nav a {
+    color: inherit;
+    margin: 0 12px;
+    font-size: .85rem;
+    letter-spacing: .4px;
+}
+
+.project-nav-left,
+.project-nav-right,
+.project-nav-center {
+    display: flex;
+    align-items: center;
+}
+
+.project-nav-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-transform: uppercase;
+    font-size: .75rem;
+    letter-spacing: 2px;
+}
+
+.project-nav-right {
+    gap: 14px;
+}
+
+.project-nav-right span {
+    opacity: .55;
+    font-size: .7rem;
+}
+
+.project-nav.scrolled {
+    background: rgba(234,234,234,.94);
+    color: #222;
+    backdrop-filter: blur(12px);
+}
+
+
+/* =========================================================
+   GENERAL
+========================================================= */
+
+.project-presentation,
+.project-plans,
+.project-cut {
+    margin: 0;
+    padding: 120px 7vw;
+    background: #eaeaea;
+}
+
+.eyebrow {
+    margin: 0 0 18px;
+    font-size: .68rem;
+    letter-spacing: 2.5px;
+    color: #777;
+}
+
+.presentation-number,
+.section-number {
+    font-size: .7rem;
+    letter-spacing: 2px;
+    color: #888;
+    margin-bottom: 35px;
+}
+
+.presentation-layout {
+    display: grid;
+    grid-template-columns: minmax(300px, .8fr) minmax(500px, 1.2fr);
+    gap: 7vw;
+    max-width: 1500px;
+    margin: 0 auto;
+    align-items: center;
+}
+
+.presentation-text h1 {
+    font-size: clamp(2.5rem, 5vw, 5.5rem);
+    line-height: .95;
+    font-weight: 500;
+    letter-spacing: -3px;
+    margin-bottom: 15px;
+}
+
+.project-subtitle {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 45px;
+}
+
+.project-description {
+    max-width: 650px;
+    color: #444;
+    font-size: .98rem;
+    line-height: 1.8;
+}
+
+.project-data {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px 35px;
+    margin-top: 55px;
+    border-top: 1px solid #ccc;
+    padding-top: 25px;
+}
+
+.project-data div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.project-data span {
+    font-size: .62rem;
+    color: #888;
+    letter-spacing: 1.5px;
+}
+
+.project-data strong {
+    font-size: .82rem;
+    font-weight: 500;
+    color: #222;
+}
+
+.presentation-media {
+    display: grid;
+    grid-template-columns: 1.45fr .7fr;
+    gap: 18px;
+    align-items: end;
+}
+
+.presentation-media figure {
+    margin: 0;
+    overflow: hidden;
+    background: #ddd;
+}
+
+.presentation-image-wrap {
+    height: min(70vh, 720px);
+}
+
+.presentation-gif-wrap {
+    height: min(48vh, 500px);
+}
+
+.presentation-media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+
+/* =========================================================
+   HEADINGS
+========================================================= */
+
+.section-heading {
+    display: flex;
+    align-items: flex-end;
+    gap: 25px;
+    max-width: 1500px;
+    margin: 0 auto 55px;
+}
+
+.section-heading .section-number {
+    margin: 0 0 9px;
+}
+
+.section-heading h2 {
+    margin: 0;
+    padding: 0;
+    font-size: clamp(2.2rem, 4vw, 4.5rem);
+    line-height: .9;
+    font-weight: 500;
+    letter-spacing: -2px;
+}
+
+
+/* =========================================================
+   PLANTAS
+========================================================= */
+
+.plans-layout {
+    max-width: 1500px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 230px 1fr;
+    min-height: 75vh;
+    border-top: 1px solid #ccc;
+}
+
+.plans-sidebar {
+    padding: 30px 30px 30px 0;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.floor-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.floor-tab {
+    width: 100%;
+    padding: 13px 12px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #666;
+    text-align: left;
+    font-size: .78rem;
+    cursor: pointer;
+    transition: .25s ease;
+}
+
+.floor-tab:hover {
+    background: #ddd;
+    color: #111;
+}
+
+.floor-tab.active {
+    background: #111;
+    color: white;
+}
+
+.plan-information {
+    border-top: 1px solid #ccc;
+    padding-top: 25px;
+}
+
+.plan-information span,
+.plan-information small {
+    color: #888;
+    font-size: .65rem;
+    letter-spacing: 1.5px;
+}
+
+.plan-information h3 {
+    margin: 10px 0;
+    font-size: 1.05rem;
+    font-weight: 500;
+}
+
+.plan-information p {
+    color: #666;
+    font-size: .78rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.floor-viewer {
+    position: relative;
+    min-width: 0;
+    min-height: 700px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eaeaea;
+}
+
+.floor-image-wrap {
+    width: 90%;
+    height: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#floorPlan {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    opacity: 0;
+    transform: scale(.985);
+    transition: opacity .35s ease, transform .35s ease;
+}
+
+#floorPlan.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.plan-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid #aaa;
+    border-radius: 50%;
+    background: rgba(234,234,234,.85);
+    color: #222;
+    font-size: 18px;
+}
+
+.plan-arrow:hover {
+    background: #111;
+    color: white;
+}
+
+.plan-prev {
+    left: 20px;
+}
+
+.plan-next {
+    right: 20px;
+}
+
+
+/* =========================================================
+   CORTE
+========================================================= */
+
+.project-cut {
+    min-height: 100vh;
+}
+
+.cut-heading {
+    position: relative;
+}
+
+.cut-controls {
+    margin-left: auto;
+    display: flex;
+    gap: 5px;
+}
+
+.cut-controls button {
+    min-width: 42px;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #bbb;
+    border-radius: 0;
+    background: transparent;
+    color: #222;
+    font-size: .75rem;
+}
+
+.cut-controls button:hover {
+    background: #111;
+    color: white;
+}
+
+.cut-viewer {
+    position: relative;
+    height: min(72vh, 800px);
+    max-width: 1500px;
+    margin: 0 auto;
+    overflow: hidden;
+    cursor: grab;
+    background:
+        linear-gradient(rgba(0,0,0,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,.025) 1px, transparent 1px);
+    background-size: 35px 35px;
+    touch-action: none;
+}
+
+.cut-viewer.dragging {
+    cursor: grabbing;
+}
+
+.cut-canvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max-content;
+    height: max-content;
+    transform:
+        translate(-50%, -50%)
+        scale(1);
+    transform-origin: center center;
+    will-change: transform;
+}
+
+#cutImage {
+    display: block;
+    max-width: 85vw;
+    max-height: 70vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+}
+
+.cut-hotspots {
+    position: absolute;
+    inset: 0;
+}
+
+.cut-hotspot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid white;
+    background: #111;
+    box-shadow: 0 0 0 5px rgba(0,0,0,.12);
+    z-index: 10;
+}
+
+.cut-hotspot:hover,
+.cut-hotspot.active {
+    transform: translate(-50%, -50%) scale(1.25);
+}
+
+.cut-tooltip {
+    position: absolute;
+    left: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 210px;
+    padding: 15px;
+    background: rgba(17,17,17,.95);
+    color: white;
+    text-align: left;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: .2s ease;
+}
+
+.cut-hotspot:hover .cut-tooltip,
+.cut-hotspot.active .cut-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.cut-tooltip strong,
+.cut-tooltip span {
+    display: block;
+}
+
+.cut-tooltip strong {
+    font-size: .75rem;
+    margin-bottom: 5px;
+}
+
+.cut-tooltip span {
+    color: #ccc;
+    font-size: .68rem;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+.cut-instruction {
+    position: absolute;
+    right: 20px;
+    bottom: 18px;
+    display: flex;
+    gap: 15px;
+    color: #888;
+    font-size: .58rem;
+    letter-spacing: 1.5px;
+    pointer-events: none;
+}
+
+.cut-description {
+    max-width: 1500px;
+    margin: 25px auto 0;
+    color: #666;
+    font-size: .82rem;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.project-cut + footer {
+    margin-top: 0;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .presentation-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .presentation-media {
+        grid-template-columns: 1.5fr .8fr;
+    }
+
+    .plans-layout {
+        grid-template-columns: 180px 1fr;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    .project-nav {
+        padding: 15px 20px;
+    }
+
+    .project-nav-left a:first-child {
+        display: none;
+    }
+
+    .project-nav-left a {
+        margin: 0;
+    }
+
+    .project-nav-center {
+        position: static;
+        transform: none;
+    }
+
+    .project-nav-right span {
+        display: none;
+    }
+
+    .project-presentation,
+    .project-plans,
+    .project-cut {
+        padding: 90px 20px;
+    }
+
+    .presentation-layout {
+        display: block;
+    }
+
+    .presentation-text h1 {
+        font-size: 3.2rem;
+        letter-spacing: -2px;
+    }
+
+    .presentation-media {
+        margin-top: 55px;
+        grid-template-columns: 1.4fr .8fr;
+        gap: 10px;
+    }
+
+    .presentation-image-wrap {
+        height: 55vh;
+    }
+
+    .presentation-gif-wrap {
+        height: 35vh;
+    }
+
+    .project-data {
+        gap: 20px;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .section-heading h2 {
+        font-size: 3rem;
+    }
+
+    .plans-layout {
+        display: block;
+        min-height: 0;
+    }
+
+    .plans-sidebar {
+        border-right: 0;
+        border-bottom: 1px solid #ccc;
+        padding: 20px 0;
+        gap: 25px;
+    }
+
+    .floor-tabs {
+        flex-direction: row;
+        overflow-x: auto;
+    }
+
+    .floor-tab {
+        width: auto;
+        white-space: nowrap;
+    }
+
+    .floor-viewer {
+        min-height: 55vh;
+    }
+
+    .floor-image-wrap {
+        width: 100%;
+        height: 90%;
+    }
+
+    .plan-arrow {
+        width: 36px;
+        height: 36px;
+    }
+
+    .cut-heading {
+        padding-right: 0;
+    }
+
+    .cut-controls {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 15px;
+    }
+
+    .cut-viewer {
+        height: 60vh;
+    }
+
+    #cutImage {
+        max-width: 95vw;
+        max-height: 55vh;
+    }
+
+    .cut-tooltip {
+        width: 170px;
+    }
+
+    .cut-instruction {
+        right: 10px;
+        bottom: 10px;
+        flex-direction: column;
+        gap: 3px;
+        align-items: flex-end;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .presentation-media {
+        grid-template-columns: 1fr;
+    }
+
+    .presentation-gif-wrap {
+        height: 40vh;
+    }
+
+    .project-data {
+        grid-template-columns: 1fr;
+    }
+
+    .floor-viewer {
+        min-height: 45vh;
+    }
+
+    .cut-viewer {
+        height: 55vh;
+    }
+
+    .cut-tooltip {
+        left: auto;
+        right: 20px;
+    }
+}

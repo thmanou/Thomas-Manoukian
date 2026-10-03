@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Proyecto | Clínica Urbana</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="plantas.css">
 </head>
 <body>
 
@@ -32,24 +33,138 @@
 
 </section>
 
-<section id="proyectoss" class="project-wrapper">
+<!-- ================= 01 PRESENTACIÓN ================= -->
+<section class="project-presentation">
 
-    <div class="project-top">
+    <div class="presentation-number">01</div>
 
-        <div class="project-description">
-            <h1 class="project-title" id="titulo"></h1>
+    <div class="presentation-layout">
 
-            <p class="project-text" id="descripcion"></p>
+        <div class="presentation-text">
+            <p class="eyebrow">PRESENTACIÓN</p>
+
+            <h1 id="projectTitle">Proyecto</h1>
+            <p class="project-subtitle" id="presentationSubtitle"></p>
+
+            <div class="project-description" id="presentationText"></div>
 
             <div class="project-data">
-                <div><strong>Año:</strong> <span id="anio"></span></div>
-                <div><strong>Ubicación:</strong> <span id="ubicacion"></span></div>
-                <div><strong>Programa:</strong> <span id="programa"></span></div>
-                <div><strong>Superficie:</strong> <span id="superficie"></span></div>
+                <div>
+                    <span>AÑO</span>
+                    <strong id="projectYear">—</strong>
+                </div>
+
+                <div>
+                    <span>UBICACIÓN</span>
+                    <strong id="projectLocation">—</strong>
+                </div>
+
+                <div>
+                    <span>PROGRAMA</span>
+                    <strong id="projectProgram">—</strong>
+                </div>
+
+                <div>
+                    <span>SUPERFICIE</span>
+                    <strong id="projectArea">—</strong>
+                </div>
             </div>
         </div>
 
+        <div class="presentation-media">
+
+            <figure class="presentation-image-wrap">
+                <img id="presentationImage" alt="">
+            </figure>
+
+            <figure class="presentation-gif-wrap" id="presentationGifWrap">
+                <img id="presentationGif" alt="">
+            </figure>
+
+        </div>
+
     </div>
+</section>
+
+
+<!-- ================= 02 PLANTAS ================= -->
+<section class="project-plans" id="plantas">
+
+    <div class="section-heading">
+        <div class="section-number">02</div>
+        <div>
+            <p class="eyebrow">DOCUMENTACIÓN</p>
+            <h2>Plantas</h2>
+        </div>
+    </div>
+
+    <div class="plans-layout">
+
+        <aside class="plans-sidebar">
+
+            <div class="floor-tabs" id="floorTabs"></div>
+
+            <div class="plan-information">
+                <span id="planCounter">01 / 01</span>
+                <h3 id="floorLabel">—</h3>
+                <p id="floorDescription"></p>
+                <small id="floorScale"></small>
+            </div>
+
+        </aside>
+
+        <div class="floor-viewer" id="floorViewer">
+
+            <button class="plan-arrow plan-prev" id="planPrev" aria-label="Planta anterior">
+                ←
+            </button>
+
+            <div class="floor-image-wrap">
+                <img id="floorPlan" alt="">
+            </div>
+
+            <button class="plan-arrow plan-next" id="planNext" aria-label="Planta siguiente">
+                →
+            </button>
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- ================= 03 CORTE ================= -->
+<section class="project-cut" id="corte">
+
+    <div class="section-heading cut-heading">
+        <div class="section-number">03</div>
+        <div>
+            <p class="eyebrow">DOCUMENTACIÓN</p>
+            <h2>Corte</h2>
+        </div>
+
+        <div class="cut-controls">
+            <button id="zoomOut" aria-label="Alejar">−</button>
+            <button id="zoomReset" aria-label="Restablecer zoom">100%</button>
+            <button id="zoomIn" aria-label="Acercar">+</button>
+        </div>
+    </div>
+
+    <div class="cut-viewer" id="cutViewer">
+
+        <div class="cut-canvas" id="cutCanvas">
+            <img id="cutImage" alt="">
+            <div class="cut-hotspots" id="cutHotspots"></div>
+        </div>
+
+        <div class="cut-instruction">
+            <span>ARRASTRAR</span>
+            <span>SCROLL PARA ZOOM</span>
+        </div>
+
+    </div>
+
+    <div class="cut-description" id="cutDescription"></div>
 
 </section>
 
@@ -81,5 +196,6 @@
 </footer>
 
 <script src="script.js" defer></script>
+
 </body>
 </html>
