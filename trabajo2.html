@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Proyecto Arquitectónico</title>
+    <title>Edificio HITO</title>
 
     <style>
         /* =========================================================
@@ -945,6 +945,90 @@
         #unit-view:not(.active){pointer-events:none}
         .uv-layer:not(.active){pointer-events:none}
         @media (max-width:700px){.uv-bar{padding:10px 12px}.uv-tab{padding:8px 10px;font-size:10px}.uv-card{width:84px}.uv-card img{height:48px}}
+
+        /* =========================================================
+           MENÚ ÚNICO FIJO (visible en todas las etapas) + FLECHAS
+        ========================================================= */
+        :root { --nav-h: 84px; }
+
+        header {
+            position: fixed;          /* siempre en pantalla, sobre planta, unidad y loader */
+            z-index: 500;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 28px;
+        }
+        .project-info {
+            padding: 10px 16px; border-radius: 12px; color: #fff;
+            background: rgba(12,12,12,.5); backdrop-filter: blur(12px);
+            box-shadow: 0 4px 18px rgba(0,0,0,.18);
+        }
+        .top-navigation {
+            align-items: center; gap: 4px; padding: 5px; max-width: 100%;
+            overflow-x: auto; scrollbar-width: none;
+            background: rgba(12,12,12,.58); backdrop-filter: blur(14px);
+            border: 1px solid rgba(255,255,255,.18); border-radius: 999px;
+            box-shadow: 0 6px 24px rgba(0,0,0,.25);
+        }
+        .top-navigation::-webkit-scrollbar { display: none; }
+        .top-button {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-height: 40px; padding: 11px 18px; border: none; border-radius: 999px;
+            background: transparent; color: #fff; text-decoration: none; white-space: nowrap;
+            font-size: 10px; letter-spacing: .14em; text-transform: uppercase; cursor: pointer;
+            transition: background .25s ease, color .25s ease, opacity .25s ease;
+        }
+        .top-button:hover { background: rgba(255,255,255,.2); }
+        .top-button.active { background: #fff; color: #111; }
+        .top-button.is-disabled { opacity: .5; }
+        .top-button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+        /* la planta y el panel de unidad arrancan debajo del menú */
+        #unit-panel { top: var(--nav-h); height: calc(100% - var(--nav-h)); padding-top: 40px; }
+        .close-panel { top: 20px; }
+        .uv-bar { padding-top: calc(var(--nav-h) + 6px); background: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,0)); }
+
+        /* --- Flechas de escena: círculo blanco, ícono oscuro, hover claro --- */
+        .scene-arrow {
+            width: 58px; height: 58px; border-radius: 50%;
+            background: rgba(255,255,255,.9); color: #111; opacity: 1;
+            border: 1px solid rgba(0,0,0,.08);
+            box-shadow: 0 6px 20px rgba(0,0,0,.3);
+            transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
+        }
+        .scene-arrow.left  { left: 24px; }
+        .scene-arrow.right { right: 24px; }
+        .scene-arrow:hover {
+            opacity: 1; background: #fff;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 10px 28px rgba(0,0,0,.4);
+        }
+        .scene-arrow:active { transform: translateY(-50%) scale(1.02); }
+        .scene-arrow:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+        .scene-arrow .arrow-line {
+            width: 13px; height: 13px; background: none;
+            border-top: 3px solid #111; border-right: 3px solid #111;
+            transition: transform .3s ease;
+        }
+        .scene-arrow .arrow-line::before,
+        .scene-arrow .arrow-line::after { display: none; }
+        .scene-arrow.right .arrow-line { transform: rotate(45deg);   margin-right: 5px; }
+        .scene-arrow.left  .arrow-line { transform: rotate(-135deg); margin-left: 5px; }
+        .scene-arrow.right:hover .arrow-line { transform: rotate(45deg)   translate(2px,-2px); }
+        .scene-arrow.left:hover  .arrow-line { transform: rotate(-135deg) translate(2px,-2px); }
+
+        @media (max-width: 700px) {
+            :root { --nav-h: 66px; }
+            header { padding: 10px 12px; justify-content: center; }
+            .project-info { display: none; }
+            .top-navigation { width: 100%; justify-content: space-between; }
+            .top-button { flex: 1; padding: 9px 8px; font-size: 9px; letter-spacing: .08em; }
+            .scene-arrow { width: 48px; height: 48px; }
+            .scene-arrow.left  { left: 10px; }
+            .scene-arrow.right { right: 10px; }
+            #unit-panel { top: auto; height: 72%; padding-top: 25px; }
+            .close-panel { top: 18px; }
+        }
     </style>
 </head>
 
@@ -1000,17 +1084,21 @@
         <div class="project-info">
 
             <div class="project-name">
-                Nombre del Proyecto
+                Edificio HITO
             </div>
 
             <div class="project-subtitle">
-                Proyecto Arquitectónico
+                Edificio de viviendas multifamiliar.
             </div>
 
         </div>
 
 
-        <div class="top-navigation">
+        <nav class="top-navigation" id="site-nav" aria-label="Navegación principal">
+
+            <a class="top-button" id="nav-home" href="index.html">Inicio</a>
+
+            <button class="top-button" id="nav-building">Edificio</button>
 
             <button
                 class="top-button"
@@ -1019,7 +1107,11 @@
                 Planta
             </button>
 
-        </div>
+            <button class="top-button" id="nav-3d" data-mode="3d">3D</button>
+
+            <button class="top-button" id="nav-360" data-mode="360">360°</button>
+
+        </nav>
 
     </header>
 
@@ -1287,12 +1379,6 @@
 
         <div class="uv-bar">
             <div class="uv-title" id="uv-title"></div>
-            <div class="uv-tabs">
-                <button class="uv-tab" data-mode="3d">3D</button>
-                <button class="uv-tab" data-mode="360">360°</button>
-                <button class="uv-tab nav" data-nav="planos">← Planos</button>
-                <button class="uv-tab nav" data-nav="edificio">⌂ Edificio</button>
-            </div>
         </div>
 
         <div class="uv-stage">
@@ -1437,8 +1523,9 @@
             nombre: "Planta baja",
             imagen: "images/PB.png",
             unidades: [
-                { id: "Cafeteria", x: 16, y: 20, w: 25, h: 60 },
-                { id: "Tienda", x: 60, y: 20, w: 25, h: 60 }
+                { id: "unidad04", x: 16, y: 20, w: 25, h: 60 },
+                { id: "unidad05", x: 60, y: 20, w: 25, h: 60 },
+                { id: "unidad06", x: 45, y: 20, w: 10, h: 60 }
             ]
         },
 
@@ -1450,7 +1537,8 @@
             unidades: [
                 { id: "unidad01", x: 16, y: 40, w: 25, h: 40 },
                 { id: "unidad02", x: 32, y: 10, w: 37, h: 25 },
-                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 }
+                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 },
+                { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
 
@@ -1462,7 +1550,8 @@
             unidades: [
                 { id: "unidad01", x: 16, y: 40, w: 25, h: 40 },
                 { id: "unidad02", x: 32, y: 10, w: 37, h: 25 },
-                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 }
+                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 },
+                { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
 
@@ -1474,7 +1563,8 @@
             unidades: [
                 { id: "unidad01", x: 16, y: 40, w: 25, h: 40 },
                 { id: "unidad02", x: 32, y: 10, w: 37, h: 25 },
-                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 }
+                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 },
+                { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
 
@@ -1486,7 +1576,8 @@
             unidades: [
                 { id: "unidad01", x: 16, y: 40, w: 25, h: 40 },
                 { id: "unidad02", x: 32, y: 10, w: 37, h: 25 },
-                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 }
+                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 },
+                { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
 
@@ -1498,7 +1589,8 @@
             unidades: [
                 { id: "unidad01", x: 16, y: 40, w: 25, h: 40 },
                 { id: "unidad02", x: 32, y: 10, w: 37, h: 25 },
-                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 }
+                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 },
+                { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
 
@@ -1511,7 +1603,7 @@
                 { id: "Solarium", x: 10, y: 35, w: 15, h: 50 },
                 { id: "Terraza", x: 10, y: 15, w: 80, h: 20 },
                 { id: "Pileta", x: 60, y: 35, w: 30, h: 50 },
-                { id: "SUM", x: 25, y: 35, w: 20, h: 50 }
+                { id: "SUM", x: 20, y: 35, w: 20, h: 50 }
             ]
         }
 
@@ -1598,6 +1690,114 @@
             dormitorios: "3",
 
             banos: "2",
+
+            descripcion:
+                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+
+            recorrido:
+                "trabajo.html"
+
+        },
+
+
+        unidad04: {
+
+            id: "unidad04",
+
+            nombre: "Cafeteria",
+
+            ambientes: "4 ambientes",
+
+            cubierta: "90 m²",
+
+            semicubierta: "15 m²",
+
+            total: "105 m²",
+
+            dormitorios: "3",
+
+            banos: "2",
+
+            descripcion:
+                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+
+            recorrido:
+                "trabajo.html"
+
+        },
+
+
+        unidad05: {
+
+            id: "unidad05",
+
+            nombre: "Tienda",
+
+            ambientes: "4 ambientes",
+
+            cubierta: "90 m²",
+
+            semicubierta: "15 m²",
+
+            total: "105 m²",
+
+            dormitorios: "3",
+
+            banos: "2",
+
+            descripcion:
+                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+
+            recorrido:
+                "trabajo.html"
+
+        },
+
+
+        unidad06: {
+
+            id: "unidad06",
+
+            nombre: "Hall Entrada",
+
+            ambientes: "-",
+
+            cubierta: "90 m²",
+
+            semicubierta: "-",
+
+            total: "105 m²",
+
+            dormitorios: "3-",
+
+            banos: "-",
+
+            descripcion:
+                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+
+            recorrido:
+                "trabajo.html"
+
+        },
+
+
+        unidad07: {
+
+            id: "unidad07",
+
+            nombre: "Hall de Piso",
+
+            ambientes: "-",
+
+            cubierta: "90 m²",
+
+            semicubierta: "-",
+
+            total: "105 m²",
+
+            dormitorios: "3-",
+
+            banos: "-",
 
             descripcion:
                 "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
@@ -2302,9 +2502,12 @@
     // Hoy solo "proyecto8" tiene recorrido; las escenas iniciales son de ejemplo.
     const unitAssets = {
         unidad01: { proyecto: "proyecto8", panoramaInicial: "living" },
-        unidad02: { proyecto: "proyecto8", panoramaInicial: "habitacion1" },
-        unidad03: { proyecto: "proyecto8", panoramaInicial: "cocina" },
-        unidad04: { proyecto: "proyecto8", panoramaInicial: "habitacion2" }
+        unidad02: { proyecto: "proyecto8", panoramaInicial: "Uni3living" },
+        unidad03: { proyecto: "proyecto8", panoramaInicial: "living" },
+        unidad04: { proyecto: "proyecto8", panoramaInicial: "Cafeteria" },
+        unidad05: { proyecto: "proyecto8", panoramaInicial: "Tienda" },
+        unidad06: { proyecto: "proyecto8", panoramaInicial: "HallPB" },
+        unidad07: { proyecto: "proyecto8", panoramaInicial: "HallP" }
     };
 
     Object.keys(unitAssets).forEach(id => {
@@ -2376,6 +2579,7 @@
 
         const unit = currentUnit;
 
+        uvLast = unit;
         uvWanted = mode;
         uvData = null;
 
@@ -2386,8 +2590,7 @@
         uv.classList.add("active");
 
         // pestaña marcada desde el primer instante
-        uv.querySelectorAll(".uv-tab[data-mode]").forEach(t =>
-            t.classList.toggle("active", t.dataset.mode === uvWanted));
+        updateNav();
 
         const data = await getUnitData(unit);
 
@@ -2414,8 +2617,7 @@
 
         if (!uvData) return;
 
-        uv.querySelectorAll(".uv-tab[data-mode]").forEach(t =>
-            t.classList.toggle("active", t.dataset.mode === mode));
+        updateNav();
 
         uvLayer3d.classList.toggle("active", mode === "3d");
         uvLayer360.classList.toggle("active", mode === "360");
@@ -2576,26 +2778,66 @@
         uvGallery.innerHTML = "";
     }
 
-    // Pestañas: 3D / 360 cambian de modo; Planos / Edificio navegan fuera de la unidad
-    uv.querySelectorAll(".uv-tab").forEach(tab => {
+    // ---------- MENÚ ÚNICO (header): Inicio · Edificio · Planta · 3D · 360° ----------
+    let uvLast = null;                       // última unidad abierta (habilita 3D / 360°)
 
-        tab.addEventListener("click", () => {
+    const navBuilding    = document.getElementById("nav-building");
+    const navModeButtons = [...document.querySelectorAll("#site-nav [data-mode]")];
 
-            if (tab.dataset.mode) {
-                uvWanted = tab.dataset.mode;
-                if (uvData) setUvMode(uvWanted);
-                else uv.querySelectorAll(".uv-tab[data-mode]").forEach(t =>
-                    t.classList.toggle("active", t.dataset.mode === uvWanted));
-                return;
-            }
+    const uvOpen = () => uv.classList.contains("active");
 
-            closeUnitView();
+    function updateNav() {
 
-            // "Planos": la planta y el nivel siguen donde estaban.
-            // "Edificio": además cerramos la planta y volvemos a la portada.
-            if (tab.dataset.nav === "edificio") backBuildingButton.click();
+        const inUnit  = uvOpen();
+        const inFloor = !inUnit && floorScene.classList.contains("active");
+
+        const mark = (el, on) => {
+            el.classList.toggle("active", on);
+            if (on) el.setAttribute("aria-current", "page");
+            else el.removeAttribute("aria-current");
+        };
+
+        mark(navBuilding, !inUnit && !inFloor);
+        mark(floorTopButton, inFloor);
+
+        navModeButtons.forEach(b => {
+            mark(b, inUnit && b.dataset.mode === uvWanted);
+            b.classList.toggle("is-disabled", !uvLast);
+            b.setAttribute("aria-disabled", String(!uvLast));
+            b.title = uvLast ? "" : "Elegí una unidad en la planta";
         });
+    }
+
+    navBuilding.addEventListener("click", () => {
+        if (isTransitioning) return;
+        if (uvOpen()) closeUnitView();
+        backBuildingButton.click();          // portada del edificio
     });
+
+    floorTopButton.addEventListener("click", () => {
+        if (uvOpen()) closeUnitView();       // vuelve a los planos desde la unidad
+    });
+
+    navModeButtons.forEach(btn => btn.addEventListener("click", () => {
+
+        const mode = btn.dataset.mode;
+
+        if (uvOpen()) {                      // ya estamos en una unidad: cambiar de modo
+            uvWanted = mode;
+            if (uvData) setUvMode(mode); else updateNav();
+            return;
+        }
+
+        if (!uvLast) { floorTopButton.click(); return; }   // aún sin unidad: ir a elegir una
+
+        currentUnit = uvLast;
+        openUnitView(mode);
+    }));
+
+    const navObserver = new MutationObserver(updateNav);
+    navObserver.observe(floorScene, { attributes: true, attributeFilter: ["class"] });
+    navObserver.observe(uv,         { attributes: true, attributeFilter: ["class"] });
+    updateNav();
 
     modelButton.addEventListener("click", () => openUnitView("3d"));
 
