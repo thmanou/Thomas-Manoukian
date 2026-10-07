@@ -2,9 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     <title>Edificio HITO</title>
+
+    <!-- PRIORIDAD 1: la fachada inicial (= scenes[0].image) arranca a descargarse
+         desde el <head>, antes de que corra el JS. Si cambiás esa imagen, cambiá esta ruta. -->
+    <link rel="preload" as="image" href="images/Frente%202.png" fetchpriority="high">
 
     <style>
         /* =========================================================
@@ -1029,6 +1033,437 @@
             #unit-panel { top: auto; height: 72%; padding-top: 25px; }
             .close-panel { top: 18px; }
         }
+
+        /* ===== Indicador discreto mientras carga una planta ===== */
+        #floor-image-container.is-loading::after {
+            content: ""; position: absolute; left: 50%; top: 50%;
+            width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%;
+            border: 2px solid rgba(0,0,0,.15); border-top-color: #111;
+            animation: pf-spin .8s linear infinite;
+        }
+        @keyframes pf-spin { to { transform: rotate(360deg); } }
+
+        /* =========================================================
+           ADAPTACIÓN MÓVIL
+           - Escritorio: estas reglas base no cambian nada visible.
+           - Móvil vertical:   (max-width: 700px)
+           - Móvil horizontal: (max-height: 520px) + landscape + táctil
+        ========================================================= */
+
+        @supports (height: 100dvh) { #app { height: 100dvh; } }   /* 100vh en móvil incluye la barra del navegador */
+
+        button, a { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+        .panel-actions { display: contents; }
+        .lbl-short { display: none; }
+        #floor-zoom, #floor-hint { display: none; }
+
+        /* ---- compartido: móvil vertical y horizontal ---- */
+        @media (max-width: 700px), (max-height: 520px) and (orientation: landscape) and (pointer: coarse) {
+
+            .hotspot { min-height: 44px; padding: 0 12px; }
+            #floor-stage { transform-origin: 50% 50%; will-change: transform; }
+            .floor-button { min-height: 46px; padding: 0 14px; font-size: 9px; letter-spacing: .08em; }
+
+            #floor-zoom {
+                display: flex; gap: 6px; position: absolute; z-index: 50;
+                opacity: 0; transition: opacity .6s ease 1s;
+            }
+            #floor-scene.active #floor-zoom { opacity: 1; }
+            #floor-zoom button {
+                width: 46px; height: 46px; border: 1px solid rgba(0,0,0,.35);
+                background: rgba(255,255,255,.85); color: #111; font-size: 20px; line-height: 1; cursor: pointer;
+            }
+            #floor-zoom button:active { background: #111; color: #fff; }
+            #floor-hint {
+                display: block; position: absolute; z-index: 45; left: 50%; transform: translateX(-50%);
+                padding: 8px 14px; border-radius: 999px; white-space: nowrap;
+                background: rgba(12,12,12,.72); color: #fff; font-size: 11px; letter-spacing: .05em;
+                opacity: 0; pointer-events: none; transition: opacity .5s ease;
+            }
+            #floor-hint.show { opacity: 1; }
+
+            /* con el panel abierto, la barra inferior de la planta queda debajo: se oculta */
+            #app:has(#unit-panel.active) #floor-navigation,
+            #app:has(#unit-panel.active) #floor-zoom { visibility: hidden; }
+
+            /* panel: cerrar cómodo, contenido legible y botones 360° / 3D siempre visibles */
+            #unit-panel { overflow-y: auto; overscroll-behavior: contain; }
+            .close-panel { width: 44px; height: 44px; z-index: 3; }
+            .unit-data { gap: 16px 12px; }
+            .data-label { font-size: 9px; }
+            .unit-description { margin-top: 20px; font-size: 13px; line-height: 1.6; }
+            .panel-actions {
+                display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+                position: sticky; bottom: 0; z-index: 2;
+                background: linear-gradient(rgba(20,20,20,0), rgba(20,20,20,.98) 30%);
+            }
+            .panel-actions .tour-button { margin: 0; min-height: 54px; padding: 0 8px; }
+            .lbl-full { display: none; }
+            .lbl-short { display: inline; font-size: 17px; letter-spacing: .12em; font-weight: 600; }
+            #tour-button { background: #fff; color: #111; border-color: #fff; }       /* primario */
+            #model-button { background: transparent; color: #fff; }                   /* secundario */
+            .scene-arrow { width: 48px; height: 48px; }
+        }
+
+        @media (max-width: 700px) {
+
+            :root { --nav-h: calc(72px + env(safe-area-inset-top, 0px)); }
+
+            /* ---- menú principal ---- */
+            header { padding: calc(8px + env(safe-area-inset-top, 0px)) 10px 8px; }
+            .top-button { min-height: 44px; font-size: 10px; }
+
+            /* ---- portada ---- */
+            .hotspot { min-height: 44px; padding: 0 12px; }
+            #scene-counter { bottom: calc(18px + env(safe-area-inset-bottom, 0px)); }
+
+            /* ---- planta: ocupa todo el ancho; se puede acercar y mover ---- */
+            #floor-image-container {
+                inset: calc(var(--nav-h) + 62px) 10px calc(78px + env(safe-area-inset-bottom, 0px));
+                touch-action: none;
+            }
+            #floor-stage { transform-origin: 50% 50%; will-change: transform; }
+
+            /* ---- niveles: tira horizontal bajo el menú (nunca se sale ni se pisa) ---- */
+            #level-menu {
+                left: 0; right: 0; top: calc(var(--nav-h) + 6px); bottom: auto; transform: none;
+                flex-direction: row; align-items: center; justify-content: safe center;
+                gap: 6px; padding: 0 12px; overflow-x: auto; overflow-y: hidden;
+                scrollbar-width: none; scroll-snap-type: x proximity; z-index: 60;
+            }
+            #level-menu::-webkit-scrollbar { display: none; }
+            .level-caption { display: none; }
+            .level-button { flex: 1 0 44px; max-width: 58px; height: 48px; font-size: 12px; scroll-snap-align: center; }
+
+            @media (max-width: 359px) {
+                #level-menu { gap: 4px; padding: 0 8px; }
+                .level-button { flex-basis: 40px; font-size: 11px; }
+                #floor-zoom { gap: 4px; }
+                #floor-zoom button { width: 42px; height: 46px; }
+            }
+
+            /* ---- barra inferior de la planta: volver (izq) + zoom (der) ---- */
+            #floor-navigation { left: 12px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+            .floor-button { min-height: 46px; padding: 0 14px; font-size: 9px; letter-spacing: .08em; }
+
+            #floor-zoom { right: 12px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+            #floor-hint { top: calc(var(--nav-h) + 64px); }
+
+            /* ---- panel de información: hoja inferior desplazable ---- */
+            #unit-panel {
+                width: 100%; top: auto; bottom: 0; height: auto; max-height: min(66%, 580px);
+                padding: 18px 20px 0; overflow-y: auto; overscroll-behavior: contain;
+                border-radius: 16px 16px 0 0; transform: translateY(100%);
+            }
+            #unit-panel.active { transform: translateY(0); }
+            .close-panel { width: 44px; height: 44px; top: 8px; right: 10px; z-index: 3; }
+            .unit-number { margin-top: 4px; }
+            .unit-title { font-size: 26px; }
+            .unit-data { gap: 16px 12px; }
+            .data-label { font-size: 9px; }
+            .unit-description { margin-top: 20px; font-size: 13px; line-height: 1.6; }
+
+            /* ---- botones 360° / 3D: siempre visibles, abajo del panel ---- */
+            .panel-actions {
+                display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+                position: sticky; bottom: 0; z-index: 2; margin: 18px -20px 0;
+                padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+                background: linear-gradient(rgba(20,20,20,0), rgba(20,20,20,.98) 30%);
+            }
+            .panel-actions .tour-button { margin: 0; min-height: 54px; padding: 0 8px; }
+            .lbl-full { display: none; }
+            .lbl-short { display: inline; font-size: 17px; letter-spacing: .12em; font-weight: 600; }
+            #tour-button { background: #fff; color: #111; border-color: #fff; }       /* primario */
+            #model-button { background: transparent; color: #fff; }                   /* secundario */
+
+            /* ---- recorrido 360 / 3D ---- */
+            #uv-gallery { bottom: calc(10px + env(safe-area-inset-bottom, 0px)); gap: 8px; padding: 0 12px; }
+            .uv-card { width: 78px; }
+            .uv-card img { height: 46px; }
+            .scene-arrow { width: 48px; height: 48px; }
+        }
+
+        @media (max-height: 520px) and (orientation: landscape) and (pointer: coarse) {
+
+            :root { --nav-h: calc(62px + env(safe-area-inset-top, 0px)); }
+
+            header { padding: calc(6px + env(safe-area-inset-top, 0px)) calc(10px + env(safe-area-inset-right, 0px)) 6px calc(10px + env(safe-area-inset-left, 0px)); justify-content: flex-end; }
+            .project-info { display: none; }                       /* libera el borde izquierdo para los niveles */
+            .level-caption { display: none; }
+            .top-navigation { width: auto; margin-left: auto; }
+            .top-button { flex: none; min-height: 40px; padding: 0 16px; font-size: 10px; }
+
+            /* planta: casi toda la pantalla */
+            #floor-image-container {
+                inset: var(--nav-h) 62px 8px calc(60px + env(safe-area-inset-left, 0px)); touch-action: none;
+            }
+
+            /* niveles: columna a la izquierda, siempre dentro de pantalla */
+            #level-menu {
+                left: calc(8px + env(safe-area-inset-left, 0px)); right: auto;
+                top: calc(var(--nav-h) + 4px); bottom: 8px; transform: none;
+                flex-direction: column; justify-content: safe center; align-items: center;
+                gap: 4px; padding: 0; overflow-x: hidden; overflow-y: auto; width: 46px;
+            }
+            .level-button { flex: none; width: 42px; max-width: none; height: 40px; font-size: 11px; }
+
+            /* volver: arriba a la izquierda (el menú principal queda a la derecha) */
+            #floor-navigation { left: calc(10px + env(safe-area-inset-left, 0px)); top: calc(8px + env(safe-area-inset-top, 0px)); bottom: auto; }
+            .floor-button { min-height: 44px; }
+
+            #floor-zoom { flex-direction: column; right: calc(10px + env(safe-area-inset-right, 0px)); bottom: 8px; }
+            #floor-zoom button { width: 44px; height: 44px; }
+            #floor-hint { top: auto; bottom: 10px; }
+
+            /* panel: lateral derecho desplazable */
+            #unit-panel {
+                top: var(--nav-h); bottom: 0; left: auto; right: 0; height: auto; max-height: none;
+                width: min(400px, 54vw); border-radius: 0; transform: translateX(100%);
+                padding: 14px 18px 0; overflow-y: auto;
+            }
+            #unit-panel.active { transform: translateX(0); }
+            .panel-actions { margin: 14px -18px 0; padding: 12px 18px 12px; }
+            .unit-title { font-size: 22px; }
+
+            .uv-card { width: 64px; }
+            .uv-card img { height: 36px; }
+            .uv-card span { display: none; }
+            .uv-bar { padding-bottom: 0; }
+        }
+
+        /* =========================================================
+           NUEVO · ALTERNAR PLANTA 3D / 2D
+        ========================================================= */
+
+        #floor-view-toggle {
+            position: absolute; right: 30px; bottom: 25px; z-index: 50;
+            display: flex;
+            border: 1px solid rgba(0,0,0,.35);
+            background: rgba(255,255,255,.75); backdrop-filter: blur(8px);
+            opacity: 0; transition: opacity .6s ease 1s;
+        }
+        #floor-scene.active #floor-view-toggle { opacity: 1; }
+        #floor-view-toggle button {
+            min-width: 54px; min-height: 34px; padding: 0 14px;
+            border: 0; background: transparent; color: #111; cursor: pointer;
+            font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+            transition: background .3s ease, color .3s ease;
+        }
+        #floor-view-toggle button + button { border-left: 1px solid rgba(0,0,0,.2); }
+        #floor-view-toggle button:hover { background: #fff; }
+        #floor-view-toggle button.active { background: #111; color: #fff; }
+        #floor-view-toggle button:focus-visible { outline: 2px solid #111; outline-offset: -2px; }
+
+        /* vista 3D: se superpone a la imagen 2D con un fundido */
+        #floor-model-wrap {
+            position: absolute; inset: 0;
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity .5s ease, visibility .5s ease;
+        }
+        #floor-scene.view-3d #floor-model-wrap { opacity: 1; visibility: visible; pointer-events: auto; }
+        #floor-scene.view-3d #floor-stage { opacity: 0 !important; pointer-events: none; }
+        #floor-model { width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
+        #floor-model-msg {
+            position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+            padding: 0 24px; text-align: center; pointer-events: none;
+            font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #111; opacity: .6;
+        }
+        #floor-scene.view-3d #floor-zoom,
+        #floor-scene.view-3d #floor-hint { display: none !important; }
+
+        /* =========================================================
+           NUEVO · ETIQUETAS DE DISPONIBILIDAD SOBRE LA PLANTA 2D
+        ========================================================= */
+
+        #unit-tags { position: absolute; inset: 0; pointer-events: none; }
+
+        .unit-tag {
+            position: absolute;
+            transform: translate(-50%, -50%) scale(var(--tag-inv, 1));
+            transform-origin: center;
+            display: flex; flex-direction: column; gap: 3px;
+            max-width: 150px; padding: 6px 11px 6px 9px;
+            background: rgba(14,14,14,.86); color: #fff;
+            border-left: 3px solid var(--tag-color, #fff);
+            box-shadow: 0 4px 14px rgba(0,0,0,.22);
+            backdrop-filter: blur(6px);
+            white-space: nowrap;
+            opacity: 0; animation: unit-tag-in .5s ease .15s forwards;
+        }
+        .unit-tag-name {
+            font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+            overflow: hidden; text-overflow: ellipsis;
+        }
+        .unit-tag-status {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 9px; letter-spacing: .12em; text-transform: uppercase; opacity: .92;
+        }
+        .unit-tag-dot {
+            flex: none; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--tag-color, #fff); box-shadow: 0 0 0 2px rgba(255,255,255,.2);
+        }
+        @keyframes unit-tag-in { to { opacity: 1; } }
+
+        /* si la unidad tiene etiqueta, el rótulo de hover es redundante */
+        .unit.has-tag .unit-label { display: none; }
+
+        /* =========================================================
+           NUEVO · GALERÍA (carrusel a pantalla completa)
+        ========================================================= */
+
+        #gallery-view {
+            --gv-fit: contain;            /* "cover" = recorta la imagen y llena toda la pantalla */
+            position: fixed; inset: 0; z-index: 400;   /* sobre la unidad (300), bajo el menú (500) */
+            background: #0e0e0e; color: #fff;
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity .6s ease, visibility .6s ease;
+        }
+        #gallery-view.active { opacity: 1; visibility: visible; pointer-events: auto; }
+
+        .gv-stage {
+            position: absolute; inset: 0; overflow: hidden;
+            touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none;
+        }
+        .gv-stage.dragging { cursor: grabbing; }
+        .gv-track {
+            display: flex; height: 100%;
+            transition: transform .7s cubic-bezier(.77,0,.18,1);
+            will-change: transform;
+        }
+        .gv-stage.dragging .gv-track { transition: none; }
+        .gv-slide { flex: 0 0 100%; height: 100%; margin: 0; }
+        .gv-slide img {
+            width: 100%; height: 100%; display: block; object-fit: var(--gv-fit);
+            pointer-events: none; -webkit-user-drag: none;
+            opacity: 0; transition: opacity .6s ease;
+        }
+        .gv-slide img.loaded { opacity: 1; }
+
+        .gv-shade {
+            position: absolute; inset: 0; pointer-events: none;
+            background: linear-gradient(to bottom, rgba(0,0,0,.45), transparent 22%, transparent 68%, rgba(0,0,0,.6));
+        }
+        .gv-arrow:disabled { opacity: .3; pointer-events: none; }
+        .gv-arrow[hidden], #nav-gallery[hidden] { display: none !important; }
+
+        .gv-caption {
+            position: absolute; left: 28px; bottom: calc(26px + env(safe-area-inset-bottom, 0px));
+            z-index: 3; pointer-events: none; max-width: calc(100% - 190px);
+        }
+        .gv-caption small {
+            display: block; margin-bottom: 7px;
+            font-size: 9px; letter-spacing: .2em; text-transform: uppercase; opacity: .65;
+        }
+        .gv-title {
+            font-size: 15px; letter-spacing: .1em; text-transform: uppercase;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .gv-close {
+            position: absolute; right: 28px; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); z-index: 3;
+            min-height: 40px; padding: 0 16px; cursor: pointer;
+            border: 1px solid rgba(255,255,255,.4); background: rgba(12,12,12,.5); backdrop-filter: blur(10px);
+            color: #fff; font-size: 9px; letter-spacing: .13em; text-transform: uppercase;
+            transition: background .3s ease, border-color .3s ease;
+        }
+        .gv-close:hover { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.8); }
+
+        /* =========================================================
+           NUEVO · AJUSTES MÓVIL (menú con 6 botones, 3D/2D, etiquetas, galería)
+        ========================================================= */
+
+        @media (max-width: 700px) {
+            .top-button { padding-left: 6px; padding-right: 6px; letter-spacing: .05em; }
+
+            #floor-view-toggle { right: 12px; top: calc(var(--nav-h) + 66px); bottom: auto; }
+            #floor-view-toggle button { min-height: 44px; min-width: 56px; font-size: 11px; }
+            #floor-hint { top: calc(var(--nav-h) + 118px); }
+
+            .unit-tag { max-width: 130px; padding: 5px 9px 5px 8px; }
+
+            #gallery-view { --gv-fit: cover; }   /* en celular vertical la imagen llena la pantalla (igual que la portada) */
+            .gv-caption { left: 14px; max-width: calc(100% - 130px); }
+            .gv-close { right: 12px; min-height: 44px; padding: 0 14px; }
+        }
+
+        @media (max-width: 380px) {
+            .top-button { padding-left: 4px; padding-right: 4px; font-size: 9px; letter-spacing: .03em; }
+        }
+
+        @media (max-height: 520px) and (orientation: landscape) and (pointer: coarse) {
+            #floor-view-toggle {
+                flex-direction: column;
+                right: calc(10px + env(safe-area-inset-right, 0px)); top: calc(var(--nav-h) + 8px); bottom: auto;
+            }
+            #floor-view-toggle button { width: 44px; min-width: 0; height: 44px; min-height: 0; padding: 0; }
+            #floor-view-toggle button + button { border-left: 0; border-top: 1px solid rgba(0,0,0,.2); }
+            #floor-hint { top: auto; bottom: 10px; }
+
+            .gv-caption { bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+            .gv-close { bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+        }
+
+        /* =========================================================
+           NUEVO · BOTÓN PARA ALTERNAR LA IMAGEN DE LA PLANTA
+        ========================================================= */
+
+        #floor-image-toggle {
+            position: absolute; left: 205px; bottom: 25px; z-index: 50;   /* junto a "Volver": el panel de unidad tapa la derecha */
+            min-width: 54px; min-height: 34px; padding: 0 14px;
+            border: 1px solid rgba(0,0,0,.35);
+            background: rgba(255,255,255,.75); backdrop-filter: blur(8px);
+            color: #111; cursor: pointer;
+            font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+            opacity: 0; transition: opacity .6s ease 1s, background .3s ease, color .3s ease;
+        }
+        #floor-scene.active #floor-image-toggle { opacity: 1; }
+        #floor-image-toggle:hover { background: #fff; }
+        #floor-image-toggle:active { background: #111; color: #fff; }
+        #floor-image-toggle:disabled { opacity: .4 !important; cursor: default; background: rgba(255,255,255,.75); color: #111; }
+        #floor-image-toggle:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+        #floor-scene.view-3d #floor-image-toggle { visibility: hidden; }
+
+        @media (max-width: 700px) {
+            #floor-image-toggle { left: auto; right: 136px; top: calc(var(--nav-h) + 66px); bottom: auto; min-height: 44px; font-size: 11px; }
+        }
+
+        @media (max-height: 520px) and (orientation: landscape) and (pointer: coarse) {
+            #floor-image-toggle {
+                left: calc(64px + env(safe-area-inset-left, 0px)); right: auto; top: auto; bottom: 8px;
+                width: 44px; min-width: 0; height: 44px; min-height: 0; padding: 0;
+            }
+            #floor-image-toggle .fit-lbl { display: none; }
+        }
+
+        /* =========================================================
+           NUEVO · UNIDADES POLIGONALES + COLOR SEGÚN ESTADO
+        ========================================================= */
+
+        /* color de la unidad según su estado: solo aparece al pasar por encima
+           (solo si figura en DISPONIBILIDAD con visible != false) */
+        .unit.has-estado:not(.unit-poly):hover,
+        .unit.has-estado:not(.unit-poly):focus-visible {
+            background: rgba(var(--unit-rgb), .32);
+            border-color: var(--unit-color);
+            box-shadow: none;
+        }
+
+        /* unidad con forma libre (floors[].unidades[].puntos): se dibuja con SVG */
+        .unit.unit-poly {
+            border: 0; background: none; box-shadow: none;
+            pointer-events: none;                     /* el área clicable es solo el polígono */
+        }
+        .unit-shape { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+        .unit-shape polygon {
+            fill: rgba(255,255,255,0); stroke: rgba(0,0,0,0); stroke-width: 1.5;
+            stroke-linejoin: round; vector-effect: non-scaling-stroke;
+            pointer-events: visiblePainted; cursor: pointer;
+            transition: fill .3s ease, stroke .3s ease;
+        }
+        .unit-shape polygon:hover { fill: rgba(255,255,255,.16); stroke: rgba(0,0,0,.5); }
+        .unit-shape:hover ~ .unit-label { opacity: 1; }
+        .unit-poly.has-estado .unit-shape polygon:hover { fill: rgba(var(--unit-rgb), .32); stroke: var(--unit-color); }
+        .unit-poly:focus-visible .unit-shape polygon { stroke: #111; }
     </style>
 </head>
 
@@ -1111,6 +1546,8 @@
 
             <button class="top-button" id="nav-360" data-mode="360">360°</button>
 
+            <button class="top-button" id="nav-gallery">Galería</button>
+
         </nav>
 
     </header>
@@ -1188,8 +1625,18 @@
         <div id="floor-image-container">
 
             <div id="floor-stage">
-                <img id="floor-image" src="images/1P.png" alt="Planta arquitectónica">
+                <img id="floor-image" data-src="images/1P.png" alt="Planta arquitectónica" decoding="async">
                 <div id="units"></div>
+                <div id="unit-tags"></div>
+            </div>
+
+            <!-- Vista 3D de la planta (se alterna con la imagen 2D) -->
+            <div id="floor-model-wrap">
+                <model-viewer id="floor-model" camera-controls auto-rotate auto-rotate-delay="0"
+                    rotation-per-second="8deg" camera-orbit="0deg 55deg auto"
+                    max-camera-orbit="auto 90deg auto" shadow-intensity="1" exposure=".9"
+                    touch-action="pan-y"></model-viewer>
+                <div id="floor-model-msg"></div>
             </div>
 
         </div>
@@ -1211,6 +1658,26 @@
             </button>
 
         </div>
+
+        <!-- Zoom de la planta (solo se muestra en móvil) -->
+        <div id="floor-zoom" aria-label="Zoom de la planta">
+            <button id="zoom-in"  aria-label="Acercar">+</button>
+            <button id="zoom-out" aria-label="Alejar">−</button>
+            <button id="zoom-fit" aria-label="Restablecer vista">⟲</button>
+        </div>
+
+        <div id="floor-hint">Pellizcá para ampliar · arrastrá para mover</div>
+
+        <!-- Alternar 3D / 2D de la misma planta -->
+        <div id="floor-view-toggle" role="group" aria-label="Tipo de vista de la planta">
+            <button type="button" data-view="3d" aria-pressed="false">3D</button>
+            <button type="button" data-view="2d" aria-pressed="true" class="active">2D</button>
+        </div>
+
+        <!-- Alterna SOLO la imagen de la planta (floors[].imagen + floors[].imagenesAlt) -->
+        <button type="button" id="floor-image-toggle" aria-label="Cambiar imagen de la planta">
+            <span class="fit-lbl">Plano</span> <span id="floor-image-count">1/1</span>
+        </button>
 
     </section>
 
@@ -1337,19 +1804,26 @@
         </p>
 
 
-        <button
-            class="tour-button"
-            id="tour-button"
-        >
-            Ingresar al recorrido →
-        </button>
+        <!-- en escritorio el contenedor es transparente (display: contents); en móvil es una barra fija abajo -->
+        <div class="panel-actions">
 
             <button
-            class="tour-button"
-            id="model-button"
-        >
-            Ver en 3D
-        </button>
+                class="tour-button"
+                id="tour-button"
+                aria-label="Ingresar al recorrido 360°"
+            >
+                <span class="lbl-full">Ingresar al recorrido →</span><span class="lbl-short">360°</span>
+            </button>
+
+            <button
+                class="tour-button"
+                id="model-button"
+                aria-label="Ver en 3D"
+            >
+                <span class="lbl-full">Ver en 3D</span><span class="lbl-short">3D</span>
+            </button>
+
+        </div>
 
     </aside>
 
@@ -1358,7 +1832,7 @@
          LOADER
     ========================================================== -->
 
-    <div id="loader">
+    <div id="loader" class="active">
 
         <div class="loader-line"></div>
 
@@ -1401,8 +1875,36 @@
 
     </section>
 
-    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-    <script src="marzipano.js"></script>
+    <!-- =========================================================
+         GALERÍA: carrusel de imágenes a pantalla completa
+    ========================================================== -->
+
+    <section id="gallery-view" aria-label="Galería de imágenes">
+
+        <div class="gv-stage" id="gv-stage">
+            <div class="gv-track" id="gv-track"></div>
+        </div>
+
+        <div class="gv-shade"></div>
+
+        <button class="scene-arrow left gv-arrow" id="gv-prev" aria-label="Imagen anterior">
+            <span class="arrow-line"></span>
+        </button>
+
+        <button class="scene-arrow right gv-arrow" id="gv-next" aria-label="Imagen siguiente">
+            <span class="arrow-line"></span>
+        </button>
+
+        <div class="gv-caption" aria-live="polite">
+            <small>Galería · <span id="gv-index">01 / 01</span></small>
+            <div class="gv-title" id="gv-title"></div>
+        </div>
+
+        <button class="gv-close" id="gv-close" aria-label="Cerrar galería">← Volver</button>
+
+    </section>
+
+    <!-- model-viewer y marzipano.js ahora se cargan bajo demanda (ver "CARGA BAJO DEMANDA") -->
 
     <script>
 
@@ -1513,6 +2015,19 @@
        PLANTAS (JSON)
        x, y, w, h = porcentaje RESPECTO A LA IMAGEN de la planta.
        "id" debe existir en el objeto `units` de más abajo.
+
+       imagen   → imagen 2D de la planta (la que se ve hoy).
+       unidades → cada unidad es un rectángulo { id, x, y, w, h } (en % de la imagen)
+                  o una FORMA LIBRE: { id, puntos: [[x,y],[x,y],[x,y],…] } con los
+                  vértices en % de la imagen (mínimo 3, en orden alrededor del contorno).
+                  Para obtener los puntos: abrí la página con ?puntos y hacé
+                  Alt + clic sobre cada vértice de la planta (Alt + Shift + clic = empezar de nuevo);
+                  la lista se copia sola al portapapeles.
+       imagenesAlt → (opcional) lista de imágenes alternativas de ESA planta para el
+                  botón "Plano": ["images/PB-b.png", "images/PB-c.png"]. Sin lista, el botón queda inactivo.
+       modelo3D → (opcional) modelo .glb de ESA misma planta para el
+                  botón 3D. Si no se define, el botón 3D avisa que
+                  todavía no está disponible. Ej.: modelo3D: "models/PB.glb"
     ============================================================ */
 
     const floors = [
@@ -1522,10 +2037,12 @@
             etiqueta: "00",
             nombre: "Planta baja",
             imagen: "images/PB.png",
+            imagenesAlt: ["images/PB-1.png"],   // ← imágenes alternativas de esta planta
+            // modelo3D: "modelos/proyecto8.glb",
             unidades: [
-                { id: "unidad04", x: 16, y: 20, w: 25, h: 60 },
-                { id: "unidad05", x: 60, y: 20, w: 25, h: 60 },
-                { id: "unidad06", x: 45, y: 20, w: 10, h: 60 }
+                { id: "unidad04", x: 11, y: 15, w: 33, h: 69 },
+                { id: "unidad05", x: 58, y: 15, w: 33, h: 69 },
+                { id: "unidad06", x: 44, y: 15, w: 14, h: 69 }
             ]
         },
 
@@ -1534,10 +2051,11 @@
             etiqueta: "01",
             nombre: "Primer Piso",
             imagen: "images/1P.png",
+            modelo3D: "modelos/proyecto8.glb",
             unidades: [
-                { id: "unidad01", x: 16, y: 40, w: 25, h: 40 },
-                { id: "unidad02", x: 32, y: 10, w: 37, h: 25 },
-                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 },
+                { id: "unidad01", puntos: [[12.2,84.7],[12.4,61.1],[8.2,61.1],[7.8,36.5],[12.2,36.9],[12.2,11.6],[23.5,11.4],[23.6,23],[29.1,22.7],[29.1,36],[42.8,36.5],[42.8,84]] },
+                { id: "unidad02", puntos: [[29.2,11.9],[72.3,10.8],[72,35.8],[29.4,35.8]], },
+                { id: "unidad03", puntos: [[59.1,84.3],[89.2,84.3],[89.2,73.1],[92.8,72.8],[93.2,36.8],[89.7,36.4],[89.2,11.2],[78,11.6],[77.7,22.4],[72.4,22.9],[72.3,35.9],[58.4,37.1]] },
                 { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
@@ -1547,10 +2065,11 @@
             etiqueta: "02",
             nombre: "Segundo Piso",
             imagen: "images/2P.png",
+            modelo3D: "modelos/proyecto8.glb",
             unidades: [
-                { id: "unidad01", x: 16, y: 40, w: 25, h: 40 },
-                { id: "unidad02", x: 32, y: 10, w: 37, h: 25 },
-                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 },
+                { id: "unidad01", puntos: [[12.2,84.7],[12.4,61.1],[8.2,61.1],[7.8,36.5],[12.2,36.9],[12.2,11.6],[23.5,11.4],[23.6,23],[29.1,22.7],[29.1,36],[42.8,36.5],[42.8,84]] },
+                { id: "unidad02", puntos: [[29.2,11.9],[72.3,10.8],[72,35.8],[29.4,35.8]], },
+                { id: "unidad03", puntos: [[59.1,84.3],[89.2,84.3],[89.2,73.1],[92.8,72.8],[93.2,36.8],[89.7,36.4],[89.2,11.2],[78,11.6],[77.7,22.4],[72.4,22.9],[72.3,35.9],[58.4,37.1]] },
                 { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
@@ -1560,10 +2079,11 @@
             etiqueta: "03",
             nombre: "Tercer Piso",
             imagen: "images/3P.png",
+            modelo3D: "modelos/proyecto8.glb",
             unidades: [
-                { id: "unidad01", x: 16, y: 40, w: 25, h: 40 },
-                { id: "unidad02", x: 32, y: 10, w: 37, h: 25 },
-                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 },
+                { id: "unidad01", puntos: [[12.2,84.7],[12.4,61.1],[8.2,61.1],[7.8,36.5],[12.2,36.9],[12.2,11.6],[23.5,11.4],[23.6,23],[29.1,22.7],[29.1,36],[42.8,36.5],[42.8,84]] },
+                { id: "unidad02", puntos: [[29.2,11.9],[72.3,10.8],[72,35.8],[29.4,35.8]], },
+                { id: "unidad03", puntos: [[59.1,84.3],[89.2,84.3],[89.2,73.1],[92.8,72.8],[93.2,36.8],[89.7,36.4],[89.2,11.2],[78,11.6],[77.7,22.4],[72.4,22.9],[72.3,35.9],[58.4,37.1]] },
                 { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
@@ -1573,10 +2093,11 @@
             etiqueta: "04",
             nombre: "Cuarto Piso",
             imagen: "images/4P.png",
+            modelo3D: "modelos/proyecto8.glb",
             unidades: [
-                { id: "unidad01", x: 16, y: 40, w: 25, h: 40 },
-                { id: "unidad02", x: 32, y: 10, w: 37, h: 25 },
-                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 },
+                { id: "unidad01", puntos: [[12.2,84.7],[12.4,61.1],[8.2,61.1],[7.8,36.5],[12.2,36.9],[12.2,11.6],[23.5,11.4],[23.6,23],[29.1,22.7],[29.1,36],[42.8,36.5],[42.8,84]] },
+                { id: "unidad02", puntos: [[29.2,11.9],[72.3,10.8],[72,35.8],[29.4,35.8]], },
+                { id: "unidad03", puntos: [[59.1,84.3],[89.2,84.3],[89.2,73.1],[92.8,72.8],[93.2,36.8],[89.7,36.4],[89.2,11.2],[78,11.6],[77.7,22.4],[72.4,22.9],[72.3,35.9],[58.4,37.1]] },
                 { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
@@ -1586,10 +2107,11 @@
             etiqueta: "05",
             nombre: "Quinto Piso",
             imagen: "images/5P.png",
+            modelo3D: "modelos/proyecto8.glb",
             unidades: [
-                { id: "unidad01", x: 16, y: 40, w: 25, h: 40 },
-                { id: "unidad02", x: 32, y: 10, w: 37, h: 25 },
-                { id: "unidad03", x: 60, y: 40, w: 25, h: 40 },
+                { id: "unidad01", puntos: [[12.2,84.7],[12.4,61.1],[8.2,61.1],[7.8,36.5],[12.2,36.9],[12.2,11.6],[23.5,11.4],[23.6,23],[29.1,22.7],[29.1,36],[42.8,36.5],[42.8,84]] },
+                { id: "unidad02", puntos: [[29.2,11.9],[72.3,10.8],[72,35.8],[29.4,35.8]], },
+                { id: "unidad03", puntos: [[59.1,84.3],[89.2,84.3],[89.2,73.1],[92.8,72.8],[93.2,36.8],[89.7,36.4],[89.2,11.2],[78,11.6],[77.7,22.4],[72.4,22.9],[72.3,35.9],[58.4,37.1]] },
                 { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
@@ -1599,11 +2121,12 @@
             etiqueta: "06",
             nombre: "Terraza",
             imagen: "images/6P.png",
+            modelo3D: "modelos/proyecto8.glb",
             unidades: [
-                { id: "Solarium", x: 10, y: 35, w: 15, h: 50 },
-                { id: "Terraza", x: 10, y: 15, w: 80, h: 20 },
-                { id: "Pileta", x: 60, y: 35, w: 30, h: 50 },
-                { id: "SUM", x: 20, y: 35, w: 20, h: 50 }
+                { id: "unidad08", x: 10, y: 35, w: 15, h: 50 },
+                { id: "unidad09", x: 10, y: 15, w: 80, h: 20 },
+                { id: "unidad10", x: 60, y: 35, w: 30, h: 50 },
+                { id: "unidad11", x: 27, y: 35, w: 15, h: 50 }
             ]
         }
 
@@ -1611,6 +2134,31 @@
 
     let currentFloor = 0;
     let floorAspect = 1.5;
+
+    // Unidades con `puntos`: se calcula solo su caja (x, y, w, h) y su centro,
+    // así el resto del código (zoom, etiquetas) las trata igual que a un rectángulo.
+    floors.forEach(f => (f.unidades || []).forEach(u => {
+
+        if (!Array.isArray(u.puntos) || u.puntos.length < 3) return;
+
+        const xs = u.puntos.map(q => q[0]);
+        const ys = u.puntos.map(q => q[1]);
+
+        u.x = Math.min(...xs);
+        u.y = Math.min(...ys);
+        u.w = Math.max(0.1, Math.max(...xs) - u.x);
+        u.h = Math.max(0.1, Math.max(...ys) - u.y);
+
+        // centroide del polígono (para ubicar la etiqueta)
+        let a = 0, cx = 0, cy = 0;
+        for (let i = 0; i < u.puntos.length; i++) {
+            const [x0, y0] = u.puntos[i];
+            const [x1, y1] = u.puntos[(i + 1) % u.puntos.length];
+            const k = x0 * y1 - x1 * y0;
+            a += k; cx += (x0 + x1) * k; cy += (y0 + y1) * k;
+        }
+        if (Math.abs(a) > 1e-6) { u.cx = cx / (3 * a); u.cy = cy / (3 * a); }
+    }));
 
 
     /* ============================================================
@@ -1805,9 +2353,231 @@
             recorrido:
                 "trabajo.html"
 
+        },
+
+
+        unidad08: {
+
+            id: "unidad08",
+
+            nombre: "Solarium",
+
+            ambientes: "-",
+
+            cubierta: "90 m²",
+
+            semicubierta: "-",
+
+            total: "105 m²",
+
+            dormitorios: "3-",
+
+            banos: "-",
+
+            descripcion:
+                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+
+            recorrido:
+                "trabajo.html"
+
+        },
+
+
+        unidad09: {
+
+            id: "unidad09",
+
+            nombre: "Terraza",
+
+            ambientes: "-",
+
+            cubierta: "90 m²",
+
+            semicubierta: "-",
+
+            total: "105 m²",
+
+            dormitorios: "3-",
+
+            banos: "-",
+
+            descripcion:
+                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+
+            recorrido:
+                "trabajo.html"
+
+        },
+
+
+        unidad10: {
+
+            id: "unidad10",
+
+            nombre: "Pileta",
+
+            ambientes: "-",
+
+            cubierta: "90 m²",
+
+            semicubierta: "-",
+
+            total: "105 m²",
+
+            dormitorios: "3-",
+
+            banos: "-",
+
+            descripcion:
+                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+
+            recorrido:
+                "trabajo.html"
+
+        },
+
+
+        unidad11: {
+
+            id: "unidad11",
+
+            nombre: "SUM",
+
+            ambientes: "-",
+
+            cubierta: "90 m²",
+
+            semicubierta: "-",
+
+            total: "105 m²",
+
+            dormitorios: "3-",
+
+            banos: "-",
+
+            descripcion:
+                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+
+            recorrido:
+                "trabajo.html"
+
         }
 
     };
+
+
+    /* ============================================================
+       ESTADOS DE UNIDAD (solo estos tres)
+       texto = lo que se lee en la etiqueta · color = punto y borde
+    ============================================================ */
+
+    const ESTADOS_UNIDAD = {
+        disponible: { texto: "Disponible", color: "#2fb36d" },
+        reservada:  { texto: "Reservada",  color: "#f29a2e" },
+        vendida:    { texto: "Vendida",    color: "#e0483f" }
+    };
+
+
+    /* ============================================================
+       DISPONIBILIDAD DE UNIDADES (etiquetas sobre la planta 2D)
+
+       Una lista por nivel. La clave es la "etiqueta" del nivel en
+       `floors` ("00" = Planta baja, "01" = Primer Piso, "02"…).
+
+         id      → el mismo id de floors[].unidades (ej. "unidad01")
+         estado  → "disponible" | "reservada" | "vendida"
+         visible → true: muestra la etiqueta · false: no muestra nada
+         nombre  → (opcional) texto de la etiqueta; si falta usa units[id].nombre
+         x, y    → (opcional) posición del CENTRO de la etiqueta, en % de la
+                   imagen de la planta. Si faltan, va al centro de la unidad.
+
+       Las unidades que NO figuran en la lista no muestran etiqueta.
+       ⚠ Los valores de abajo son de EJEMPLO: reemplazalos por los reales.
+    ============================================================ */
+
+    const DISPONIBILIDAD = {
+
+        // Planta baja
+        "00": [ 
+        ],
+
+        // Primer Piso
+        "01": [
+            { id: "unidad01", estado: "disponible", visible: true,  x: 28, y: 60 },
+            { id: "unidad02", estado: "reservada",  visible: true,  x: 50, y: 22 },
+            { id: "unidad03", estado: "disponible", visible: true, x: 72, y: 60 } 
+        ],
+
+        // Segundo Piso
+        "02": [
+            { id: "unidad01", estado: "disponible", visible: true,  x: 28, y: 60 },
+            { id: "unidad02", estado: "reservada",  visible: true,  x: 50, y: 22 },
+            { id: "unidad03", estado: "disponible", visible: true, x: 72, y: 60 }
+        ],
+
+        // Segundo Piso
+        "03": [
+            { id: "unidad01", estado: "disponible", visible: true,  x: 28, y: 60 },
+            { id: "unidad02", estado: "reservada",  visible: true,  x: 50, y: 22 },
+            { id: "unidad03", estado: "vendida", visible: true, x: 72, y: 60 }
+        ],
+
+        // Segundo Piso
+        "04": [
+            { id: "unidad01", estado: "reservada", visible: true,  x: 28, y: 60 },
+            { id: "unidad02", estado: "vendida",  visible: true,  x: 50, y: 22 },
+            { id: "unidad03", estado: "vendida", visible: true, x: 72, y: 60 }
+        ],
+
+        // Segundo Piso
+        "05": [
+            { id: "unidad01", estado: "vendida", visible: true,  x: 28, y: 60 },
+            { id: "unidad02", estado: "reservada",  visible: true,  x: 50, y: 22 },
+            { id: "unidad03", estado: "vendida", visible: true, x: 72, y: 60 }
+        ],
+
+        // Segundo Piso
+        "06": [
+            { id: "unidad01", estado: "vendida", visible: true,  x: 28, y: 60 },
+            { id: "unidad02", estado: "vendida",  visible: true,  x: 50, y: 22 },
+            { id: "unidad03", estado: "vendida", visible: true, x: 72, y: 60 }
+        ]
+
+    };
+
+
+    /* ============================================================
+       GALERÍA (carrusel a pantalla completa)
+       Cada item es una imagen, en este orden:
+         { escena: "fachada", titulo: "…" }   → reutiliza la imagen de esa escena (scenes[].image)
+         { src: "images/archivo.jpg", titulo: "…" } → cualquier otra imagen
+    ============================================================ */
+
+    const GALERIA = [
+        { escena: "fachada",     titulo: "Fachada" },
+        { escena: "lateral",     titulo: "Vista lateral" },
+        { escena: "posterior",   titulo: "Vista posterior" },
+        { escena: "perspectiva", titulo: "Perspectiva" },
+        { src: "images/PB.png", titulo: "Planta Baja" },
+        { src: "images/1P.png", titulo: "Primer Piso" },
+        { src: "images/2P.png", titulo: "Segundo Piso" },
+        { src: "images/3P.png", titulo: "Tercer Piso" },
+        { src: "images/4P.png", titulo: "Cuarto Piso" },
+        { src: "images/5P.png", titulo: "Quinto Piso" },
+        { src: "images/6P.png", titulo: "Sexto Piso" },
+        { src: "images/proyecto8-1.png", titulo: "Toillete" },
+        { src: "images/proyecto8-2.png", titulo: "Unidad Tipo" },
+        { src: "images/proyecto8-3.jpg", titulo: "Baño" },
+        { src: "images/proyecto8-4.jpg", titulo: "Living - Comedor" },
+        { src: "images/proyecto8-5.jpg", titulo: "Cocina" },
+        { src: "images/proyecto8-6.jpg", titulo: "Habitación" },
+        { src: "images/proyecto8-7.jpg", titulo: "Habitación Suite" },
+        { src: "images/proyecto8-8.jpg", titulo: "Vestidor Suite" },
+        { src: "images/proyecto8-9.jpg", titulo: "Baño Suite" },
+        { src: "images/proyecto8-10.png", titulo: "Tienda" },
+        { src: "images/proyecto8-11.png", titulo: "Cafeteria" }
+        // , { src: "images/otra-imagen.jpg", titulo: "Hall de acceso" }
+    ];
 
 
     /* ============================================================
@@ -1899,6 +2669,7 @@
         sceneImage.classList.add("active");
 
         updateHotspot();
+        warmAround(index);
 
         currentSceneElement.textContent =
             String(index + 1).padStart(2, "0");
@@ -2061,7 +2832,7 @@
         transitionVideo.ontimeupdate = null;
         transitionVideo.onended = null;
 
-        try { await floorImage.decode(); } catch (e) {}
+        try { await ensureFloor(); } catch (e) {}
 
         // La planta (z-index 30) se desvanece POR ENCIMA del video (z-index 20)
         floorScene.classList.add("active");
@@ -2309,6 +3080,10 @@
             estamos viendo el edificio.
         */
 
+        if (galleryOpen()) {
+            return;
+        }
+
         if (
             floorScene.classList.contains("active")
         ) {
@@ -2330,52 +3105,120 @@
 
 
     /* ============================================================
-       PRELOAD DE IMÁGENES
+       CARGA PRIORIZADA
+       P1: fachada inicial (scenes[0]) — inmediata
+       P2: imágenes y videos de las escenas VECINAS a la actual
+       P3: plantas, video de entrada, modelo 3D, recorrido 360 — bajo demanda
     ============================================================ */
 
-    scenes.forEach(scene => {
+    const ENTRY_VIDEO = "videos/Clip 3.mp4";
 
-        const image =
-            new Image();
+    const warmImages = new Map();     // url -> Image (se guarda la referencia)
+    const warmVideos = new Map();     // url -> <video> precargando
+    let warmToken = 0;
+    let entryWarmed = false;
 
-        image.src =
-            scene.image;
+    function warmImage(url, priority) {
 
-    });
+        if (!url) return null;
+        if (warmImages.has(url)) return warmImages.get(url);
 
+        const im = new Image();
+        im.decoding = "async";
+        if (priority) im.fetchPriority = priority;
+        im.src = url;
 
-    /* ============================================================
-       PRELOAD DE VIDEOS
-    ============================================================ */
+        warmImages.set(url, im);
+        return im;
+    }
 
-    scenes.forEach(scene => {
+    function warmVideo(url) {
 
-        if (scene.next && scene.next.video) {
+        if (!url || warmVideos.has(url)) return;
 
-            const video =
-                document.createElement("video");
+        const v = document.createElement("video");
+        v.preload = "auto";
+        v.muted = true;
+        v.src = url;
 
-            video.preload = "auto";
+        warmVideos.set(url, v);
+    }
 
-            video.src =
-                scene.next.video;
+    // cancela la descarga de videos que ya no son "vecinos" de la escena actual
+    function releaseVideos(keep) {
 
+        for (const [url, v] of warmVideos) {
+            if (keep.includes(url)) continue;
+            v.removeAttribute("src");
+            v.load();
+            warmVideos.delete(url);
         }
+    }
 
+    // P2: imágenes de las escenas a las que se puede ir desde `index`, y después sus videos
+    function warmAround(index) {
 
-        if (scene.prev && scene.prev.video) {
+        const scene = scenes[index];
+        const token = ++warmToken;
 
-            const video =
-                document.createElement("video");
+        const links = [scene.next, scene.prev].filter(Boolean);
 
-            video.preload = "auto";
+        const imgs = links
+            .map(l => scenes[l.target] && warmImage(scenes[l.target].image))
+            .filter(Boolean);
 
-            video.src =
-                scene.prev.video;
+        const vids = links.map(l => l.video).filter(Boolean);
 
-        }
+        releaseVideos(entryWarmed ? [...vids, ENTRY_VIDEO] : vids);
 
-    });
+        Promise.all(imgs.map(im => im.decode().catch(() => {}))).then(() => {
+
+            if (token !== warmToken) return;      // el usuario ya cambió de escena
+
+            vids.forEach(warmVideo);
+
+            // si desde esta escena se puede entrar al edificio, ya nos "acercamos"
+            // (con un respiro, para no competir con los videos vecinos)
+            if (scene.hotspot) {
+                setTimeout(() => { if (token === warmToken) warmEntry(); }, 2000);
+            }
+        });
+    }
+
+    // P3 (al acercarse): video de entrada + primera planta
+    function warmEntry() {
+
+        entryWarmed = true;
+        warmVideo(ENTRY_VIDEO);
+        ensureFloor();
+    }
+
+    // P3 (bajo demanda): scripts pesados
+    const lazyScripts = {};
+
+    function loadScriptOnce(src, isModule) {
+
+        if (lazyScripts[src]) return lazyScripts[src];
+
+        lazyScripts[src] = new Promise((resolve, reject) => {
+
+            const el = document.createElement("script");
+            if (isModule) el.type = "module";
+            el.src = src;
+            el.onload = resolve;
+            el.onerror = () => { delete lazyScripts[src]; reject(new Error("No se pudo cargar " + src)); };
+            document.head.appendChild(el);
+        });
+
+        return lazyScripts[src];
+    }
+
+    const loadMarzipano = () => typeof Marzipano !== "undefined"
+        ? Promise.resolve() : loadScriptOnce("marzipano.js");
+
+    const loadModelViewer = () => customElements.get("model-viewer")
+        ? Promise.resolve()
+        : loadScriptOnce("https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js", true);
 
 
     /* ============================================================
@@ -2440,12 +3283,90 @@
             b.style.width  = u.w + "%";
             b.style.height = u.h + "%";
 
+            if (Array.isArray(u.puntos) && u.puntos.length >= 3) {
+
+                b.classList.add("unit-poly");
+
+                const NS = "http://www.w3.org/2000/svg";
+                const svg = document.createElementNS(NS, "svg");
+                svg.setAttribute("class", "unit-shape");
+                svg.setAttribute("viewBox", "0 0 100 100");
+                svg.setAttribute("preserveAspectRatio", "none");
+
+                const poly = document.createElementNS(NS, "polygon");
+                poly.setAttribute("points", u.puntos
+                    .map(q => ((q[0] - u.x) / u.w * 100) + "," + ((q[1] - u.y) / u.h * 100))
+                    .join(" "));
+
+                svg.appendChild(poly);
+                b.appendChild(svg);
+            }
+
             const label = document.createElement("span");
             label.className = "unit-label";
             label.textContent = data ? data.nombre : u.id;
 
             b.appendChild(label);
             unitsLayer.appendChild(b);
+        });
+
+        renderUnitTags(floor);
+    }
+
+    function hexToRgb(hex) {
+        const m = /^#?([0-9a-f]{6})$/i.exec(hex || "");
+        if (!m) return "255,255,255";
+        const n = parseInt(m[1], 16);
+        return [(n >> 16) & 255, (n >> 8) & 255, n & 255].join(",");
+    }
+
+    // Etiquetas de disponibilidad (opcionales, una por unidad; ver DISPONIBILIDAD)
+    function renderUnitTags(floor) {
+
+        const layer = document.getElementById("unit-tags");
+
+        layer.innerHTML = "";
+
+        (DISPONIBILIDAD[floor.etiqueta] || []).forEach(info => {
+
+            if (!info || info.visible === false) return;
+
+            const estado = ESTADOS_UNIDAD[info.estado];
+            const u = floor.unidades.find(x => x.id === info.id);
+
+            if (!estado) { console.warn("DISPONIBILIDAD: estado inválido", info); return; }
+            if (!u)      { console.warn("DISPONIBILIDAD: la unidad no existe en el nivel " + floor.etiqueta, info); return; }
+
+            const data = units[u.id];
+            const x = typeof info.x === "number" ? info.x : (typeof u.cx === "number" ? u.cx : u.x + u.w / 2);
+            const y = typeof info.y === "number" ? info.y : (typeof u.cy === "number" ? u.cy : u.y + u.h / 2);
+
+            const tag = document.createElement("div");
+            tag.className = "unit-tag unit-tag-" + info.estado;
+            tag.style.left = x + "%";
+            tag.style.top  = y + "%";
+            tag.style.setProperty("--tag-color", estado.color);
+
+            const name = document.createElement("span");
+            name.className = "unit-tag-name";
+            name.textContent = info.nombre || (data && data.nombre) || u.id;
+
+            const status = document.createElement("span");
+            status.className = "unit-tag-status";
+
+            const dot = document.createElement("i");
+            dot.className = "unit-tag-dot";
+
+            status.append(dot, estado.texto);
+            tag.append(name, status);
+            layer.appendChild(tag);
+
+            const btn = unitsLayer.querySelector('.unit[data-unit="' + CSS.escape(u.id) + '"]');
+            if (btn) {
+                btn.classList.add("has-tag", "has-estado");
+                btn.style.setProperty("--unit-color", estado.color);
+                btn.style.setProperty("--unit-rgb", hexToRgb(estado.color));
+            }
         });
     }
 
@@ -2463,6 +3384,9 @@
             b.classList.toggle("active", Number(b.dataset.index) === index);
         });
 
+        const activeLevel = levelMenu.querySelector(".level-button.active");
+        if (activeLevel && activeLevel.scrollIntoView) activeLevel.scrollIntoView({ inline: "center", block: "nearest" });
+
         if (!instant) {
             floorStage.style.opacity = "0";
             await new Promise(r => setTimeout(r, 350));
@@ -2470,7 +3394,12 @@
 
         const img = new Image();
         img.src = floor.imagen;
+
+        // indicador discreto solo si la planta tarda en llegar
+        const spin = setTimeout(() => floorContainer.classList.add("is-loading"), 250);
         try { await img.decode(); } catch (e) {}
+        clearTimeout(spin);
+        floorContainer.classList.remove("is-loading");
 
         floorAspect = (img.naturalWidth / img.naturalHeight) || 1.5;
 
@@ -2481,14 +3410,228 @@
         renderUnits(floor);
 
         floorStage.style.opacity = "1";
+
+        if (typeof resetFloorView === "function") resetFloorView();
+        if (typeof syncFloorModel === "function") syncFloorModel();
+        if (typeof resetFloorVariant === "function") resetFloorVariant();
+
+        // P3: plantas vecinas en segundo plano, de baja prioridad
+        warmImage(floors[index + 1] && floors[index + 1].imagen, "low");
+        warmImage(floors[index - 1] && floors[index - 1].imagen, "low");
+    }
+
+    // la primera planta se carga la primera vez que hace falta (no al abrir la página)
+    let floorReady = null;
+
+    function ensureFloor() {
+
+        if (!floorReady) {
+            floorStage.style.opacity = "0";
+            floorReady = showFloor(currentFloor, true);
+        }
+        return floorReady;
     }
 
     window.addEventListener("resize", fitStage);
 
-    floors.forEach(f => { const im = new Image(); im.src = f.imagen; });   // precarga
-
     renderLevelMenu();
-    showFloor(0, true);
+    levelMenu.querySelectorAll(".level-button").forEach(b =>
+        b.classList.toggle("active", Number(b.dataset.index) === currentFloor));
+
+
+    /* ============================================================
+       PLANTA: ALTERNAR 3D / 2D
+       2D → imagen de la planta (floors[].imagen) con sus unidades.
+       3D → modelo .glb de la misma planta (floors[].modelo3D, opcional).
+    ============================================================ */
+
+    const floorToggle    = document.getElementById("floor-view-toggle");
+    const floorModelWrap = document.getElementById("floor-model-wrap");
+    const floorModel     = document.getElementById("floor-model");
+    const floorModelMsg  = document.getElementById("floor-model-msg");
+
+    let floorView = "2d";
+
+    function floorModelMessage(text) {
+        floorModelMsg.textContent = text || "";
+        floorModelMsg.style.display = text ? "flex" : "none";
+    }
+
+    function syncFloorModel() {
+
+        if (floorView !== "3d") return;
+
+        const src = floors[currentFloor] && floors[currentFloor].modelo3D;
+
+        if (!src) {
+            floorModel.removeAttribute("src");
+            floorModelMessage("Modelo 3D no disponible para esta planta");
+            return;
+        }
+
+        if (floorModel.getAttribute("src") !== src) {
+            floorModelMessage("Cargando modelo 3D…");
+            floorModel.setAttribute("src", src);
+        }
+    }
+
+    floorModel.addEventListener("load",  () => floorModelMessage(""));
+    floorModel.addEventListener("error", () => floorModelMessage("No se pudo cargar el modelo 3D"));
+
+    // el gesto de zoom/arrastre de la planta 2D no debe interferir con el modelo
+    floorModelWrap.addEventListener("pointerdown", e => e.stopPropagation());
+
+    function setFloorView(mode) {
+
+        floorView = mode === "3d" ? "3d" : "2d";
+
+        floorScene.classList.toggle("view-3d", floorView === "3d");
+
+        floorToggle.querySelectorAll("button").forEach(b => {
+            const on = b.dataset.view === floorView;
+            b.classList.toggle("active", on);
+            b.setAttribute("aria-pressed", String(on));
+        });
+
+        if (floorView === "3d") {
+            unitPanel.classList.remove("active");
+            loadModelViewer().catch(() => {});
+            syncFloorModel();
+        }
+    }
+
+    floorToggle.addEventListener("click", e => {
+        const b = e.target.closest("button");
+        if (b) setFloorView(b.dataset.view);
+    });
+
+    // se pre-carga el visor 3D cuando el usuario se acerca al botón
+    ["pointerenter", "focus", "touchstart"].forEach(ev =>
+        floorToggle.addEventListener(ev, () => loadModelViewer().catch(() => {}), { passive: true, once: true }));
+
+
+    /* ============================================================
+       PLANTA: ALTERNAR IMAGEN (independiente de unidades y de 3D/2D)
+       Solo cambia el src de #floor-image. No toca las unidades, el panel,
+       el zoom/posición ni el modelo 3D.
+    ============================================================ */
+
+    const floorImageToggle = document.getElementById("floor-image-toggle");
+    const floorImageCount  = document.getElementById("floor-image-count");
+
+    let floorVariant = 0;
+    let floorVariantBusy = false;
+
+    function floorImageList() {
+        const f = floors[currentFloor];
+        return f ? [f.imagen].concat(f.imagenesAlt || []) : [];
+    }
+
+    function updateFloorImageButton() {
+        const n = floorImageList().length;
+        floorImageToggle.disabled = n < 2;
+        floorImageCount.textContent = (floorVariant + 1) + "/" + n;
+        floorImageToggle.title = n < 2 ? "Esta planta no tiene imágenes alternativas" : "Cambiar imagen de la planta";
+    }
+
+    // al cambiar de nivel, showFloor ya carga la imagen principal: solo se sincroniza el botón
+    function resetFloorVariant() {
+        floorVariant = 0;
+        updateFloorImageButton();
+    }
+
+    async function cycleFloorImage() {
+
+        const list = floorImageList();
+
+        if (list.length < 2 || floorVariantBusy) return;
+
+        floorVariantBusy = true;
+
+        const level = currentFloor;
+        const next  = (floorVariant + 1) % list.length;
+
+        const img = new Image();
+        img.src = list[next];
+        try { await img.decode(); } catch (e) {}
+
+        if (!img.naturalWidth) {
+            console.warn("No se pudo cargar la imagen de planta: " + list[next]);
+            floorVariantBusy = false;
+            return;
+        }
+
+        floorImage.style.transition = "opacity .3s ease";
+        floorImage.style.opacity = "0";
+        await new Promise(r => setTimeout(r, 300));
+
+        if (level === currentFloor) {
+
+            floorVariant = next;
+            floorImage.src = list[next];
+
+            const aspect = img.naturalWidth / img.naturalHeight;
+
+            if (aspect && Math.abs(aspect - floorAspect) > 0.001) {   // solo si la proporción difiere
+                floorAspect = aspect;
+                fitStage();
+                if (typeof applyFloorView === "function") applyFloorView();
+            }
+
+            updateFloorImageButton();
+        }
+
+        floorImage.style.opacity = "1";
+        floorVariantBusy = false;
+    }
+
+    floorImageToggle.addEventListener("click", cycleFloorImage);
+    updateFloorImageButton();
+
+
+    /* ============================================================
+       AYUDA PARA DIBUJAR FORMAS: abrí la página con ?puntos
+       Alt + clic sobre cada vértice de la planta → copia  puntos: [[x,y],…]
+       Alt + Shift + clic → empieza una lista nueva.
+    ============================================================ */
+
+    if (location.search.includes("puntos")) {
+
+        const picked = [];
+        let toast = null;
+
+        floorStage.addEventListener("click", e => {
+
+            if (!e.altKey) return;
+
+            e.stopPropagation();
+            e.preventDefault();
+
+            const r = floorStage.getBoundingClientRect();
+
+            if (e.shiftKey) picked.length = 0;
+
+            picked.push([
+                +((e.clientX - r.left) / r.width  * 100).toFixed(1),
+                +((e.clientY - r.top)  / r.height * 100).toFixed(1)
+            ]);
+
+            const txt = "puntos: " + JSON.stringify(picked) + ",";
+
+            console.log(txt);
+            if (navigator.clipboard) navigator.clipboard.writeText(txt).catch(() => {});
+
+            if (!toast) {
+                toast = document.createElement("div");
+                toast.style.cssText = "position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:900;" +
+                    "padding:10px 16px;background:#111;color:#fff;font:12px/1.4 monospace;max-width:90vw;" +
+                    "overflow-wrap:anywhere;pointer-events:none";
+                document.body.appendChild(toast);
+            }
+            toast.textContent = "Copiado: " + txt;
+
+        }, true);
+    }
 
 
     /* ============================================================
@@ -2530,6 +3673,23 @@
     let projectsCache = null;
 
     let uvError = "";
+
+    // Título del recorrido: siempre la escena (panorama) en la que está el usuario
+    let uvCurrentPano = null;
+
+    function setUnitTitle(u) {            // título "de la unidad" (modo 3D / mientras carga)
+        if (!u) return;
+        uvTitle.innerHTML = "<small>" + (u.ambientes || "") + "</small>" + u.nombre;
+    }
+
+    function setTourTitle(id) {           // título de la escena actual del recorrido 360
+        const panos = uvData && uvData.recorrido360 && uvData.recorrido360.panoramas;
+        const pano  = panos && panos[id];
+        const small = document.createElement("small");
+        small.textContent = (uvData && uvData.nombre) || "";
+        uvTitle.textContent = "";
+        uvTitle.append(small, (pano && pano.nombre) || id);
+    }
 
     async function getUnitData(u) {
 
@@ -2582,6 +3742,7 @@
         uvLast = unit;
         uvWanted = mode;
         uvData = null;
+        uvCurrentPano = null;
 
         uvTitle.innerHTML =
             "<small>" + (unit.ambientes || "") + "</small>" + unit.nombre;
@@ -2619,12 +3780,17 @@
 
         updateNav();
 
+        if (mode === "3d") setUnitTitle(uvData);
+        else if (uvCurrentPano) setTourTitle(uvCurrentPano);
+
         uvLayer3d.classList.toggle("active", mode === "3d");
         uvLayer360.classList.toggle("active", mode === "360");
 
         let msg = "";
 
         if (mode === "3d") {
+            loadModelViewer().catch(() => {});
+
             if (uvData.modelo) {
                 if (uvModel.getAttribute("src") !== uvData.modelo) {
                     uvModel.setAttribute("src", uvData.modelo);
@@ -2636,7 +3802,16 @@
 
         if (mode === "360") {
             if (typeof Marzipano === "undefined") {
-                msg = "Falta marzipano.js en la carpeta del proyecto";
+                msg = "Cargando recorrido…";
+                loadMarzipano()
+                    .then(() => {
+                        if (typeof Marzipano !== "undefined" && uvOpen() && uvWanted === "360") setUvMode("360");
+                    })
+                    .catch(() => {
+                        if (!uvOpen() || uvWanted !== "360") return;
+                        uvMsg.textContent = "Falta marzipano.js en la carpeta del proyecto";
+                        uvMsg.style.display = "flex";
+                    });
             } else if (uvData.recorrido360 && uvData.recorrido360.panoramas) {
                 buildTour();
             } else {
@@ -2739,6 +3914,9 @@
 
         if (!scene) return;
 
+        uvCurrentPano = id;
+        setTourTitle(id);
+
         scene.switchTo({ transitionDuration: duration });
 
         uvGallery.querySelectorAll(".uv-card").forEach(c =>
@@ -2760,6 +3938,8 @@
             const img = document.createElement("img");
             img.src = d.miniatura || d.imagen;
             img.alt = d.nombre || id;
+            img.loading = "lazy";
+            img.decoding = "async";
 
             const label = document.createElement("span");
             label.textContent = d.nombre || id;
@@ -2775,8 +3955,212 @@
         if (uvViewer) { uvViewer.destroy(); uvViewer = null; }
 
         uvScenes = {};
+        uvCurrentPano = null;
         uvGallery.innerHTML = "";
     }
+
+    /* ============================================================
+       GALERÍA: carrusel horizontal a pantalla completa
+       Se abre desde el menú (botón "Galería") como una capa SOBRE la
+       vista actual: al cerrarla se vuelve exactamente al mismo punto.
+    ============================================================ */
+
+    const galleryView = document.getElementById("gallery-view");
+    const gvStage     = document.getElementById("gv-stage");
+    const gvTrack     = document.getElementById("gv-track");
+    const gvPrev      = document.getElementById("gv-prev");
+    const gvNext      = document.getElementById("gv-next");
+    const gvClose     = document.getElementById("gv-close");
+    const gvIndexEl   = document.getElementById("gv-index");
+    const gvTitleEl   = document.getElementById("gv-title");
+    const navGallery  = document.getElementById("nav-gallery");
+
+    // misma lista que GALERIA, resolviendo las escenas a su imagen (sin duplicar rutas)
+    const galleryItems = GALERIA.map(g => {
+        const sc = g.escena ? scenes.find(x => x.id === g.escena) : null;
+        return { src: g.src || (sc && sc.image), titulo: g.titulo || (sc && sc.id) || "" };
+    }).filter(g => g.src);
+
+    let gvIndex = 0;
+    let gvBuilt = false;
+    let gvDrag = null;
+    let gvWheelLock = 0;
+
+    const galleryOpen = () => galleryView.classList.contains("active");
+
+    function gvBuild() {
+
+        if (gvBuilt) return;
+        gvBuilt = true;
+
+        galleryItems.forEach((g, i) => {
+
+            const slide = document.createElement("figure");
+            slide.className = "gv-slide";
+            slide.setAttribute("role", "group");
+            slide.setAttribute("aria-roledescription", "diapositiva");
+            slide.setAttribute("aria-label", (i + 1) + " de " + galleryItems.length);
+
+            const img = document.createElement("img");
+            img.alt = g.titulo;
+            img.draggable = false;
+            img.decoding = "async";
+            img.dataset.src = g.src;
+            img.addEventListener("load",  () => img.classList.add("loaded"));
+            img.addEventListener("error", () => img.classList.add("loaded"));
+
+            slide.appendChild(img);
+            gvTrack.appendChild(slide);
+        });
+    }
+
+    // carga la imagen actual y las vecinas (la actual primero)
+    function gvLoad(i) {
+
+        [i, i + 1, i - 1].forEach(k => {
+            const slide = gvTrack.children[k];
+            const img = slide && slide.firstElementChild;
+            if (img && !img.getAttribute("src")) img.src = img.dataset.src;
+        });
+    }
+
+    function gvRender(dx = 0) {
+        gvTrack.style.transform =
+            "translate3d(calc(" + (-gvIndex * 100) + "% + " + dx + "px),0,0)";
+    }
+
+    function gvGo(i) {
+
+        const last = galleryItems.length - 1;
+
+        gvIndex = Math.max(0, Math.min(last, i));
+
+        gvRender(0);
+        gvLoad(gvIndex);
+
+        const pad = n => String(n).padStart(2, "0");
+
+        gvIndexEl.textContent = pad(gvIndex + 1) + " / " + pad(galleryItems.length);
+        gvTitleEl.textContent = (galleryItems[gvIndex] && galleryItems[gvIndex].titulo) || "";
+
+        gvPrev.disabled = gvIndex === 0;
+        gvNext.disabled = gvIndex === last;
+    }
+
+    function openGallery() {
+        gvBuild();
+        galleryView.classList.add("active");
+        gvGo(gvIndex);
+    }
+
+    function closeGallery() {
+        galleryView.classList.remove("active");
+    }
+
+    gvPrev.addEventListener("click", () => gvGo(gvIndex - 1));
+    gvNext.addEventListener("click", () => gvGo(gvIndex + 1));
+    gvClose.addEventListener("click", closeGallery);
+
+    // "Galería" abre y vuelve a cerrar; cualquier otro botón del menú la cierra primero
+    navGallery.addEventListener("click", () => galleryOpen() ? closeGallery() : openGallery());
+
+    document.getElementById("site-nav").addEventListener("click", e => {
+        if (galleryOpen() && !e.target.closest("#nav-gallery")) closeGallery();
+    }, true);
+
+    // teclado: ← → navegan · Esc cierra (sin cerrar también lo que hay debajo)
+    document.addEventListener("keydown", e => {
+
+        if (!galleryOpen()) return;
+
+        if (e.key === "Escape") {
+            e.stopImmediatePropagation();
+            closeGallery();
+        } else if (e.key === "ArrowRight") {
+            gvGo(gvIndex + 1);
+        } else if (e.key === "ArrowLeft") {
+            gvGo(gvIndex - 1);
+        }
+    }, true);
+
+    // mouse (rueda / trackpad)
+    gvStage.addEventListener("wheel", e => {
+
+        e.preventDefault();
+
+        const now = performance.now();
+        if (now < gvWheelLock) return;
+
+        const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        if (Math.abs(d) < 12) return;
+
+        gvWheelLock = now + 650;
+        gvGo(gvIndex + (d > 0 ? 1 : -1));
+
+    }, { passive: false });
+
+    // arrastre con mouse, dedo o lápiz
+    gvStage.addEventListener("pointerdown", e => {
+
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+
+        gvDrag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, dx: 0, t0: performance.now(), moved: false };
+    });
+
+    gvStage.addEventListener("pointermove", e => {
+
+        if (!gvDrag || e.pointerId !== gvDrag.id) return;
+
+        const dx = e.clientX - gvDrag.x0;
+        const dy = e.clientY - gvDrag.y0;
+
+        if (!gvDrag.moved) {
+
+            if (Math.abs(dx) < 6) return;
+
+            if (Math.abs(dy) > Math.abs(dx) * 1.2) { gvDrag = null; return; }   // gesto vertical: se ignora
+
+            gvDrag.moved = true;
+            gvStage.classList.add("dragging");
+            try { gvStage.setPointerCapture(e.pointerId); } catch (err) {}
+        }
+
+        gvDrag.dx = dx;
+
+        const last = galleryItems.length - 1;
+        const atEdge = (gvIndex === 0 && dx > 0) || (gvIndex === last && dx < 0);
+
+        gvRender(atEdge ? dx * 0.3 : dx);
+    });
+
+    function gvEnd(e) {
+
+        if (!gvDrag || e.pointerId !== gvDrag.id) return;
+
+        const d = gvDrag;
+        gvDrag = null;
+
+        gvStage.classList.remove("dragging");
+
+        if (!d.moved) return;
+
+        const v  = d.dx / Math.max(1, performance.now() - d.t0);   // px/ms
+        const th = Math.min(120, gvStage.clientWidth * 0.15);
+
+        if (d.dx < -th || v < -0.5)     gvGo(gvIndex + 1);
+        else if (d.dx > th || v > 0.5)  gvGo(gvIndex - 1);
+        else                            gvGo(gvIndex);                  // vuelve a su lugar
+    }
+
+    gvStage.addEventListener("pointerup", gvEnd);
+    gvStage.addEventListener("pointercancel", gvEnd);
+
+    // ocultar flechas si hay una sola imagen
+    if (galleryItems.length < 2) { gvPrev.hidden = true; gvNext.hidden = true; }
+
+    // si no hay imágenes, el botón no hace nada
+    if (!galleryItems.length) navGallery.hidden = true;
+
 
     // ---------- MENÚ ÚNICO (header): Inicio · Edificio · Planta · 3D · 360° ----------
     let uvLast = null;                       // última unidad abierta (habilita 3D / 360°)
@@ -2790,6 +4174,7 @@
 
         const inUnit  = uvOpen();
         const inFloor = !inUnit && floorScene.classList.contains("active");
+        const inGallery = galleryOpen();
 
         const mark = (el, on) => {
             el.classList.toggle("active", on);
@@ -2797,11 +4182,12 @@
             else el.removeAttribute("aria-current");
         };
 
-        mark(navBuilding, !inUnit && !inFloor);
-        mark(floorTopButton, inFloor);
+        mark(navBuilding, !inGallery && !inUnit && !inFloor);
+        mark(floorTopButton, !inGallery && inFloor);
+        mark(navGallery, inGallery);
 
         navModeButtons.forEach(b => {
-            mark(b, inUnit && b.dataset.mode === uvWanted);
+            mark(b, !inGallery && inUnit && b.dataset.mode === uvWanted);
             b.classList.toggle("is-disabled", !uvLast);
             b.setAttribute("aria-disabled", String(!uvLast));
             b.title = uvLast ? "" : "Elegí una unidad en la planta";
@@ -2837,6 +4223,7 @@
     const navObserver = new MutationObserver(updateNav);
     navObserver.observe(floorScene, { attributes: true, attributeFilter: ["class"] });
     navObserver.observe(uv,         { attributes: true, attributeFilter: ["class"] });
+    navObserver.observe(galleryView, { attributes: true, attributeFilter: ["class"] });
     updateNav();
 
     modelButton.addEventListener("click", () => openUnitView("3d"));
@@ -2852,38 +4239,224 @@
 
 
     /* ============================================================
-       PRELOAD DE PLANTA Y VIDEO DE ENTRADA
+       PLANTA EN MÓVIL: zoom (pellizco / botones) y arrastre
+       En escritorio no hace nada (no se aplica ninguna transformación).
     ============================================================ */
 
-    const preloadFloor = new Image();
-    preloadFloor.src = floorImage.getAttribute("src");
-    preloadFloor.decode && preloadFloor.decode().catch(() => {});
+    const mobileMQ = window.matchMedia(
+        "(max-width: 700px), (max-height: 520px) and (orientation: landscape) and (pointer: coarse)");
 
-    const preloadEnter = document.createElement("video");
-    preloadEnter.preload = "auto";
-    preloadEnter.src = "videos/Clip 3.mp4";
+    const isMobileLayout = () => mobileMQ.matches;
+
+    const fz = { k: 1, x: 0, y: 0, min: 1, max: 5 };
+    const floorHint = document.getElementById("floor-hint");
+    let fzDragged = false;
+    let lastViewportW = window.innerWidth;
+
+    function applyFloorView() {
+
+        if (!isMobileLayout()) { floorStage.style.transform = ""; floorStage.style.setProperty("--tag-inv", "1"); return; }
+
+        const W = floorStage.offsetWidth  * fz.k;
+        const H = floorStage.offsetHeight * fz.k;
+        const cw = floorContainer.clientWidth;
+        const ch = floorContainer.clientHeight;
+
+        const mx = Math.max(0, (W - cw) / 2);
+        const my = Math.max(0, (H - ch) / 2);
+
+        fz.x = Math.min(mx, Math.max(-mx, fz.x));
+        fz.y = Math.min(my, Math.max(-my, fz.y));
+
+        floorStage.style.transform =
+            "translate(" + fz.x + "px," + fz.y + "px) scale(" + fz.k + ")";
+
+        floorStage.style.setProperty("--tag-inv", String(1 / fz.k));   // etiquetas: tamaño constante
+    }
+
+    // Vista inicial: acerca la planta hacia donde están las unidades
+    function resetFloorView() {
+
+        if (!isMobileLayout()) { floorStage.style.transform = ""; return; }
+
+        const floor = floors[currentFloor];
+        const us = (floor && floor.unidades) || [];
+
+        let k = 1, cx = 0.5, cy = 0.5;
+
+        if (us.length) {
+            const x0 = Math.min(...us.map(u => u.x)),     x1 = Math.max(...us.map(u => u.x + u.w));
+            const y0 = Math.min(...us.map(u => u.y)),     y1 = Math.max(...us.map(u => u.y + u.h));
+            const fw = Math.max(0.2, (x1 - x0) / 100);
+            const minK = window.innerHeight > window.innerWidth ? 1.6 : 1;   // en vertical, planta más grande por defecto
+            k  = Math.min(3, Math.max(minK, 0.92 / fw));
+            cx = (x0 + x1) / 200;
+            cy = (y0 + y1) / 200;
+        }
+
+        fz.k = k;
+        fz.x = -(cx - 0.5) * floorStage.offsetWidth  * k;
+        fz.y = -(cy - 0.5) * floorStage.offsetHeight * k;
+
+        applyFloorView();
+    }
+
+    function zoomFloorBy(factor, px = 0, py = 0) {      // px,py: punto fijo relativo al centro del contenedor
+
+        const k1 = Math.min(fz.max, Math.max(fz.min, fz.k * factor));
+        const r  = k1 / fz.k;
+
+        fz.x = px - (px - fz.x) * r;
+        fz.y = py - (py - fz.y) * r;
+        fz.k = k1;
+
+        applyFloorView();
+    }
+
+    // --- gestos ---
+    const pts = new Map();
+    let pinch = null;
+
+    const centerOf = () => {
+        const r = floorContainer.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    };
+
+    floorContainer.addEventListener("pointerdown", e => {
+
+        if (!isMobileLayout()) return;
+
+        pts.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY });
+        fzDragged = false;
+
+        if (pts.size === 2) {
+            const [a, b] = [...pts.values()];
+            const c = centerOf();
+            pinch = {
+                d0: Math.hypot(a.x - b.x, a.y - b.y) || 1,
+                k0: fz.k, x0: fz.x, y0: fz.y,
+                mx: (a.x + b.x) / 2 - c.x, my: (a.y + b.y) / 2 - c.y
+            };
+        }
+    });
+
+    floorContainer.addEventListener("pointermove", e => {
+
+        const p = pts.get(e.pointerId);
+
+        if (!p || !isMobileLayout()) return;
+
+        if (pts.size === 1) {
+
+            if (!fzDragged && Math.hypot(e.clientX - p.sx, e.clientY - p.sy) < 8) return;
+
+            fzDragged = true;
+            fz.x += e.clientX - p.x;
+            fz.y += e.clientY - p.y;
+            p.x = e.clientX; p.y = e.clientY;
+            applyFloorView();
+
+        } else if (pts.size === 2 && pinch) {
+
+            p.x = e.clientX; p.y = e.clientY;
+
+            const [a, b] = [...pts.values()];
+            const c  = centerOf();
+            const d  = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+            const k1 = Math.min(fz.max, Math.max(fz.min, pinch.k0 * d / pinch.d0));
+            const r  = k1 / pinch.k0;
+            const cx = (a.x + b.x) / 2 - c.x;
+            const cy = (a.y + b.y) / 2 - c.y;
+
+            fzDragged = true;
+            fz.k = k1;
+            fz.x = cx - (pinch.mx - pinch.x0) * r;
+            fz.y = cy - (pinch.my - pinch.y0) * r;
+            applyFloorView();
+        }
+    });
+
+    const endPointer = e => {
+        pts.delete(e.pointerId);
+        if (pts.size < 2) pinch = null;
+        if (pts.size === 1) { const q = [...pts.values()][0]; q.sx = q.x; q.sy = q.y; }
+    };
+
+    floorContainer.addEventListener("pointerup", endPointer);
+    floorContainer.addEventListener("pointercancel", endPointer);
+
+    // un arrastre no debe abrir una unidad por accidente
+    floorContainer.addEventListener("click", e => {
+        if (fzDragged) { e.stopPropagation(); e.preventDefault(); fzDragged = false; }
+    }, true);
+
+    document.getElementById("zoom-in").addEventListener("click",  () => zoomFloorBy(1.5));
+    document.getElementById("zoom-out").addEventListener("click", () => zoomFloorBy(1 / 1.5));
+    document.getElementById("zoom-fit").addEventListener("click", resetFloorView);
+
+    // al cambiar el tamaño u orientación
+    window.addEventListener("resize", () => {
+
+        if (Math.abs(window.innerWidth - lastViewportW) > 60) {
+            lastViewportW = window.innerWidth;
+            fitStage();
+            resetFloorView();
+        } else {
+            applyFloorView();
+        }
+    });
+
+    // el botón de nivel activo se desplaza hasta quedar a la vista
+    levelMenu.addEventListener("click", e => {
+        const b = e.target.closest(".level-button");
+        if (b && b.scrollIntoView) b.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+    });
+
+    // pista de uso, una sola vez
+    let hintShown = false;
+    function showFloorHint() {
+        if (hintShown || !isMobileLayout()) return;
+        hintShown = true;
+        floorHint.classList.add("show");
+        setTimeout(() => floorHint.classList.remove("show"), 3800);
+    }
+    new MutationObserver(() => { if (floorScene.classList.contains("active")) setTimeout(showFloorHint, 900); })
+        .observe(floorScene, { attributes: true, attributeFilter: ["class"] });
+
+    // volver a la unidad: el panel arranca arriba
+    document.getElementById("units").addEventListener("click", () => { unitPanel.scrollTop = 0; });
+
+
+    /* ============================================================
+       P3 AL ACERCARSE: el usuario muestra intención → precargar
+    ============================================================ */
+
+    ["pointerenter", "focus", "touchstart"].forEach(ev => {
+        floorTopButton.addEventListener(ev, warmEntry, { passive: true, once: true });
+        hotspot.addEventListener(ev, warmEntry, { passive: true, once: true });
+    });
+
+    floorTopButton.addEventListener("click", ensureFloor);
+
+    // al elegir una unidad se prepara el 3D y el 360 (suelen ser lo siguiente)
+    document.getElementById("units").addEventListener("click", () => {
+        loadMarzipano().catch(() => {});
+        loadModelViewer().catch(() => {});
+    });
 
 
     /* ============================================================
        INICIALIZACIÓN
+       La primera escena se muestra apenas está lista (ya no se espera
+       a que termine de cargar TODO el resto de recursos).
     ============================================================ */
 
-    window.addEventListener(
-        "load",
-        () => {
+    showScene(0).then(() => {
+        setTimeout(() => loader.classList.remove("active"), 300);
+    });
 
-            showScene(0);
-
-            setTimeout(() => {
-
-                loader.classList.remove(
-                    "active"
-                );
-
-            }, 500);
-
-        }
-    );
+    // red de seguridad: el loader nunca queda trabado
+    setTimeout(() => loader.classList.remove("active"), 10000);
 
 </script>
 
