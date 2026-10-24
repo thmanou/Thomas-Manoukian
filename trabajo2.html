@@ -1464,6 +1464,237 @@
         .unit-shape:hover ~ .unit-label { opacity: 1; }
         .unit-poly.has-estado .unit-shape polygon:hover { fill: rgba(var(--unit-rgb), .32); stroke: var(--unit-color); }
         .unit-poly:focus-visible .unit-shape polygon { stroke: #111; }
+
+        /* =========================================================
+           NUEVO · EL PROYECTO (sección para inversores)
+           Capa a pantalla completa, igual que la galería: se abre sobre la
+           vista actual y al cerrarla se vuelve exactamente al mismo punto.
+        ========================================================= */
+
+        #project-view {
+            --pj-line: rgba(255,255,255,.14);
+            --pj-dim: rgba(255,255,255,.62);
+            --pj-panel: rgba(255,255,255,.04);
+            position: fixed; inset: 0; z-index: 400;        /* bajo el menú (500), igual que la galería */
+            background: #0e0e0e; color: #fff;
+            overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity .5s ease, visibility .5s ease;
+            outline: none;
+        }
+        #project-view.active { opacity: 1; visibility: visible; pointer-events: auto; }
+
+        .pj-wrap {
+            max-width: 1120px; margin: 0 auto;
+            padding: calc(var(--nav-h) + 34px) 40px calc(60px + env(safe-area-inset-bottom, 0px));
+        }
+        .pj-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 26px; }
+        .pj-kicker { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--pj-dim); }
+        .pj-back {
+            min-height: 40px; padding: 0 16px; cursor: pointer; color: #fff;
+            border: 1px solid rgba(255,255,255,.4); background: rgba(12,12,12,.5);
+            font-size: 9px; letter-spacing: .13em; text-transform: uppercase;
+            transition: background .3s ease, border-color .3s ease;
+        }
+        .pj-back:hover { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.8); }
+
+        .pj-tabs {
+            position: sticky; top: var(--nav-h); z-index: 5;
+            display: flex; gap: 26px; overflow-x: auto; scrollbar-width: none;
+            margin: 0 -40px 34px; padding: 0 40px;
+            background: rgba(14,14,14,.94); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--pj-line);
+        }
+        .pj-tabs::-webkit-scrollbar { display: none; }
+        .pj-tab {
+            flex: none; min-height: 48px; padding: 0; border: 0; background: none; cursor: pointer;
+            color: var(--pj-dim); font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+            border-bottom: 2px solid transparent; margin-bottom: -1px;
+            transition: color .25s ease, border-color .25s ease;
+        }
+        .pj-tab:hover { color: #fff; }
+        .pj-tab[aria-selected="true"] { color: #fff; border-bottom-color: #fff; }
+        .pj-tab:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+
+        .pj-panel { display: none; }
+        .pj-panel.active { display: block; animation: pjIn .45s ease both; }
+        @keyframes pjIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+        .pj-h { font-size: 26px; font-weight: 400; letter-spacing: .04em; line-height: 1.25; margin-bottom: 8px; }
+        .pj-sub { font-size: 14px; line-height: 1.7; color: var(--pj-dim); max-width: 68ch; }
+        .pj-h3 { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--pj-dim); font-weight: 400; margin: 38px 0 14px; }
+        .pj-h3:first-child { margin-top: 0; }
+        .pj-p { font-size: 15px; line-height: 1.75; max-width: 68ch; color: rgba(255,255,255,.86); }
+        .pj-note { font-size: 12px; line-height: 1.65; color: var(--pj-dim); max-width: 72ch; margin-top: 14px; }
+        .pj-note.warn { border-left: 2px solid rgba(242,154,46,.8); padding-left: 12px; }
+
+        .pj-cols { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(0,1fr); gap: 44px; align-items: start; }
+        .pj-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0; border-top: 1px solid var(--pj-line); }
+        .pj-fact { padding: 16px 18px 16px 0; border-bottom: 1px solid var(--pj-line); }
+        .pj-fact dt { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--pj-dim); margin-bottom: 7px; }
+        .pj-fact dd { font-size: 16px; line-height: 1.4; }
+        .pj-fact small { display: block; margin-top: 5px; font-size: 12px; line-height: 1.5; color: var(--pj-dim); }
+
+        .pj-imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .pj-imgs img { width: 100%; height: 100%; display: block; object-fit: cover; aspect-ratio: 4/3; background: #1a1a1a; }
+        .pj-imgs img:first-child { grid-column: 1 / -1; aspect-ratio: 16/10; }
+
+        .pj-list { list-style: none; border-top: 1px solid var(--pj-line); }
+        .pj-list li { padding: 12px 0; border-bottom: 1px solid var(--pj-line); font-size: 14px; line-height: 1.55; display: flex; justify-content: space-between; gap: 18px; }
+        .pj-list li span:last-child { color: var(--pj-dim); text-align: right; flex: none; }
+
+        .pj-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+        .pj-card { padding: 20px; border: 1px solid var(--pj-line); background: var(--pj-panel); }
+        .pj-card h4 { font-size: 15px; font-weight: 400; letter-spacing: .06em; margin-bottom: 14px; }
+        .pj-card dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 13px; }
+        .pj-card dt { color: var(--pj-dim); }
+        .pj-card dd { text-align: right; }
+        .pj-card p { font-size: 13px; line-height: 1.6; color: var(--pj-dim); margin-top: 12px; }
+
+        .pj-map { width: 100%; height: 360px; border: 1px solid var(--pj-line); background: #1a1a1a; display: block; filter: grayscale(.35) contrast(.95); }
+        .pj-link { color: #fff; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.5); padding-bottom: 2px; }
+        .pj-link:hover { border-bottom-color: #fff; }
+
+        /* barras simples (unidades por tipología / por nivel) */
+        .pj-bars { display: grid; gap: 12px; }
+        .pj-bar { display: grid; grid-template-columns: minmax(90px, 190px) 1fr 48px; gap: 14px; align-items: center; font-size: 13px; }
+        .pj-bar i { display: block; height: 8px; background: rgba(255,255,255,.1); position: relative; }
+        .pj-bar i b { position: absolute; inset: 0 auto 0 0; background: #fff; }
+        .pj-bar span:last-child { text-align: right; color: var(--pj-dim); }
+        .pj-big { display: flex; align-items: baseline; gap: 12px; margin-bottom: 26px; }
+        .pj-big strong { font-size: 44px; font-weight: 300; line-height: 1; }
+        .pj-big span { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--pj-dim); }
+
+        .pj-tablewrap { overflow-x: auto; border-top: 1px solid var(--pj-line); }
+        .pj-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 560px; }
+        .pj-table th { text-align: left; font-weight: 400; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--pj-dim); padding: 14px 16px 12px 0; border-bottom: 1px solid var(--pj-line); }
+        .pj-table td { padding: 14px 16px 14px 0; border-bottom: 1px solid var(--pj-line); vertical-align: top; line-height: 1.55; }
+        .pj-table td.num { white-space: nowrap; font-size: 15px; }
+        .pj-table tr.total td { border-bottom: 2px solid rgba(255,255,255,.4); }
+        .pj-pending { color: var(--pj-dim); font-style: italic; }
+
+        /* estado del desarrollo */
+        .pj-steps { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 6px; }
+        .pj-step { position: relative; padding-top: 22px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--pj-dim); }
+        .pj-step::before { content: ""; position: absolute; left: 0; top: 4px; right: 0; height: 2px; background: rgba(255,255,255,.16); }
+        .pj-step::after { content: ""; position: absolute; left: 0; top: 0; width: 10px; height: 10px; border-radius: 50%; background: #0e0e0e; border: 2px solid rgba(255,255,255,.4); }
+        .pj-step.done { color: rgba(255,255,255,.8); }
+        .pj-step.done::before { background: rgba(255,255,255,.7); }
+        .pj-step.done::after { background: rgba(255,255,255,.7); border-color: rgba(255,255,255,.7); }
+        .pj-step.now { color: #fff; }
+        .pj-step.now::after { background: #fff; border-color: #fff; box-shadow: 0 0 0 5px rgba(255,255,255,.18); }
+        .pj-step.now::before { background: linear-gradient(90deg, rgba(255,255,255,.7), rgba(255,255,255,.16)); }
+        .pj-step small { display: block; margin-top: 6px; font-size: 11px; letter-spacing: 0; text-transform: none; line-height: 1.5; color: var(--pj-dim); font-weight: 400; }
+
+        /* cronograma */
+        .pj-tl { list-style: none; position: relative; }
+        .pj-tl li { position: relative; padding: 0 0 26px 30px; }
+        .pj-tl li::before { content: ""; position: absolute; left: 4px; top: 8px; bottom: -4px; width: 1px; background: var(--pj-line); }
+        .pj-tl li:last-child::before { display: none; }
+        .pj-tl li::after { content: ""; position: absolute; left: 0; top: 5px; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.5); background: #0e0e0e; }
+        .pj-tl li.completada::after { background: #fff; border-color: #fff; }
+        .pj-tl li.en-curso::after { background: #fff; border-color: #fff; box-shadow: 0 0 0 5px rgba(255,255,255,.18); }
+        .pj-tl h4 { font-size: 15px; font-weight: 400; letter-spacing: .04em; display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+        .pj-chip { font-size: 9px; letter-spacing: .14em; text-transform: uppercase; border: 1px solid rgba(255,255,255,.35); padding: 3px 8px; color: var(--pj-dim); }
+        .pj-tl p { margin-top: 6px; font-size: 13px; line-height: 1.6; color: var(--pj-dim); max-width: 64ch; }
+        .pj-dates { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px 26px; font-size: 12px; color: rgba(255,255,255,.8); }
+        .pj-dates em { font-style: normal; color: var(--pj-dim); margin-right: 6px; }
+
+        /* acciones, dossier y contacto */
+        .pj-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            min-height: 48px; padding: 0 24px; cursor: pointer; text-decoration: none;
+            border: 1px solid #fff; background: #fff; color: #111;
+            font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+            transition: background .3s ease, color .3s ease;
+        }
+        .pj-btn:hover { background: transparent; color: #fff; }
+        .pj-btn.ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,.45); }
+        .pj-btn.ghost:hover { background: rgba(255,255,255,.14); border-color: #fff; }
+        .pj-btn:focus-visible, .pj-back:focus-visible, .pj-link:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+        .pj-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+        .pj-contact a.plain { color: #fff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.3); }
+        .pj-contact a.plain:hover { border-bottom-color: #fff; }
+        .pj-form { display: none; margin-top: 22px; max-width: 560px; gap: 14px; }
+        .pj-form.open { display: grid; }
+        .pj-form label { display: grid; gap: 6px; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--pj-dim); }
+        .pj-form input, .pj-form textarea {
+            width: 100%; padding: 12px 14px; font: inherit; font-size: 15px; letter-spacing: 0; text-transform: none;
+            color: #fff; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.25); border-radius: 0;
+        }
+        .pj-form textarea { min-height: 110px; resize: vertical; }
+        .pj-form input:focus, .pj-form textarea:focus { outline: 2px solid #fff; outline-offset: 1px; }
+        .pj-status { font-size: 13px; min-height: 18px; color: var(--pj-dim); }
+        .pj-empty { padding: 60px 0; max-width: 56ch; }
+
+        @media (max-width: 860px) { .pj-cols { grid-template-columns: 1fr; gap: 30px; } }
+        @media (max-width: 700px) {
+            .pj-wrap { padding: calc(var(--nav-h) + 22px) 18px calc(48px + env(safe-area-inset-bottom, 0px)); }
+            .pj-tabs { margin: 0 -18px 26px; padding: 0 18px; gap: 22px; }
+            .pj-h { font-size: 22px; }
+            .pj-back { min-height: 44px; }
+            .pj-map { height: 280px; }
+            .pj-bar { grid-template-columns: 1fr 44px; }
+            .pj-bar i { grid-column: 1 / -1; grid-row: 2; }
+            .pj-steps { grid-template-columns: 1fr; gap: 18px; }
+            .pj-step { padding: 0 0 0 26px; }
+            .pj-step::before { left: 4px; right: auto; top: 14px; bottom: -18px; width: 2px; height: auto; }
+            .pj-step:last-child::before { display: none; }
+            .pj-step::after { top: 2px; }
+            .pj-btn { width: 100%; }
+        }
+        @media (min-width: 481px) { .pj-lbl-s { display: none; } }
+        @media (max-width: 480px) { .pj-lbl-l { display: none; } }
+        @media (prefers-reduced-motion: reduce) {
+            #project-view, .pj-panel.active { transition: none; animation: none; }
+        }
+
+        /* =========================================================
+           NUEVO: VISTA AÉREA INICIAL + ZONAS DE PISOS EN FACHADAS
+        ========================================================= */
+        #aerial-intro{position:absolute;inset:0;z-index:45;transition:opacity .6s ease,visibility .6s ease;overflow:hidden;background:radial-gradient(120% 90% at 50% 40%,#2a3138,#0c0f12);color:#fff;opacity:0;visibility:hidden}
+        #aerial-intro.active{opacity:1;visibility:visible}
+        #aerial-intro .ai-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.04);animation:aiDrift 18s ease-in-out infinite alternate;transition:transform 1.6s cubic-bezier(.65,0,.35,1)}
+        #aerial-intro.sin-imagen .ai-img{display:none}
+        #aerial-intro .ai-shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,.05) 55%,rgba(0,0,0,.35));pointer-events:none}
+        #aerial-intro .ai-content{position:absolute;left:0;right:0;bottom:0;padding:0 clamp(24px,5vw,70px) calc(clamp(34px,7vh,70px) + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:flex-start;gap:14px;transition:opacity .4s ease,transform .6s ease}
+        .ai-kicker{font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.75}
+        .ai-title{font-size:clamp(28px,5vw,58px);font-weight:400;letter-spacing:.14em;text-transform:uppercase;line-height:1.05}
+        .ai-sub{font-size:12px;letter-spacing:.1em;opacity:.7;margin-bottom:10px}
+        .ai-btn{min-height:52px;padding:16px 36px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.12);color:#fff;font-size:12px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(10px);transition:background .3s,color .3s}
+        .ai-btn:hover,.ai-btn:focus-visible{background:#fff;color:#111;outline:none}
+        #aerial-intro.leaving{opacity:0;visibility:hidden;transition:opacity 1.1s ease .35s,visibility 0s linear 1.45s;pointer-events:none}
+        #aerial-intro.leaving .ai-img{animation:none;transform:scale(1.28)}
+        #aerial-intro.leaving .ai-content{opacity:0;transform:translateY(12px)}
+        @keyframes aiDrift{to{transform:scale(1.1)}}
+        @media (max-width:700px){#aerial-intro .ai-content{align-items:center;text-align:center}.ai-btn{width:100%;max-width:340px}}
+
+        #facade-zones{position:absolute;inset:0;z-index:34;overflow:hidden;pointer-events:none;transition:opacity .6s ease .15s}
+        #facade-zones.fz-off,#app:has(#aerial-intro.active) #facade-zones,#app:has(#floor-scene.active) #facade-zones,
+        #app:has(#aerial-intro.active) #fz-levels,#app:has(#floor-scene.active) #fz-levels,#fz-levels.fz-off{opacity:0;visibility:hidden;pointer-events:none}
+        #fz-stage{position:absolute;pointer-events:none}
+        #fz-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+        .fz-zone{fill:var(--fz-fill);stroke:var(--fz-stroke);stroke-width:var(--fz-w);vector-effect:non-scaling-stroke;stroke-linejoin:round;pointer-events:all;cursor:pointer;transition:fill .25s,stroke .25s;outline:none;-webkit-tap-highlight-color:transparent}
+        .fz-zone.on,.fz-zone:focus-visible{fill:var(--fz-fill-h);stroke:var(--fz-stroke-h);stroke-width:var(--fz-w-h)}
+        .fz-tag{position:absolute;transform:translate(-50%,-50%) scale(.94);padding:7px 12px;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.55);color:#fff;font-size:10px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;opacity:0;pointer-events:none;backdrop-filter:blur(6px);transition:opacity .2s,transform .2s}
+        .fz-tag.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+        #fz-levels{position:absolute;z-index:36;left:40px;top:120px;display:flex;flex-direction:column;gap:6px;transition:opacity .6s ease .15s}
+        .fz-chip{min-height:36px;padding:8px 14px;text-align:left;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.3);color:#fff;font-size:9px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(8px);transition:background .25s,border-color .25s}
+        .fz-chip.on,.fz-chip:hover{background:rgba(255,255,255,.88);color:#111;border-color:#fff}
+        #fz-hint{font-size:9px;letter-spacing:.14em;text-transform:uppercase;opacity:.7;margin-bottom:4px}
+        @media (max-width:700px),(max-height:520px) and (pointer:coarse){
+            #fz-levels{left:10px;right:10px;top:auto;bottom:calc(56px + env(safe-area-inset-bottom,0px));flex-direction:row;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+            #fz-levels::-webkit-scrollbar{display:none}
+            #fz-hint{display:none}
+            .fz-chip{flex:0 0 auto;min-height:44px;padding:10px 14px;white-space:nowrap;background:rgba(0,0,0,.5)}
+            .fz-tag{font-size:11px;padding:8px 14px}
+        }
+        #ed-panel{position:fixed;left:10px;bottom:10px;z-index:900;width:330px;max-width:calc(100vw - 20px);padding:12px;background:rgba(10,10,10,.9);color:#fff;font:11px/1.45 Arial,sans-serif;border:1px solid rgba(255,255,255,.3)}
+        #ed-panel select,#ed-panel button{font:inherit;padding:7px 9px;margin:4px 4px 0 0;background:#222;color:#fff;border:1px solid rgba(255,255,255,.4);cursor:pointer}
+        #ed-panel textarea{width:100%;height:96px;margin-top:6px;background:#000;color:#9fe6a0;font:10px/1.4 monospace;border:1px solid #444}
+        .ed-surface{position:absolute;inset:0;pointer-events:auto;cursor:crosshair}
+        .ed-pt{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:#ff6a00;border:2px solid #fff;color:#fff;font:700 9px/16px Arial;text-align:center;pointer-events:auto;cursor:grab;touch-action:none;z-index:2}
+        @media (prefers-reduced-motion:reduce){#aerial-intro .ai-img{animation:none}}
     </style>
 </head>
 
@@ -1535,6 +1766,8 @@
 
             <button class="top-button" id="nav-building">Edificio</button>
 
+            <button class="top-button" id="nav-facades">Fachadas</button>
+
             <button
                 class="top-button"
                 id="floor-top-button"
@@ -1588,19 +1821,7 @@
             y = porcentaje vertical
         -->
 
-        <button
-            class="hotspot"
-            id="building-hotspot"
-            aria-label="Ingresar al edificio"
-        >
-
-            <span class="hotspot-point"></span>
-
-            <span class="hotspot-label">
-                Ingresar →
-            </span>
-
-        </button>
+        <!-- botón «Ingresar →» eliminado: la entrada ahora ocurre al elegir un piso en la fachada -->
 
     </div>
 
@@ -1832,6 +2053,22 @@
          LOADER
     ========================================================== -->
 
+    <!-- NUEVO: pantalla aérea inicial (config: const AEREA en el JS) -->
+    <div id="aerial-intro" class="active" role="dialog" aria-label="Vista aérea del edificio">
+        <img class="ai-img" id="aerial-image" alt="Vista aérea del edificio" decoding="async" fetchpriority="high">
+        <div class="ai-shade"></div>
+        <div class="ai-content">
+            <div class="ai-kicker" id="ai-kicker"></div>
+            <h1 class="ai-title" id="ai-title"></h1>
+            <p class="ai-sub" id="ai-sub"></p>
+            <button class="ai-btn" id="aerial-enter" type="button"></button>
+        </div>
+    </div>
+
+    <!-- NUEVO: zonas interactivas de pisos sobre la fachada (config: ZONAS_FACHADAS) -->
+    <div id="facade-zones"><div id="fz-stage"><svg id="fz-svg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg></div></div>
+    <nav id="fz-levels" aria-label="Elegir piso"></nav>
+
     <div id="loader" class="active">
 
         <div class="loader-line"></div>
@@ -1902,6 +2139,22 @@
 
         <button class="gv-close" id="gv-close" aria-label="Cerrar galería">← Volver</button>
 
+    </section>
+
+    <!-- =========================================================
+         EL PROYECTO: información técnica, comercial y de inversión
+         (el contenido se genera desde la constante PROYECTO)
+    ========================================================== -->
+
+    <section id="project-view" aria-label="El proyecto" tabindex="-1">
+        <div class="pj-wrap">
+            <div class="pj-top">
+                <div class="pj-kicker" id="pj-kicker">El proyecto</div>
+                <button class="pj-back" id="pj-close" type="button">← Volver</button>
+            </div>
+            <div class="pj-tabs" id="pj-tabs" role="tablist" aria-label="Secciones del proyecto"></div>
+            <div id="pj-panels"></div>
+        </div>
     </section>
 
     <!-- model-viewer y marzipano.js ahora se cargan bajo demanda (ver "CARGA BAJO DEMANDA") -->
@@ -2012,6 +2265,116 @@
 
 
     /* ============================================================
+       NUEVO · 1) PANTALLA AÉREA INICIAL
+       imagen   → ruta de la imagen aérea / satelital (ponela en images/).
+                  Si el archivo no existe, la pantalla igual funciona (fondo neutro).
+       posicion → object-position CSS para decidir qué parte se ve en celular.
+       omitir   → true para arrancar directo en las fachadas (también: ?sinaerea).
+    ============================================================ */
+
+    const AEREA = {
+        imagen:   "images/Aerea.png",      // ← CAMBIAR por tu imagen aérea
+        posicion: "50% 50%",
+        kicker:   "Edificio de viviendas multifamiliar",
+        titulo:   "Edificio HITO",
+        texto:    "Implantación y entorno",
+        boton:    "Ingresar al edificio",
+        omitir:   false
+    };
+
+
+    /* ============================================================
+       NUEVO · 2) NIVELES (definidos UNA sola vez, comunes a todas las fachadas)
+       id     → clave que se usa en ZONAS_FACHADAS
+       nombre → texto visible
+       piso   → id del nivel en `floors` (p1…p7): es el DESTINO de navegación
+       Orden: de abajo hacia arriba.
+    ============================================================ */
+
+    const NIVELES_EDIFICIO = [
+        { id: "pb", nombre: "Planta baja",  piso: "p1" },
+        { id: "n1", nombre: "Primer piso",  piso: "p2" },
+        { id: "n2", nombre: "Segundo piso", piso: "p3" },
+        { id: "n3", nombre: "Tercer piso",  piso: "p4" },
+        { id: "n4", nombre: "Cuarto piso",  piso: "p5" },
+        { id: "n5", nombre: "Quinto piso",  piso: "p6" },
+        { id: "n6", nombre: "Terraza",      piso: "p7" }
+    ];
+
+
+    /* ============================================================
+       NUEVO · 3) ZONAS INTERACTIVAS POR FACHADA
+       La clave es el `id` de la escena (scenes[].id). Cada fachada tiene su
+       propia geometría. Cada nivel admite:
+         [[x,y],[x,y],…]                         → solo la forma (atajo)
+         { forma:[[x,y],…], destino:"p3",        → destino opcional (si no, usa NIVELES_EDIFICIO)
+           estilo:{ normal:{…}, hover:{…} } }    → estilo opcional (fill, stroke, width)
+         null                                     → ese nivel NO se puede elegir en esa fachada
+       Coordenadas 0–100 RESPECTO A LA IMAGEN ORIGINAL (no a la pantalla):
+       se escalan solas con el recorte `cover`.
+       Para obtenerlas: abrí la página con ?zonas y hacé Alt + clic sobre cada
+       vértice (Alt + Shift + clic = empezar de nuevo); se copia al portapapeles.
+       ⚠ Los valores de abajo son PROVISORIOS (bandas horizontales): ajustalos
+         sobre cada render.
+    ============================================================ */
+
+    const ZONAS_ESTILO = {
+        normal: { fill: "rgba(255,255,255,0)",    stroke: "rgba(255,255,255,0)",    width: 1 },
+        hover:  { fill: "rgba(255,255,255,0.24)", stroke: "#ffffff",                width: 2 }
+    };
+
+    // Ayuda: reparte N bandas apiladas entre yAlto..yBajo (una por nivel de NIVELES_EDIFICIO)
+    const pilaDeNiveles = (x0, x1, yAlto, yBajo, extra = {}) => {
+        const h = (yBajo - yAlto) / NIVELES_EDIFICIO.length, o = {};
+        NIVELES_EDIFICIO.forEach((n, k) => {
+            const b = yBajo - k * h, t = b - h;
+            o[n.id] = [[x0, t + .3], [x1, t + .3], [x1, b - .3], [x0, b - .3]];
+        });
+        return { ...o, ...extra };
+    };
+
+    const ZONAS_FACHADAS = {
+        fachada: {
+        pb: [[28,80.8],[54.9,77.4],[57.8,77.7],[67.5,79.7],[67.3,89.3],[54.5,90.3],[28,88.9]],
+        n1: [[29.2,72.5],[55.1,65.6],[57.4,66.8],[58.8,66.4],[66.4,70.3],[66.2,79.5],[57.5,77.6],[54.7,77.3],[29.2,80.7]],
+        n2: [[29.1,64.4],[54.7,53.8],[57.2,55.3],[58.8,54.5],[66.4,60.6],[66.4,70.2],[58.8,66.3],[57.4,66.7],[54.9,65.7],[29.2,72.5]],
+        n3: [[29.2,56.4],[54.9,41.4],[57.3,43.8],[58.8,43.1],[66.4,51],[66.5,60.5],[58.8,54.4],[57.2,55.3],[54.7,53.7],[29.2,64.3]],
+        n4: [[29.2,48.6],[55.1,29.8],[57.4,32.7],[59,32],[66.6,42.3],[66.3,50.8],[58.8,43],[57.2,43.7],[54.9,41.5],[29.3,56.2]],
+        n5: [[59.1,31.7],[57.6,32.6],[55.1,29.5],[29.2,48.5],[29.4,40.6],[55,17.8],[66.5,34.6],[66.7,42.7]],
+        n6: [[66.6,26.6],[66.5,34.3],[55,17.8],[29.4,40.4],[29.3,32.7],[55.5,9.8]],
+    },
+        lateral:     {
+    pb: [[37.9,82],[61.3,81.7],[61.5,95.1],[37.9,95.1]],
+    n1: [[38.8,69.4],[61,69.5],[61.1,81.5],[38.7,81.6]],
+    n2: [[38.9,57.2],[61.1,57.2],[61.1,69.1],[38.8,69]],
+    n3: [[38.9,45.4],[61.3,45.4],[61.1,57],[38.8,57]],
+    n4: [[39,33.6],[61.2,33.6],[61.2,45],[38.8,45.1]],
+    n5: [[39.1,20.9],[61.3,21],[61.2,33.3],[39.1,33.6]],
+    n6: [[53.5,14.4],[61.2,14.2],[61.3,20.9],[38.8,20.7],[38.9,14.1],[45.9,14.1],[45.9,11.2],[53.6,11.3]],
+    },
+        posterior:   {
+    pb: [[30.5,71.6],[36.1,72.9],[36,73.8],[45.2,75.7],[46.9,75.3],[56.4,77.9],[62.4,76.4],[64.4,76.8],[70.7,74.9],[70.7,84.5],[56.3,92.3],[30.5,79.3]],
+    n1: [[31.2,34.3],[54.5,13.3],[60.5,19],[62.5,17.5],[66.1,21.3],[67.1,21.9],[68.9,23.9],[68.9,28.3],[71.6,30.6],[71.7,34.8],[69.2,35.5],[62.5,30.1],[60.5,31.1],[54.3,26.2],[31.1,41.7]],
+    n2: [[31.2,64.1],[54.7,64.7],[69,64.7],[69,70.3],[71.6,70.7],[71.7,74.6],[64.5,76.8],[62.4,76.4],[56.3,77.8],[46.8,75.3],[45.3,75.7],[36.1,73.5],[36.1,72.8],[31.1,71.7]],
+    n3: [[31.2,56.6],[54.4,51.5],[60.6,53.5],[62.5,53.1],[68.9,55.2],[68.9,60.3],[71.7,60.7],[71.7,64.6],[64.5,64.7],[62.3,64.8],[56.2,64.7],[54.5,64.7],[45.3,64.6],[31.2,64.1]],
+    n4: [[31.2,49.1],[54.4,39.1],[60.5,42.2],[62.7,41.5],[68.9,45.3],[68.8,49.5],[71.6,50.8],[71.7,54.5],[68.8,55],[62.4,53.1],[60.5,53.5],[54.4,51.4],[31.2,56.4]],
+    n5: [[31.1,41.6],[54.3,26],[60.5,31],[62.6,30.2],[69,35.6],[68.9,39],[71.5,40.7],[71.5,44.5],[69.1,45.4],[62.6,41.5],[60.5,42.2],[54.3,39],[31.1,49.2]],
+    n6: [[31.1,32],[54.6,9.6],[60.5,15.8],[62.5,14.2],[67.1,19.1],[67.1,21.9],[62.6,17.7],[60.5,18.9],[54.5,13.4],[31.1,34.2]],   
+    },
+        perspectiva: {
+    pb: [[22.3,80.2],[71.1,80.4],[71.1,92.1],[22.2,91.7]],
+    n1: [[24.3,69.1],[71.1,69.2],[71.1,80.1],[24.2,79.9]],
+    n2: [[24.4,58.2],[70.9,58.4],[71.2,68.8],[24.3,68.9]],
+    n3: [[24.4,46.5],[70.9,46.5],[71,58.2],[24.3,58]],
+    n4: [[24.3,35.4],[70.8,35.9],[70.9,46.2],[24.2,46.3]],
+    n5: [[24.4,23.7],[70.8,23.9],[70.9,35.6],[24.2,35.3]],
+    n6: [[24.9,19.9],[33.6,19.9],[33.8,11.8],[43.4,11.7],[43.3,14.3],[47.1,14.3],[47.1,10.6],[52.5,10.6],[52.5,17.1],[69.5,17],[69.5,19.7],[70.1,19.7],[70.1,23.6],[24.5,23.6]],
+    }
+        // Ej. de excepción:  posterior: pilaDeNiveles(28,74,18,86,{ n6: null })
+    };
+
+
+    /* ============================================================
        PLANTAS (JSON)
        x, y, w, h = porcentaje RESPECTO A LA IMAGEN de la planta.
        "id" debe existir en el objeto `units` de más abajo.
@@ -2038,7 +2401,7 @@
             nombre: "Planta baja",
             imagen: "images/PB.png",
             imagenesAlt: ["images/PB-1.png"],   // ← imágenes alternativas de esta planta
-            // modelo3D: "modelos/proyecto8.glb",
+            modelo3D: "modelos/Unidad B.glb",
             unidades: [
                 { id: "unidad04", x: 11, y: 15, w: 33, h: 69 },
                 { id: "unidad05", x: 58, y: 15, w: 33, h: 69 },
@@ -2052,11 +2415,11 @@
             nombre: "Primer Piso",
             imagen: "images/1P.png",
             imagenesAlt: ["images/1P-b.png"],
-            modelo3D: "modelos/proyecto8.glb",
+            modelo3D: "modelos/Unidad A3.glb",
             unidades: [
-                { id: "unidad01", puntos: [[12.2,84.7],[12.4,61.1],[8.2,61.1],[7.8,36.5],[12.2,36.9],[12.2,11.6],[23.5,11.4],[23.6,23],[29.1,22.7],[29.1,36],[42.8,36.5],[42.8,84]] },
-                { id: "unidad02", puntos: [[29.2,11.9],[72.3,10.8],[72,35.8],[29.4,35.8]], },
-                { id: "unidad03", puntos: [[59.1,84.3],[89.2,84.3],[89.2,73.1],[92.8,72.8],[93.2,36.8],[89.7,36.4],[89.2,11.2],[78,11.6],[77.7,22.4],[72.4,22.9],[72.3,35.9],[58.4,37.1]] },
+                { id: "unidad01", puntos: [[12.2,84.7],[12.2,61.1],[8.2,61.1],[8.2,36.5],[12.2,36.5],[12.2,11.6],[23.6,11.4],[23.6,23],[29.1,22.7],[29.1,36.5],[42.8,36.5],[42.8,84.7]] },
+                { id: "unidad02", puntos: [[29.2,11.9],[72.3,11.9],[72,35.8],[29.4,35.8]], },
+                { id: "unidad03", puntos: [[58.4,84.7],[89.2,84.7],[89.2,73.1],[92.8,72.8],[92.8,36.8],[89.2,36.8],[89.2,11.2],[77.7,11.6],[77.7,22.4],[72.3,22.4],[72.3,36.8],[58.4,36.8]] },
                 { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
@@ -2067,11 +2430,11 @@
             nombre: "Segundo Piso",
             imagen: "images/2P.png",
             imagenesAlt: ["images/2P-b.png"],
-            modelo3D: "modelos/proyecto8.glb",
+            modelo3D: "modelos/Unidad A3.glb",
             unidades: [
-                { id: "unidad01", puntos: [[12.2,84.7],[12.4,61.1],[8.2,61.1],[7.8,36.5],[12.2,36.9],[12.2,11.6],[23.5,11.4],[23.6,23],[29.1,22.7],[29.1,36],[42.8,36.5],[42.8,84]] },
-                { id: "unidad02", puntos: [[29.2,11.9],[72.3,10.8],[72,35.8],[29.4,35.8]], },
-                { id: "unidad03", puntos: [[59.1,84.3],[89.2,84.3],[89.2,73.1],[92.8,72.8],[93.2,36.8],[89.7,36.4],[89.2,11.2],[78,11.6],[77.7,22.4],[72.4,22.9],[72.3,35.9],[58.4,37.1]] },
+                { id: "unidad01", puntos: [[12.2,84.7],[12.2,61.1],[8.2,61.1],[8.2,36.5],[12.2,36.5],[12.2,11.6],[23.6,11.4],[23.6,23],[29.1,22.7],[29.1,36.5],[42.8,36.5],[42.8,84.7]] },
+                { id: "unidad02", puntos: [[29.2,11.9],[72.3,11.9],[72,35.8],[29.4,35.8]], },
+                { id: "unidad03", puntos: [[58.4,84.7],[89.2,84.7],[89.2,73.1],[92.8,72.8],[92.8,36.8],[89.2,36.8],[89.2,11.2],[77.7,11.6],[77.7,22.4],[72.3,22.4],[72.3,36.8],[58.4,36.8]] },
                 { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
@@ -2082,11 +2445,11 @@
             nombre: "Tercer Piso",
             imagen: "images/3P.png",
             imagenesAlt: ["images/3P-b.png"],
-            modelo3D: "modelos/proyecto8.glb",
+            modelo3D: "modelos/Unidad A3.glb",
             unidades: [
-                { id: "unidad01", puntos: [[12.2,84.7],[12.4,61.1],[8.2,61.1],[7.8,36.5],[12.2,36.9],[12.2,11.6],[23.5,11.4],[23.6,23],[29.1,22.7],[29.1,36],[42.8,36.5],[42.8,84]] },
-                { id: "unidad02", puntos: [[29.2,11.9],[72.3,10.8],[72,35.8],[29.4,35.8]], },
-                { id: "unidad03", puntos: [[59.1,84.3],[89.2,84.3],[89.2,73.1],[92.8,72.8],[93.2,36.8],[89.7,36.4],[89.2,11.2],[78,11.6],[77.7,22.4],[72.4,22.9],[72.3,35.9],[58.4,37.1]] },
+                { id: "unidad01", puntos: [[12.2,84.7],[12.2,61.1],[8.2,61.1],[8.2,36.5],[12.2,36.5],[12.2,11.6],[23.6,11.4],[23.6,23],[29.1,22.7],[29.1,36.5],[42.8,36.5],[42.8,84.7]] },
+                { id: "unidad02", puntos: [[29.2,11.9],[72.3,11.9],[72,35.8],[29.4,35.8]], },
+                { id: "unidad03", puntos: [[58.4,84.7],[89.2,84.7],[89.2,73.1],[92.8,72.8],[92.8,36.8],[89.2,36.8],[89.2,11.2],[77.7,11.6],[77.7,22.4],[72.3,22.4],[72.3,36.8],[58.4,36.8]] },
                 { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
@@ -2097,11 +2460,11 @@
             nombre: "Cuarto Piso",
             imagen: "images/4P.png",
             imagenesAlt: ["images/2P-b.png"],
-            modelo3D: "modelos/proyecto8.glb",
+            modelo3D: "modelos/Unidad A3.glb",
             unidades: [
-                { id: "unidad01", puntos: [[12.2,84.7],[12.4,61.1],[8.2,61.1],[7.8,36.5],[12.2,36.9],[12.2,11.6],[23.5,11.4],[23.6,23],[29.1,22.7],[29.1,36],[42.8,36.5],[42.8,84]] },
-                { id: "unidad02", puntos: [[29.2,11.9],[72.3,10.8],[72,35.8],[29.4,35.8]], },
-                { id: "unidad03", puntos: [[59.1,84.3],[89.2,84.3],[89.2,73.1],[92.8,72.8],[93.2,36.8],[89.7,36.4],[89.2,11.2],[78,11.6],[77.7,22.4],[72.4,22.9],[72.3,35.9],[58.4,37.1]] },
+                { id: "unidad01", puntos: [[12.2,84.7],[12.2,61.1],[8.2,61.1],[8.2,36.5],[12.2,36.5],[12.2,11.6],[23.6,11.4],[23.6,23],[29.1,22.7],[29.1,36.5],[42.8,36.5],[42.8,84.7]] },
+                { id: "unidad02", puntos: [[29.2,11.9],[72.3,11.9],[72,35.8],[29.4,35.8]], },
+                { id: "unidad03", puntos: [[58.4,84.7],[89.2,84.7],[89.2,73.1],[92.8,72.8],[92.8,36.8],[89.2,36.8],[89.2,11.2],[77.7,11.6],[77.7,22.4],[72.3,22.4],[72.3,36.8],[58.4,36.8]] },
                 { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
@@ -2112,11 +2475,11 @@
             nombre: "Quinto Piso",
             imagen: "images/5P.png",
             imagenesAlt: ["images/3P-b.png"],
-            modelo3D: "modelos/proyecto8.glb",
+            modelo3D: "modelos/Unidad A3.glb",
             unidades: [
-                { id: "unidad01", puntos: [[12.2,84.7],[12.4,61.1],[8.2,61.1],[7.8,36.5],[12.2,36.9],[12.2,11.6],[23.5,11.4],[23.6,23],[29.1,22.7],[29.1,36],[42.8,36.5],[42.8,84]] },
-                { id: "unidad02", puntos: [[29.2,11.9],[72.3,10.8],[72,35.8],[29.4,35.8]], },
-                { id: "unidad03", puntos: [[59.1,84.3],[89.2,84.3],[89.2,73.1],[92.8,72.8],[93.2,36.8],[89.7,36.4],[89.2,11.2],[78,11.6],[77.7,22.4],[72.4,22.9],[72.3,35.9],[58.4,37.1]] },
+                { id: "unidad01", puntos: [[12.2,84.7],[12.2,61.1],[8.2,61.1],[8.2,36.5],[12.2,36.5],[12.2,11.6],[23.6,11.4],[23.6,23],[29.1,22.7],[29.1,36.5],[42.8,36.5],[42.8,84.7]] },
+                { id: "unidad02", puntos: [[29.2,11.9],[72.3,11.9],[72,35.8],[29.4,35.8]], },
+                { id: "unidad03", puntos: [[58.4,84.7],[89.2,84.7],[89.2,73.1],[92.8,72.8],[92.8,36.8],[89.2,36.8],[89.2,11.2],[77.7,11.6],[77.7,22.4],[72.3,22.4],[72.3,36.8],[58.4,36.8]] },
                 { id: "unidad07", x: 44, y: 40, w: 15, h: 40 }
             ]
         },
@@ -2127,7 +2490,7 @@
             nombre: "Terraza",
             imagen: "images/6P.png",
             imagenesAlt: ["images/6P-b.png"],
-            modelo3D: "modelos/proyecto8.glb",
+            modelo3D: "modelos/TERRAZA.glb",
             unidades: [
                 { id: "unidad08", x: 10, y: 35, w: 15, h: 50 },
                 { id: "unidad09", x: 10, y: 15, w: 80, h: 20 },
@@ -2260,20 +2623,20 @@
 
             nombre: "Cafeteria",
 
-            ambientes: "4 ambientes",
+            ambientes: "-",
 
-            cubierta: "90 m²",
+            cubierta: "130 m²",
 
-            semicubierta: "15 m²",
+            semicubierta: "-",
 
-            total: "105 m²",
+            total: "130 m²",
 
-            dormitorios: "3",
+            dormitorios: "-",
 
-            banos: "2",
+            banos: "1",
 
             descripcion:
-                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+                "Espacio para la apertura de una cafeteria barrial.",
 
             recorrido:
                 "trabajo.html"
@@ -2287,17 +2650,17 @@
 
             nombre: "Tienda",
 
-            ambientes: "4 ambientes",
+            ambientes: "-",
 
-            cubierta: "90 m²",
+            cubierta: "130 m²",
 
-            semicubierta: "15 m²",
+            semicubierta: "-",
 
-            total: "105 m²",
+            total: "130 m²",
 
-            dormitorios: "3",
+            dormitorios: "-",
 
-            banos: "2",
+            banos: "1",
 
             descripcion:
                 "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
@@ -2316,18 +2679,18 @@
 
             ambientes: "-",
 
-            cubierta: "90 m²",
+            cubierta: "40 m²",
 
             semicubierta: "-",
 
-            total: "105 m²",
+            total: "40 m²",
 
-            dormitorios: "3-",
+            dormitorios: "-",
 
             banos: "-",
 
             descripcion:
-                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+                "Hall conector entre la vereda y el garaje, junto a un espacio de espera.",
 
             recorrido:
                 "trabajo.html"
@@ -2343,18 +2706,18 @@
 
             ambientes: "-",
 
-            cubierta: "90 m²",
+            cubierta: "20 m²",
 
             semicubierta: "-",
 
-            total: "105 m²",
+            total: "20 m²",
 
-            dormitorios: "3-",
+            dormitorios: "-",
 
             banos: "-",
 
             descripcion:
-                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+                "Hall de conexion entre las unidades.",
 
             recorrido:
                 "trabajo.html"
@@ -2370,18 +2733,18 @@
 
             ambientes: "-",
 
-            cubierta: "90 m²",
+            cubierta: "130 m²",
 
             semicubierta: "-",
 
-            total: "105 m²",
+            total: "130 m²",
 
-            dormitorios: "3-",
+            dormitorios: "-",
 
             banos: "-",
 
             descripcion:
-                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+                "Espacio de uso comun para el descanso en la terraza.",
 
             recorrido:
                 "trabajo.html"
@@ -2397,18 +2760,18 @@
 
             ambientes: "-",
 
-            cubierta: "90 m²",
+            cubierta: "130 m²",
 
             semicubierta: "-",
 
-            total: "105 m²",
+            total: "130 m²",
 
-            dormitorios: "3-",
+            dormitorios: "-",
 
             banos: "-",
 
             descripcion:
-                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+                "Espacio de uso comun para el descanso en la terraza.",
 
             recorrido:
                 "trabajo.html"
@@ -2424,18 +2787,18 @@
 
             ambientes: "-",
 
-            cubierta: "90 m²",
+            cubierta: "-",
 
             semicubierta: "-",
 
-            total: "105 m²",
+            total: "50 m²",
 
-            dormitorios: "3-",
+            dormitorios: "-",
 
             banos: "-",
 
             descripcion:
-                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+                "Pileta con area de descanso.",
 
             recorrido:
                 "trabajo.html"
@@ -2451,18 +2814,18 @@
 
             ambientes: "-",
 
-            cubierta: "90 m²",
+            cubierta: "35 m²",
 
             semicubierta: "-",
 
-            total: "105 m²",
+            total: "35 m²",
 
-            dormitorios: "3-",
+            dormitorios: "-",
 
-            banos: "-",
+            banos: "1",
 
             descripcion:
-                "Unidad de mayor superficie con ambientes flexibles, expansión exterior y espacios de estar integrados.",
+                "Espacio para reuniones de uso comun.",
 
             recorrido:
                 "trabajo.html"
@@ -2581,9 +2944,153 @@
         { src: "images/proyecto8-8.jpg", titulo: "Vestidor Suite" },
         { src: "images/proyecto8-9.jpg", titulo: "Baño Suite" },
         { src: "images/proyecto8-10.png", titulo: "Tienda" },
-        { src: "images/proyecto8-11.png", titulo: "Cafeteria" }
+        { src: "images/proyecto8-11.png", titulo: "Cafeteria" },
+        { src: "images/proyecto8-12.png", titulo: "Living Unidad 3" },
+        { src: "images/proyecto8-13.png", titulo: "Cocina Unidad 3" },
+        { src: "images/proyecto8-14.png", titulo: "Dormitorio Unidad 3" },
+        { src: "images/proyecto8-15.png", titulo: "Baño Unidad 3" },
+        { src: "images/proyecto8-16.png", titulo: "Hall Terraza" },
+        { src: "images/proyecto8-17.png", titulo: "Hall Planta Baja" },
+        { src: "images/proyecto8-18.png", titulo: "Garaje" },
+        { src: "images/proyecto8-19.png", titulo: "Pileta" },
+        { src: "images/proyecto8-20.png", titulo: "Terraza" },
+        { src: "images/proyecto8-21.png", titulo: "SUM" }
         // , { src: "images/otra-imagen.jpg", titulo: "Hall de acceso" }
     ];
+
+    /* ============================================================
+       EL PROYECTO (sección para inversores, desarrolladores y socios)
+
+       TODO el contenido de «El proyecto» sale de este objeto.
+       Reglas:
+         · Un campo vacío ("", null, [] ) no se muestra.
+         · Un apartado sin datos NO aparece en el menú de la sección.
+         · Nada está precargado: completá solo con datos CONFIRMADOS.
+           Si un dato no existe, dejalo vacío (no pongas valores de ejemplo).
+         · Los textos son texto plano (no admiten HTML).
+    ============================================================ */
+
+    const PROYECTO = {
+
+        /* ---- 1. INFORMACIÓN GENERAL ---- */
+        general: {
+            nombre: "Edificio HITO",
+            ubicacion: "",                                    // ← completar: "Calle, número, localidad"
+            tipo: "Edificio de viviendas multifamiliar",
+            descripcion: "HITO es un edificio de viviendas multifamiliar de planta baja, cinco pisos y terraza. " +
+                "En planta baja combina hall de acceso, cafetería y tienda con la vida del barrio; en los pisos 1 a 5 " +
+                "reúne quince viviendas de tres y cuatro ambientes, cada una con su expansión semicubierta; y remata en una " +
+                "terraza de uso común con solárium, pileta y SUM.",
+            caracteristicas: [
+                { titulo: "Niveles",                  valor: "Planta baja + 5 pisos + terraza" },
+                { titulo: "Viviendas",                valor: "15 (3 por piso, de 1.º a 5.º)" },
+                { titulo: "Tipologías",               valor: "3 y 4 ambientes" },
+                { titulo: "Planta baja",              valor: "Hall de acceso, cafetería y tienda" },
+                { titulo: "Terraza de uso común",     valor: "Solárium, pileta y SUM" },
+                { titulo: "Expansión exterior",       valor: "Semicubiertos de 10 a 15 m² por vivienda" }
+            ],
+            imagenes: [                                       // se muestran las 3 primeras
+                "images/Frente 2.png",
+                "images/Frente 3.png",
+                "images/Frente 4.png"
+            ]
+        },
+
+        /* ---- 2. UBICACIÓN E INFRAESTRUCTURA (solo datos verificados) ---- */
+        ubicacion: {
+            direccion: "",
+            accesibilidad: [ /* { nombre: "Av. …", detalle: "…" } */ ],
+            transporte:    [ /* { nombre: "Línea …", detalle: "a X m" } */ ],
+            entorno: [
+                // { categoria: "Educación", items: [ { nombre: "…", detalle: "a 400 m" } ] }
+            ],
+            infraestructura: [ /* "Red de agua", "Gas natural" … */ ],
+            caracteristicasUrbanas: [ /* "Zonificación …", "FOT …" */ ],
+            mapa: {
+                lat: null, lng: null,   // coordenadas del terreno → mapa OpenStreetMap
+                embedUrl: ""
+            }
+        },
+
+        /* ---- 3. UNIDADES Y TIPOLOGÍAS (salen de floors / units de esta misma página) ---- */
+        unidades: {
+            total: 17,
+            tipologias: [
+                { nombre: "Tipo 01 · 4 ambientes",   ambientes: "4", cantidad: 5, superficie: "97 m² (85 cubiertos + 12 semicubiertos)" },
+                { nombre: "Tipo 02 · 3 ambientes",   ambientes: "3", cantidad: 5, superficie: "82 m² (72 cubiertos + 10 semicubiertos)" },
+                { nombre: "Tipo 03 · 4 ambientes",   ambientes: "4", cantidad: 5, superficie: "105 m² (90 cubiertos + 15 semicubiertos)" },
+                { nombre: "Locales comerciales (PB)", cantidad: 2 }
+            ],
+            porNivel: [
+                { nivel: "Planta baja",   cantidad: 2 },
+                { nivel: "Primer piso",   cantidad: 3 },
+                { nivel: "Segundo piso",  cantidad: 3 },
+                { nivel: "Tercer piso",   cantidad: 3 },
+                { nivel: "Cuarto piso",   cantidad: 3 },
+                { nivel: "Quinto piso",   cantidad: 3 }
+            ],
+            notas: "15 viviendas (tres por piso, de 1.º a 5.º) y 2 locales comerciales en planta baja. " +
+                   "La terraza reúne los espacios comunes: solárium, pileta y SUM.",
+            enlazarPlantas: true
+        },
+
+        /* ---- 4. SUPERFICIES ---- */
+        superficies: {
+            criterio: "",               // ← norma / criterio de medición (hasta completarlo figura «A confirmar»)
+            categorias: [
+                { nombre: "Superficie cubierta por vivienda",     valor: "72 – 90 m²",
+                  incluye: "Tipo 02: 72 m² · Tipo 01: 85 m² · Tipo 03: 90 m²", calculo: "" },
+                { nombre: "Superficie semicubierta por vivienda", valor: "10 – 15 m²",
+                  incluye: "Tipo 02: 10 m² · Tipo 01: 12 m² · Tipo 03: 15 m²", calculo: "" },
+                { nombre: "Superficie total por vivienda",        valor: "82 – 105 m²",
+                  incluye: "Tipo 02: 82 m² · Tipo 01: 97 m² · Tipo 03: 105 m²", calculo: "" }
+            ],
+            total: { valor: "", criterio: "" },   // superficie total construida del edificio (con su criterio)
+            notas: ""
+        },
+
+        /* ---- 5. ESTADO DEL DESARROLLO ---- */
+        estado: {
+            actual: "",                 // "proyecto" | "obra" | "finalizado"
+            descripcion: ""
+        },
+
+        /* ---- 6. CRONOGRAMA ---- */
+        cronograma: [
+            // { etapa: "…", descripcion: "", estado: "pendiente" | "en-curso" | "completada",
+            //   inicioPrevisto: "", finPrevisto: "", inicioReal: "", finReal: "" }
+        ],
+
+        /* ---- 7. INDICADORES FINANCIEROS (oculto por defecto) ---- */
+        financiero: {
+            activo: false,
+            indicadores: [ /* { nombre: "…", valor: "…", nota: "…" } */ ],
+            fecha: "",
+            fuente: "",
+            supuestos: [],
+            aviso: ""
+        },
+
+        /* ---- 8. DOSSIER DESCARGABLE ---- */
+        dossier: {
+            archivo: "",                // ej.: "docs/dossier-hito.pdf"
+            etiqueta: "Descargar dossier del proyecto",
+            detalle: ""
+        },
+
+        /* ---- 9. CONTACTO ---- */
+        contacto: {
+            empresa: "",
+            email: "",
+            telefono: "",
+            whatsapp: "",               // con código de país, ej.: "5491122334455"
+            textoBoton: "Solicitar información del proyecto",
+            formulario: {
+                activo: false,
+                endpoint: ""
+            }
+        }
+    };
 
 
     /* ============================================================
@@ -2597,7 +3104,7 @@
         document.getElementById("transition-video");
 
     const hotspot =
-        document.getElementById("building-hotspot");
+        document.getElementById("building-hotspot") || document.createElement("button");   // ya no existe en el HTML
 
     const floorScene =
         document.getElementById("floor-scene");
@@ -2676,6 +3183,7 @@
 
         updateHotspot();
         warmAround(index);
+        fzRender();
 
         currentSceneElement.textContent =
             String(index + 1).padStart(2, "0");
@@ -2730,6 +3238,7 @@
 
         isTransitioning = true;
         hotspot.classList.remove("visible");
+        fzHide();
 
         if (!transition.video) {
             fallbackTransition(transition.target);
@@ -2796,21 +3305,27 @@
     );
 
 
-    function enterBuilding() {
+    function enterBuilding(idx) {
 
         if (isTransitioning) return;
 
         isTransitioning = true;
+
+        // piso elegido en la fachada: se prepara MIENTRAS corre el video
+        const pre = typeof idx === "number"
+            ? (currentFloor = idx, floorReady ? showFloor(idx, true) : ensureFloor())
+            : null;
 
         let opened = false;
 
         const open = () => {
             if (opened) return;
             opened = true;
-            finishEnteringBuilding();
+            finishEnteringBuilding(pre);
         };
 
         hotspot.classList.remove("visible");
+        fzHide();
         loader.classList.add("active");
 
         transitionVideo.src = "videos/Clip 3.mp4";
@@ -2833,12 +3348,12 @@
     }
 
 
-    async function finishEnteringBuilding() {
+    async function finishEnteringBuilding(pre) {
 
         transitionVideo.ontimeupdate = null;
         transitionVideo.onended = null;
 
-        try { await ensureFloor(); } catch (e) {}
+        try { await (pre || ensureFloor()); } catch (e) {}
 
         // La planta (z-index 30) se desvanece POR ENCIMA del video (z-index 20)
         floorScene.classList.add("active");
@@ -3086,7 +3601,7 @@
             estamos viendo el edificio.
         */
 
-        if (galleryOpen()) {
+        if (aerialOpen() || galleryOpen()) {
             return;
         }
 
@@ -4172,6 +4687,7 @@
     let uvLast = null;                       // última unidad abierta (habilita 3D / 360°)
 
     const navBuilding    = document.getElementById("nav-building");
+    const navFacades     = document.getElementById("nav-facades");
     const navModeButtons = [...document.querySelectorAll("#site-nav [data-mode]")];
 
     const uvOpen = () => uv.classList.contains("active");
@@ -4188,7 +4704,9 @@
             else el.removeAttribute("aria-current");
         };
 
-        mark(navBuilding, !inGallery && !inUnit && !inFloor);
+        const _ae = document.getElementById("aerial-intro"), onAerial = !!(_ae && _ae.classList.contains("active"));
+        mark(navBuilding, !inGallery && !inUnit && !inFloor && onAerial);
+        mark(navFacades,  !inGallery && !inUnit && !inFloor && !onAerial);
         mark(floorTopButton, !inGallery && inFloor);
         mark(navGallery, inGallery);
 
@@ -4200,10 +4718,10 @@
         });
     }
 
-    navBuilding.addEventListener("click", () => {
+    navFacades.addEventListener("click", () => {
         if (isTransitioning) return;
         if (uvOpen()) closeUnitView();
-        backBuildingButton.click();          // portada del edificio
+        backBuildingButton.click();          // vista de fachadas
     });
 
     floorTopButton.addEventListener("click", () => {
@@ -4452,6 +4970,248 @@
 
 
     /* ============================================================
+       NUEVO: PANTALLA AÉREA + ZONAS DE PISOS EN FACHADAS
+    ============================================================ */
+
+    const aerial = document.getElementById("aerial-intro");
+    function aerialOpen() { return !!aerial && aerial.isConnected && aerial.classList.contains("active"); }
+
+    (function () {
+        const ai = document.getElementById("aerial-image");
+        ai.style.objectPosition = AEREA.posicion || "50% 50%";
+        ai.addEventListener("error", () => aerial.classList.add("sin-imagen"));
+        ai.src = AEREA.imagen;
+        document.getElementById("ai-kicker").textContent = AEREA.kicker || "";
+        document.getElementById("ai-title").textContent  = AEREA.titulo || "";
+        document.getElementById("ai-sub").textContent    = AEREA.texto || "";
+        document.getElementById("aerial-enter").textContent = AEREA.boton || "Ingresar al edificio";
+    })();
+
+    function openAerial() {
+        aerial.classList.remove("leaving");
+        aerial.classList.add("active");
+        sceneImage.style.transform = "scale(1.08)";
+    }
+    function hideAerialNow() {
+        aerial.classList.remove("active", "leaving");
+        sceneImage.style.transform = "";
+    }
+
+    if (AEREA.omitir || /[?&]sinaerea/.test(location.search)) hideAerialNow();
+    else sceneImage.style.transform = "scale(1.08)";      // la fachada "se aproxima" al entrar
+
+    document.getElementById("aerial-enter").addEventListener("click", () => {
+        if (aerial.classList.contains("leaving")) return;
+        aerial.classList.add("leaving");
+        sceneImage.style.transform = "";
+        setTimeout(() => { if (aerial.classList.contains("leaving")) hideAerialNow(); }, 1500);
+    });
+
+    // Cualquier otro botón del menú cierra la aérea al instante; «Edificio» la abre.
+    document.getElementById("site-nav").addEventListener("click", e => {
+        if (aerialOpen() && !e.target.closest("#nav-building")) hideAerialNow();
+    }, true);
+
+    navBuilding.addEventListener("click", () => {
+        if (isTransitioning) return;
+        if (uvOpen()) closeUnitView();
+        backBuildingButton.click();
+        openAerial();
+    });
+
+    new MutationObserver(() => updateNav()).observe(aerial, { attributes: true, attributeFilter: ["class"] });
+
+    const fzLayer  = document.getElementById("facade-zones");
+    const fzStage  = document.getElementById("fz-stage");
+    const fzSvg    = document.getElementById("fz-svg");
+    const fzLevels = document.getElementById("fz-levels");
+    let fzPointer = "mouse";
+    const EDIT = location.search.includes("zonas");
+
+    const fzNorm = d => !d ? null : Array.isArray(d) ? { forma: d } : (Array.isArray(d.forma) && d.forma.length >= 3 ? d : null);
+    const fzHide = () => { fzLayer.classList.add("fz-off"); fzLevels.classList.add("fz-off"); };
+    const fzShow = () => { fzLayer.classList.remove("fz-off"); fzLevels.classList.remove("fz-off"); };
+    const fzSet  = (id, on) => document.querySelectorAll('[data-nivel="' + id + '"]').forEach(e => e.classList.toggle("on", on));
+
+    // Correspondencia imagen ↔ pantalla con object-fit: cover (centrado)
+    function fzFit() {
+        const iw = sceneImage.naturalWidth, ih = sceneImage.naturalHeight;
+        const cw = fzLayer.clientWidth, ch = fzLayer.clientHeight;
+        if (!iw || !ih || !cw || !ch) return;
+        const k = Math.max(cw / iw, ch / ih), w = iw * k, h = ih * k;
+        Object.assign(fzStage.style, { width: w + "px", height: h + "px", left: (cw - w) / 2 + "px", top: (ch - h) / 2 + "px" });
+    }
+
+    function fzGo(nivel, d) {
+        const idx = floors.findIndex(f => f.id === ((d && d.destino) || nivel.piso));
+        if (idx < 0) { console.warn("ZONAS: destino inexistente para", nivel); return; }
+        if (EDIT || isTransitioning || floorScene.classList.contains("active")) return;
+        fzSet(nivel.id, false);
+        enterBuilding(idx);          // video de entrada (Clip 3) → planta del piso elegido
+    }
+
+    function fzRender() {
+        if (EDIT) return edRender();
+        const cfg = ZONAS_FACHADAS[scenes[currentScene].id] || {};
+        const NS = "http://www.w3.org/2000/svg";
+        fzSvg.innerHTML = ""; fzLevels.innerHTML = "";
+        fzStage.querySelectorAll(".fz-tag").forEach(e => e.remove());
+
+        const hint = document.createElement("div");
+        hint.id = "fz-hint"; hint.textContent = "Elegí un piso";
+        fzLevels.appendChild(hint);
+
+        NIVELES_EDIFICIO.slice().reverse().forEach(n => {
+            const d = fzNorm(cfg[n.id]);
+            if (!d) return;
+
+            const st = d.estilo || {}, a = { ...ZONAS_ESTILO.normal, ...(st.normal || {}) }, b = { ...ZONAS_ESTILO.hover, ...(st.hover || {}) };
+
+            const poly = document.createElementNS(NS, "polygon");
+            poly.setAttribute("points", d.forma.map(q => q[0] + "," + q[1]).join(" "));
+            poly.setAttribute("class", "fz-zone");
+            poly.setAttribute("tabindex", "0");
+            poly.setAttribute("role", "button");
+            poly.setAttribute("aria-label", n.nombre);
+            poly.dataset.nivel = n.id;
+            poly.style.cssText = "--fz-fill:" + a.fill + ";--fz-stroke:" + a.stroke + ";--fz-w:" + a.width +
+                ";--fz-fill-h:" + b.fill + ";--fz-stroke-h:" + b.stroke + ";--fz-w-h:" + b.width;
+            fzSvg.appendChild(poly);
+
+            // etiqueta en el centro de la zona
+            const cx = d.forma.reduce((s2, q) => s2 + q[0], 0) / d.forma.length;
+            const cy = d.forma.reduce((s2, q) => s2 + q[1], 0) / d.forma.length;
+            const tag = document.createElement("div");
+            tag.className = "fz-tag"; tag.dataset.nivel = n.id; tag.textContent = n.nombre;
+            tag.style.left = cx + "%"; tag.style.top = cy + "%";
+            fzStage.appendChild(tag);
+
+            const chip = document.createElement("button");
+            chip.type = "button"; chip.className = "fz-chip"; chip.dataset.nivel = n.id; chip.textContent = n.nombre;
+            fzLevels.appendChild(chip);
+
+            const hoverable = () => fzPointer === "mouse";
+            [poly, chip].forEach(el => {
+                el.addEventListener("pointerenter", e => { fzPointer = e.pointerType; if (hoverable()) fzSet(n.id, true); });
+                el.addEventListener("pointerleave", () => fzSet(n.id, false));
+                el.addEventListener("pointerdown", e => { fzPointer = e.pointerType; fzSet(n.id, true); });   // feedback al tocar
+                el.addEventListener("pointercancel", () => fzSet(n.id, false));
+                el.addEventListener("focus", () => fzSet(n.id, true));
+                el.addEventListener("blur", () => fzSet(n.id, false));
+                el.addEventListener("click", () => setTimeout(() => fzGo(n, d), fzPointer === "mouse" ? 0 : 180));
+            });
+            poly.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fzGo(n, d); } });
+        });
+
+        fzFit();
+        fzShow();
+    }
+
+    sceneImage.addEventListener("load", fzRender);
+    window.addEventListener("resize", fzFit);
+    // al volver de la planta (botón Volver, Edificio o Esc) las zonas reaparecen
+    new MutationObserver(() => { if (!floorScene.classList.contains("active") && !isTransitioning) fzShow(); })
+        .observe(floorScene, { attributes: true, attributeFilter: ["class"] });
+
+    /* ============================================================
+       EDITOR VISUAL DE ZONAS: abrí la página con ?zonas
+       · Elegí el piso en el panel, hacé clic en la fachada para ir poniendo vértices.
+       · Arrastrá un punto para moverlo · doble clic sobre un punto = borrarlo.
+       · Cambiá de fachada con las flechas: cada una guarda su propia forma.
+       · «Copiar código» y pegalo en ZONAS_FACHADAS reemplazando esa fachada.
+    ============================================================ */
+
+    const ED = { all: {}, sel: NIVELES_EDIFICIO[0].id, panel: null };
+
+    function edPts() {
+        const id = scenes[currentScene].id;
+        if (!ED.all[id]) {
+            const cfg = ZONAS_FACHADAS[id] || {}, o = {};
+            NIVELES_EDIFICIO.forEach(n => { const d = fzNorm(cfg[n.id]); o[n.id] = d ? d.forma.map(q => q.slice()) : []; });
+            ED.all[id] = o;
+        }
+        return ED.all[id];
+    }
+
+    function edCode() {
+        const o = edPts();
+        return scenes[currentScene].id + ": {\n" + NIVELES_EDIFICIO.map(n =>
+            "    " + n.id + ": " + (o[n.id].length >= 3 ? JSON.stringify(o[n.id]) : "null") + ",").join("\n") + "\n},";
+    }
+
+    function edPanelUpdate() {
+        if (!ED.panel) {
+            const p = ED.panel = document.createElement("div");
+            p.id = "ed-panel";
+            p.innerHTML = '<b>Editor de zonas · <span id="ed-fac"></span></b><br>Clic = agregar punto · arrastrar = mover · doble clic = borrar<br>' +
+                '<select id="ed-sel">' + NIVELES_EDIFICIO.map(n => '<option value="' + n.id + '">' + n.nombre + '</option>').join("") + '</select>' +
+                '<button id="ed-undo">Deshacer punto</button><button id="ed-clear">Vaciar piso</button><button id="ed-copy">Copiar código</button>' +
+                '<textarea id="ed-out" readonly></textarea>';
+            document.body.appendChild(p);
+            p.querySelector("#ed-sel").addEventListener("change", e => { ED.sel = e.target.value; edRender(); });
+            p.querySelector("#ed-undo").addEventListener("click", () => { edPts()[ED.sel].pop(); edRender(); });
+            p.querySelector("#ed-clear").addEventListener("click", () => { edPts()[ED.sel].length = 0; edRender(); });
+            p.querySelector("#ed-copy").addEventListener("click", () => {
+                const t = p.querySelector("#ed-out"); t.select();
+                if (navigator.clipboard) navigator.clipboard.writeText(t.value).catch(() => document.execCommand("copy"));
+                else document.execCommand("copy");
+            });
+        }
+        ED.panel.querySelector("#ed-fac").textContent = scenes[currentScene].id;
+        ED.panel.querySelector("#ed-sel").value = ED.sel;
+        ED.panel.querySelector("#ed-out").value = edCode();
+    }
+
+    function edRender() {
+        const o = edPts(), NS = "http://www.w3.org/2000/svg";
+        const pt = (e, r) => [Math.min(100, Math.max(0, +((e.clientX - r.left) / r.width * 100).toFixed(1))),
+                              Math.min(100, Math.max(0, +((e.clientY - r.top) / r.height * 100).toFixed(1)))];
+        fzSvg.innerHTML = ""; fzLevels.innerHTML = "";
+        fzStage.querySelectorAll(".fz-tag,.ed-pt,.ed-surface").forEach(e => e.remove());
+
+        const surf = document.createElement("div");
+        surf.className = "ed-surface";
+        surf.addEventListener("click", e => { o[ED.sel].push(pt(e, fzStage.getBoundingClientRect())); edRender(); });
+        fzStage.appendChild(surf);
+
+        NIVELES_EDIFICIO.forEach((n, k) => {
+            const pts = o[n.id];
+            if (!pts.length) return;
+            const sel = n.id === ED.sel, hue = k * 50;
+            const poly = document.createElementNS(NS, "polygon");
+            const draw = () => poly.setAttribute("points", pts.map(q => q[0] + "," + q[1]).join(" "));
+            draw();
+            poly.setAttribute("style", "pointer-events:none;vector-effect:non-scaling-stroke;fill:hsla(" + hue + ",85%,55%," + (sel ? .35 : .14) +
+                ");stroke:hsl(" + hue + ",85%,62%);stroke-width:" + (sel ? 3 : 1.5));
+            fzSvg.appendChild(poly);
+
+            if (!sel) return;
+            pts.forEach((q, i) => {
+                const h = document.createElement("div");
+                h.className = "ed-pt"; h.textContent = i + 1;
+                h.style.left = q[0] + "%"; h.style.top = q[1] + "%";
+                h.addEventListener("pointerdown", e => { e.stopPropagation(); h.setPointerCapture(e.pointerId); h._drag = true; });
+                h.addEventListener("pointermove", e => {
+                    if (!h._drag) return;
+                    const c = pt(e, fzStage.getBoundingClientRect());
+                    q[0] = c[0]; q[1] = c[1];
+                    h.style.left = c[0] + "%"; h.style.top = c[1] + "%";
+                    draw();
+                });
+                h.addEventListener("pointerup", () => { h._drag = false; edPanelUpdate(); });
+                h.addEventListener("click", e => e.stopPropagation());
+                h.addEventListener("dblclick", e => { e.stopPropagation(); pts.splice(i, 1); edRender(); });
+                fzStage.appendChild(h);
+            });
+        });
+
+        fzFit(); fzShow(); edPanelUpdate();
+    }
+
+    if (EDIT) document.getElementById("hotspots").style.display = "none";   // no tapa el edificio al dibujar
+
+
+    /* ============================================================
        INICIALIZACIÓN
        La primera escena se muestra apenas está lista (ya no se espera
        a que termine de cargar TODO el resto de recursos).
@@ -4463,6 +5223,456 @@
 
     // red de seguridad: el loader nunca queda trabado
     setTimeout(() => loader.classList.remove("active"), 10000);
+
+
+    /* ============================================================
+       EL PROYECTO: lógica (no hace falta tocar nada de acá para
+       actualizar datos: todo sale de la constante PROYECTO)
+       Se abre como capa SOBRE la vista actual, igual que la galería.
+    ============================================================ */
+
+    (function () {
+
+        const view     = document.getElementById("project-view");
+        const tabsEl   = document.getElementById("pj-tabs");
+        const panelsEl = document.getElementById("pj-panels");
+        const kicker   = document.getElementById("pj-kicker");
+        const closeBtn = document.getElementById("pj-close");
+        const nav      = document.getElementById("site-nav");
+
+        // botón del menú: se agrega al final de la navegación existente
+        const navProject = document.createElement("button");
+        navProject.className = "top-button";
+        navProject.id = "nav-project";
+        navProject.type = "button";
+        navProject.innerHTML = '<span class="pj-lbl-l">El proyecto</span><span class="pj-lbl-s">Proyecto</span>';
+        nav.appendChild(navProject);
+
+        const P = PROYECTO;
+
+        /* ---------- utilidades ---------- */
+        const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g,
+            c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const has  = v => v !== null && v !== undefined && String(v).trim() !== "";
+        const arr  = a => Array.isArray(a) ? a : [];
+        const safeUrl = u => has(u) && !/^\s*(javascript|data|vbscript):/i.test(u);
+        const isEmail = e => /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(String(e || "").trim());
+        const digits  = s => String(s || "").replace(/\D/g, "");
+
+        const fact = (label, value, small) => has(value)
+            ? '<div class="pj-fact"><dt>' + esc(label) + '</dt><dd>' + esc(value) +
+              (has(small) ? '<small>' + esc(small) + '</small>' : '') + '</dd></div>' : "";
+
+        const listRows = items => {
+            const rows = arr(items).map(it => {
+                if (typeof it === "string") return has(it) ? '<li><span>' + esc(it) + '</span></li>' : "";
+                if (!it || !has(it.nombre)) return "";
+                return '<li><span>' + esc(it.nombre) + '</span>' +
+                       (has(it.detalle) ? '<span>' + esc(it.detalle) + '</span>' : '') + '</li>';
+            }).join("");
+            return rows ? '<ul class="pj-list">' + rows + '</ul>' : "";
+        };
+
+        const ESTADOS = [
+            { id: "proyecto",   label: "Proyecto",   desc: "Diseño, planificación y documentación" },
+            { id: "obra",       label: "En obra",    desc: "Ejecución de los trabajos" },
+            { id: "finalizado", label: "Finalizado", desc: "Obra terminada" }
+        ];
+
+        /* ---------- 1. RESUMEN (datos generales + estado) ---------- */
+        function renderResumen() {
+
+            const g = P.general || {};
+            const est = P.estado || {};
+            const cur = ESTADOS.findIndex(e => e.id === est.actual);
+
+            const imgs = arr(g.imagenes).filter(safeUrl).slice(0, 3)
+                .map(src => '<img src="' + esc(src) + '" alt="' + esc(g.nombre || "Imagen del proyecto") + '" loading="lazy" decoding="async">').join("");
+
+            const feats = arr(g.caracteristicas).filter(c => c && has(c.titulo))
+                .map(c => '<li><span>' + esc(c.titulo) + '</span>' + (has(c.valor) ? '<span>' + esc(c.valor) + '</span>' : '') + '</li>').join("");
+
+            const facts = fact("Ubicación", g.ubicacion) + fact("Tipo de desarrollo", g.tipo) +
+                          (cur >= 0 ? fact("Estado actual", ESTADOS[cur].label, est.descripcion) : "");
+
+            if (!has(g.descripcion) && !facts && !imgs && !feats) return "";
+
+            const steps = cur < 0 ? "" :
+                '<h3 class="pj-h3">Estado del desarrollo</h3><div class="pj-steps" role="list" aria-label="Estado del desarrollo">' +
+                ESTADOS.map((e, i) =>
+                    '<div class="pj-step ' + (i < cur ? "done" : i === cur ? "now" : "") + '" role="listitem"' +
+                    (i === cur ? ' aria-current="step"' : '') + '>' + esc(e.label) +
+                    '<small>' + esc(i === cur && has(est.descripcion) ? est.descripcion : e.desc) + '</small></div>').join("") +
+                '</div>';
+
+            return '<div class="pj-cols"><div>' +
+                (has(g.nombre) ? '<h2 class="pj-h">' + esc(g.nombre) + '</h2>' : '') +
+                (has(g.descripcion) ? '<p class="pj-p">' + esc(g.descripcion) + '</p>' : '') +
+                (facts ? '<dl class="pj-facts" style="margin-top:26px">' + facts + '</dl>' : '') +
+                (feats ? '<h3 class="pj-h3">Características</h3><ul class="pj-list">' + feats + '</ul>' : '') +
+                '</div>' + (imgs ? '<div class="pj-imgs">' + imgs + '</div>' : '<div></div>') + '</div>' + steps;
+        }
+
+        /* ---------- 2. UBICACIÓN ---------- */
+        function mapSrc(m) {
+            if (!m) return "";
+            if (safeUrl(m.embedUrl)) return m.embedUrl;
+            const lat = Number(m.lat), lng = Number(m.lng);
+            if (!has(m.lat) || !has(m.lng) || !isFinite(lat) || !isFinite(lng)) return "";
+            const d = 0.004;
+            return "https://www.openstreetmap.org/export/embed.html?bbox=" +
+                [lng - d, lat - d, lng + d, lat + d].join("%2C") + "&layer=mapnik&marker=" + lat + "%2C" + lng;
+        }
+
+        function renderUbicacion() {
+
+            const u = P.ubicacion || {};
+            const blocks = [];
+
+            if (has(u.direccion)) blocks.push('<h3 class="pj-h3">Dirección</h3><p class="pj-p">' + esc(u.direccion) + '</p>');
+
+            [["Accesibilidad y vías de conexión", u.accesibilidad], ["Transporte público", u.transporte]].forEach(([t, list]) => {
+                const l = listRows(list);
+                if (l) blocks.push('<h3 class="pj-h3">' + t + '</h3>' + l);
+            });
+
+            const ent = arr(u.entorno).filter(c => c && has(c.categoria) && listRows(c.items));
+            if (ent.length) blocks.push('<h3 class="pj-h3">Entorno</h3><div class="pj-grid">' +
+                ent.map(c => '<div class="pj-card"><h4>' + esc(c.categoria) + '</h4>' + listRows(c.items) + '</div>').join("") + '</div>');
+
+            [["Infraestructura y servicios", u.infraestructura], ["Características urbanas", u.caracteristicasUrbanas]].forEach(([t, list]) => {
+                const l = listRows(list);
+                if (l) blocks.push('<h3 class="pj-h3">' + t + '</h3>' + l);
+            });
+
+            const src = mapSrc(u.mapa);
+            if (src) blocks.unshift('<h3 class="pj-h3">Mapa</h3><iframe class="pj-map" data-src="' + esc(src) +
+                '" title="Mapa de ubicación del proyecto" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>');
+
+            return blocks.join("");
+        }
+
+        /* ---------- 3. UNIDADES Y TIPOLOGÍAS ---------- */
+        function bars(rows, key, label) {
+            const vals = rows.map(r => Number(r.cantidad));
+            const max = Math.max(...vals.filter(isFinite), 0);
+            if (!max) return "";
+            return '<div class="pj-bars">' + rows.filter(r => isFinite(Number(r.cantidad)) && has(r.cantidad)).map(r =>
+                '<div class="pj-bar"><span>' + esc(r[key]) + '</span><i><b style="width:' + (Number(r.cantidad) / max * 100) + '%"></b></i><span>' +
+                esc(r.cantidad) + '</span></div>').join("") + '</div>';
+        }
+
+        function renderUnidades() {
+
+            const u = P.unidades || {};
+            const tip = arr(u.tipologias).filter(t => t && has(t.nombre));
+            const niv = arr(u.porNivel).filter(n => n && has(n.nivel));
+
+            if (!has(u.total) && !tip.length && !niv.length && !has(u.notas)) return "";
+
+            let h = "";
+            if (has(u.total)) h += '<div class="pj-big"><strong>' + esc(u.total) + '</strong><span>unidades en total</span></div>';
+
+            if (tip.length) {
+                const b = bars(tip, "nombre");
+                if (b) h += '<h3 class="pj-h3">Distribución por tipología</h3>' + b;
+                h += '<h3 class="pj-h3">Tipologías</h3><div class="pj-grid">' + tip.map(t =>
+                    '<div class="pj-card"><h4>' + esc(t.nombre) + '</h4><dl>' +
+                    (has(t.ambientes) ? '<dt>Ambientes</dt><dd>' + esc(t.ambientes) + '</dd>' : '') +
+                    (has(t.cantidad) ? '<dt>Unidades</dt><dd>' + esc(t.cantidad) + '</dd>' : '') +
+                    (has(t.superficie) ? '<dt>Superficie</dt><dd>' + esc(t.superficie) + '</dd>' : '') +
+                    '</dl></div>').join("") + '</div>';
+            }
+
+            if (niv.length) {
+                const b = bars(niv, "nivel");
+                h += '<h3 class="pj-h3">Unidades por nivel</h3>' + (b || '<ul class="pj-list">' +
+                    niv.map(n => '<li><span>' + esc(n.nivel) + '</span>' + (has(n.cantidad) ? '<span>' + esc(n.cantidad) + '</span>' : '') + '</li>').join("") + '</ul>');
+            }
+
+            if (has(u.notas)) h += '<p class="pj-note">' + esc(u.notas) + '</p>';
+
+            if (u.enlazarPlantas !== false)
+                h += '<div class="pj-actions"><button class="pj-btn ghost" type="button" id="pj-go-floors">Ver plantas interactivas</button></div>';
+
+            return h;
+        }
+
+        /* ---------- 4. SUPERFICIES ---------- */
+        function renderSuperficies() {
+
+            const s = P.superficies || {};
+            const cats = arr(s.categorias).filter(c => c && has(c.nombre));
+            const t = s.total || {};
+
+            if (!cats.length && !has(t.valor) && !has(s.criterio)) return "";
+
+            const val = v => has(v) ? esc(v) : '<span class="pj-pending">A confirmar</span>';
+            let h = "";
+
+            if (has(s.criterio)) h += '<p class="pj-p">' + esc(s.criterio) + '</p>';
+
+            if (cats.length || has(t.valor)) {
+                h += '<h3 class="pj-h3">Categorías de superficie</h3><div class="pj-tablewrap"><table class="pj-table"><thead><tr>' +
+                    '<th>Categoría</th><th>Superficie</th><th>Qué incluye</th><th>Cómo se calcula</th></tr></thead><tbody>' +
+                    cats.map(c => '<tr><td>' + esc(c.nombre) + '</td><td class="num">' + val(c.valor) + '</td><td>' +
+                        val(c.incluye) + '</td><td>' + val(c.calculo) + '</td></tr>').join("") +
+                    (has(t.valor) ? '<tr class="total"><td>Total</td><td class="num">' + (has(t.criterio) ? esc(t.valor) : '<span class="pj-pending">A confirmar</span>') +
+                        '</td><td colspan="2">' + (has(t.criterio) ? esc(t.criterio) : '<span class="pj-pending">Criterio de cálculo pendiente de confirmación</span>') + '</td></tr>' : '') +
+                    '</tbody></table></div>';
+                h += '<p class="pj-note warn">Las categorías pueden superponerse según el criterio de medición: no deben sumarse entre sí salvo que el criterio indicado lo establezca.</p>';
+            }
+
+            if (has(s.notas)) h += '<p class="pj-note">' + esc(s.notas) + '</p>';
+            return h;
+        }
+
+        /* ---------- 5. CRONOGRAMA ---------- */
+        const CRON_LABEL = { "pendiente": "Pendiente", "en-curso": "En curso", "completada": "Completada" };
+
+        function renderCronograma() {
+
+            const c = arr(P.cronograma).filter(e => e && has(e.etapa));
+            if (!c.length) return "";
+
+            let hayPrevistas = false;
+            const range = (a, b) => has(a) && has(b) ? esc(a) + " – " + esc(b) : has(a) ? "Inicio: " + esc(a) : has(b) ? "Fin: " + esc(b) : "";
+
+            const items = c.map(e => {
+                const st = CRON_LABEL[e.estado] ? e.estado : "pendiente";
+                const prev = range(e.inicioPrevisto, e.finPrevisto);
+                const real = range(e.inicioReal, e.finReal);
+                if (prev) hayPrevistas = true;
+                return '<li class="' + st + '"><h4>' + esc(e.etapa) + '<span class="pj-chip">' + CRON_LABEL[st] + '</span></h4>' +
+                    (has(e.descripcion) ? '<p>' + esc(e.descripcion) + '</p>' : '') +
+                    ((prev || real) ? '<div class="pj-dates">' +
+                        (prev ? '<span><em>Previsto</em>' + prev + '</span>' : '') +
+                        (real ? '<span><em>Real</em>' + real + '</span>' : '') + '</div>' : '') + '</li>';
+            }).join("");
+
+            return '<ol class="pj-tl">' + items + '</ol>' +
+                (hayPrevistas ? '<p class="pj-note warn">Las fechas «previstas» son estimaciones sujetas a modificación y no constituyen un compromiso de ejecución. Solo las fechas marcadas como «reales» corresponden a hitos efectivamente cumplidos.</p>' : '');
+        }
+
+        /* ---------- 6. INDICADORES FINANCIEROS (opcional) ---------- */
+        function renderFinanciero() {
+
+            const f = P.financiero || {};
+            const ind = arr(f.indicadores).filter(i => i && has(i.nombre) && has(i.valor));
+            if (f.activo !== true || !ind.length) return "";
+
+            const sup = arr(f.supuestos).filter(has);
+
+            return '<div class="pj-grid">' + ind.map(i =>
+                '<div class="pj-card"><h4>' + esc(i.nombre) + '</h4><div style="font-size:26px;font-weight:300">' + esc(i.valor) + '</div>' +
+                (has(i.nota) ? '<p>' + esc(i.nota) + '</p>' : '') + '</div>').join("") + '</div>' +
+                ((has(f.fecha) || has(f.fuente)) ? '<dl class="pj-facts" style="margin-top:26px">' + fact("Fecha de la información", f.fecha) + fact("Fuente", f.fuente) + '</dl>' : '') +
+                (sup.length ? '<h3 class="pj-h3">Supuestos</h3><ul class="pj-list">' + sup.map(s => '<li><span>' + esc(s) + '</span></li>').join("") + '</ul>' : '') +
+                '<p class="pj-note warn">' + esc(has(f.aviso) ? f.aviso : "") + (has(f.aviso) ? " " : "") +
+                'Información de carácter estimativo, sujeta a validación y a las condiciones del mercado. No constituye una garantía de resultados ni una oferta vinculante.</p>';
+        }
+
+        /* ---------- 7. DOSSIER + CONTACTO ---------- */
+        function renderContacto() {
+
+            const d = P.dossier || {};
+            const c = P.contacto || {};
+            const fm = c.formulario || {};
+            const mail = isEmail(c.email) ? c.email.trim() : "";
+            const wa = digits(c.whatsapp);
+            const tel = digits(c.telefono);
+            const hasForm = fm.activo === true && (safeUrl(fm.endpoint) || mail);
+            const canContact = !!(mail || wa || tel);
+            let h = "";
+
+            if (safeUrl(d.archivo)) {
+                h += '<h3 class="pj-h3">Dossier</h3><p class="pj-p">Descripción general, ubicación, plantas, superficies y estado del desarrollo.</p>' +
+                    '<div class="pj-actions"><a class="pj-btn" href="' + esc(d.archivo) + '" download target="_blank" rel="noopener">' +
+                    esc(has(d.etiqueta) ? d.etiqueta : "Descargar dossier del proyecto") + '</a></div>' +
+                    (has(d.detalle) ? '<p class="pj-note">' + esc(d.detalle) + '</p>' : '');
+            }
+
+            if (canContact || has(c.empresa)) {
+                h += '<div class="pj-contact"><h3 class="pj-h3">Contacto</h3>' +
+                    (has(c.empresa) ? '<h2 class="pj-h" style="font-size:20px">' + esc(c.empresa) + '</h2>' : '') +
+                    '<dl class="pj-facts" style="margin-top:14px">' +
+                    (mail ? '<div class="pj-fact"><dt>Correo electrónico</dt><dd><a class="plain" href="mailto:' + esc(mail) + '">' + esc(mail) + '</a></dd></div>' : '') +
+                    (tel ? '<div class="pj-fact"><dt>Teléfono</dt><dd><a class="plain" href="tel:+' + esc(tel) + '">' + esc(c.telefono) + '</a></dd></div>' : '') +
+                    (wa ? '<div class="pj-fact"><dt>WhatsApp</dt><dd><a class="plain" href="https://wa.me/' + esc(wa) + '" target="_blank" rel="noopener">' + esc(c.whatsapp) + '</a></dd></div>' : '') +
+                    '</dl>';
+
+                if (canContact) {
+                    const label = has(c.textoBoton) ? c.textoBoton : "Solicitar información del proyecto";
+                    const subject = "Consulta: " + (P.general && P.general.nombre ? P.general.nombre : "proyecto");
+                    const cta = hasForm
+                        ? '<button class="pj-btn" type="button" id="pj-open-form" aria-expanded="false" aria-controls="pj-form">' + esc(label) + '</button>'
+                        : mail ? '<a class="pj-btn" href="mailto:' + esc(mail) + '?subject=' + encodeURIComponent(subject) + '">' + esc(label) + '</a>'
+                        : wa ? '<a class="pj-btn" href="https://wa.me/' + esc(wa) + '?text=' + encodeURIComponent(subject) + '" target="_blank" rel="noopener">' + esc(label) + '</a>'
+                        : '<a class="pj-btn" href="tel:+' + esc(tel) + '">' + esc(label) + '</a>';
+                    h += '<div class="pj-actions">' + cta + '</div>';
+                }
+
+                if (hasForm) h += '<form class="pj-form" id="pj-form" novalidate>' +
+                    '<label>Nombre<input name="nombre" type="text" autocomplete="name" required></label>' +
+                    '<label>Correo electrónico<input name="email" type="email" autocomplete="email" required></label>' +
+                    '<label>Teléfono (opcional)<input name="telefono" type="tel" autocomplete="tel"></label>' +
+                    '<label>Consulta<textarea name="mensaje" required></textarea></label>' +
+                    '<button class="pj-btn" type="submit">Enviar consulta</button>' +
+                    '<div class="pj-status" id="pj-status" role="status" aria-live="polite"></div></form>';
+
+                h += '</div>';
+            }
+
+            return h;
+        }
+
+        /* ---------- armado: solo aparecen los apartados con datos ---------- */
+        const SECCIONES = [
+            { id: "resumen",     label: "Resumen",     html: renderResumen },
+            { id: "ubicacion",   label: "Ubicación",   html: renderUbicacion },
+            { id: "unidades",    label: "Unidades",    html: renderUnidades },
+            { id: "superficies", label: "Superficies", html: renderSuperficies },
+            { id: "cronograma",  label: "Cronograma",  html: renderCronograma },
+            { id: "inversion",   label: "Inversión",   html: renderFinanciero },
+            { id: "contacto",    label: "Contacto",    html: renderContacto }
+        ].map(s => ({ ...s, html: s.html() })).filter(s => s.html);
+
+        if (has(P.general && P.general.nombre)) kicker.textContent = "El proyecto · " + P.general.nombre;
+
+        if (!SECCIONES.length) {
+            panelsEl.innerHTML = '<div class="pj-empty"><h2 class="pj-h">Información en preparación</h2>' +
+                '<p class="pj-sub">Los datos técnicos, urbanos y comerciales del proyecto se publicarán en esta sección a medida que estén confirmados.</p></div>';
+            tabsEl.hidden = true;
+        } else {
+            tabsEl.hidden = SECCIONES.length < 2;
+            tabsEl.innerHTML = SECCIONES.map((s, i) =>
+                '<button class="pj-tab" role="tab" type="button" id="pj-tab-' + s.id + '" data-id="' + s.id +
+                '" aria-controls="pj-panel-' + s.id + '" aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '">' + esc(s.label) + '</button>').join("");
+            panelsEl.innerHTML = SECCIONES.map((s, i) =>
+                '<div class="pj-panel' + (i === 0 ? " active" : "") + '" role="tabpanel" id="pj-panel-' + s.id +
+                '" aria-labelledby="pj-tab-' + s.id + '">' + s.html + '</div>').join("");
+        }
+
+        /* ---------- comportamiento ---------- */
+        const tabs = () => [...tabsEl.querySelectorAll(".pj-tab")];
+
+        function selectTab(id, focus) {
+            tabs().forEach(t => {
+                const on = t.dataset.id === id;
+                t.setAttribute("aria-selected", String(on));
+                t.tabIndex = on ? 0 : -1;
+                if (on && focus) t.focus();
+                if (on) t.scrollIntoView({ block: "nearest", inline: "center" });
+            });
+            panelsEl.querySelectorAll(".pj-panel").forEach(p => p.classList.toggle("active", p.id === "pj-panel-" + id));
+            const map = panelsEl.querySelector("#pj-panel-" + id + " iframe[data-src]");
+            if (map && !map.src) map.src = map.dataset.src;            // el mapa se carga recién al verlo
+            view.scrollTop = 0;
+        }
+
+        tabsEl.addEventListener("click", e => {
+            const b = e.target.closest(".pj-tab");
+            if (b) selectTab(b.dataset.id, false);
+        });
+        tabsEl.addEventListener("keydown", e => {
+            const list = tabs(), i = list.findIndex(t => t.getAttribute("aria-selected") === "true");
+            const to = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? list.length - 1 : null;
+            if (to === null) return;
+            e.preventDefault();
+            selectTab(list[(to + list.length) % list.length].dataset.id, true);
+        });
+
+        const projectOpen = () => view.classList.contains("active");
+
+        function syncNav() {
+            if (projectOpen()) {
+                nav.querySelectorAll(".top-button").forEach(b => {
+                    const mine = b === navProject;
+                    b.classList.toggle("active", mine);
+                    if (mine) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+                });
+            } else {
+                navProject.classList.remove("active");
+                navProject.removeAttribute("aria-current");
+            }
+        }
+
+        function openProject() {
+            if (typeof galleryOpen === "function" && galleryOpen()) closeGallery();
+            view.classList.add("active");
+            view.scrollTop = 0;
+            const first = tabs()[0];
+            if (first) selectTab(first.dataset.id, false);
+            syncNav();
+            view.focus({ preventScroll: true });
+        }
+
+        function closeProject() {
+            if (!projectOpen()) return;
+            view.classList.remove("active");
+            updateNav();                          // devuelve el estado del menú original
+            syncNav();
+        }
+
+        navProject.addEventListener("click", () => projectOpen() ? closeProject() : openProject());
+        closeBtn.addEventListener("click", closeProject);
+
+        // cualquier otro botón del menú cierra «El proyecto» primero (y sigue con su acción normal)
+        nav.addEventListener("click", e => {
+            if (projectOpen() && !e.target.closest("#nav-project")) closeProject();
+        }, true);
+
+        // Esc cierra solo esta capa (sin cerrar también lo que hay debajo)
+        document.addEventListener("keydown", e => {
+            if (projectOpen() && e.key === "Escape") { e.stopImmediatePropagation(); closeProject(); }
+        }, true);
+
+        // si otras vistas cambian de estado, el menú no debe marcar dos botones a la vez
+        [floorScene, uv, galleryView].forEach(el =>
+            new MutationObserver(syncNav).observe(el, { attributes: true, attributeFilter: ["class"] }));
+
+        // «Ver plantas interactivas»: vincula con el sistema de plantas existente
+        panelsEl.addEventListener("click", e => {
+            if (e.target.closest("#pj-go-floors")) { closeProject(); floorTopButton.click(); }
+            if (e.target.closest("#pj-open-form")) {
+                const f = document.getElementById("pj-form"), b = e.target.closest("#pj-open-form");
+                const open = f.classList.toggle("open");
+                b.setAttribute("aria-expanded", String(open));
+                if (open) f.querySelector("input").focus();
+            }
+        });
+
+        // formulario: POST al endpoint configurado o, si no hay, abre el correo con el texto armado
+        panelsEl.addEventListener("submit", async e => {
+            if (e.target.id !== "pj-form") return;
+            e.preventDefault();
+            const f = e.target, st = document.getElementById("pj-status");
+            const d = Object.fromEntries(new FormData(f).entries());
+            if (!has(d.nombre) || !isEmail(d.email) || !has(d.mensaje)) {
+                st.textContent = "Completá nombre, un correo válido y tu consulta.";
+                return;
+            }
+            const fm = (P.contacto && P.contacto.formulario) || {};
+            if (safeUrl(fm.endpoint)) {
+                st.textContent = "Enviando…";
+                try {
+                    const r = await fetch(fm.endpoint, { method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ proyecto: (P.general && P.general.nombre) || "", ...d }) });
+                    if (!r.ok) throw new Error(r.status);
+                    f.reset();
+                    st.textContent = "¡Gracias! Recibimos tu consulta y te vamos a responder a la brevedad.";
+                } catch (err) {
+                    st.textContent = "No pudimos enviar la consulta. Probá de nuevo o escribinos por correo.";
+                }
+            } else {
+                const body = d.mensaje + "\n\n" + d.nombre + "\n" + d.email + (has(d.telefono) ? "\n" + d.telefono : "");
+                location.href = "mailto:" + P.contacto.email.trim() + "?subject=" +
+                    encodeURIComponent("Consulta: " + ((P.general && P.general.nombre) || "proyecto")) + "&body=" + encodeURIComponent(body);
+                st.textContent = "Se abrió tu aplicación de correo con la consulta lista para enviar.";
+            }
+        });
+
+    })();
 
 </script>
 

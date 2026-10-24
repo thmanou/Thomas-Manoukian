@@ -515,7 +515,7 @@
     ],
 
     "modelo3D": {
-        "archivo": "modelos/proyecto8.glb"
+        "archivo": "modelos/Unidad A3.glb"
     },
 
     "recorrido360": {
@@ -822,7 +822,7 @@
             "HallT": {
 
                 "nombre": "HallT",
-                "miniatura": "images/proyecto8-3.jpg",
+                "miniatura": "images/proyecto8-16.png",
                 "imagen": "panoramas/proyecto8/hall t.png",
 
                 "yawInicial": 0,
@@ -864,7 +864,7 @@
             "HallPB": {
 
                 "nombre": "HallPB",
-                "miniatura": "images/proyecto8-3.jpg",
+                "miniatura": "images/proyecto8-17.png",
                 "imagen": "panoramas/proyecto8/hall pb.png",
 
                 "yawInicial": 0,
@@ -875,25 +875,25 @@
 
                     {
                         "target": "Exterior",
-                        "yaw": 3,
+                        "yaw": 1.5,
                         "pitch": 0,
                         "nombre": "Exterior"
                     },
                     {
                         "target": "HallT",
-                        "yaw": 1.3,
+                        "yaw": 0,
                         "pitch": -0.2,
                         "nombre": "HallT"
                     },
                     {
                         "target": "HallP",
-                        "yaw": 1.3,
+                        "yaw": 0,
                         "pitch": 0,
                         "nombre": "HallP"
                     },
                     {
                         "target": "Garaje",
-                        "yaw": -0.1,
+                        "yaw": -1.5,
                         "pitch": 0,
                         "nombre": "Garaje"
                     }
@@ -905,7 +905,7 @@
             "HallP": {
 
                 "nombre": "HallP",
-                "miniatura": "images/proyecto8-3.jpg",
+                "miniatura": "images/proyecto8-16.png",
                 "imagen": "panoramas/proyecto8/hall p.png",
 
                 "yawInicial": 0,
@@ -916,31 +916,31 @@
 
                     {
                         "target": "HallT",
-                        "yaw": -0.7,
+                        "yaw": 0,
                         "pitch": -0.5,
                         "nombre": "HallT"
                     },
                     {
                         "target": "HallPB",
-                        "yaw": -0.7,
+                        "yaw": 0,
                         "pitch": 0,
                         "nombre": "HallPB"
                     },
                     {
                         "target": "cocina",
-                        "yaw": -1.65,
+                        "yaw": -0.7,
                         "pitch": 0,
                         "nombre": "cocina"
                     },
                     {
                         "target": "Uni3living",
-                        "yaw": 3,
+                        "yaw": -1.6,
                         "pitch": 0,
                         "nombre": "Uni3living"
                     },
                     {
                         "target": "cocina",
-                        "yaw": 1.6,
+                        "yaw": -2.2,
                         "pitch": 0,
                         "nombre": "cocina"
                     }
@@ -952,7 +952,7 @@
             "Terraza": {
 
                 "nombre": "Terraza",
-                "miniatura": "images/proyecto8-3.jpg",
+                "miniatura": "images/proyecto8-20.png",
                 "imagen": "panoramas/proyecto8/Terraza.png",
 
                 "yawInicial": 0,
@@ -987,7 +987,7 @@
             "SUM": {
 
                 "nombre": "SUM",
-                "miniatura": "images/proyecto8-3.jpg",
+                "miniatura": "images/proyecto8-21.png",
                 "imagen": "panoramas/proyecto8/SUM.png",
 
                 "yawInicial": 0,
@@ -1022,7 +1022,7 @@
             "solarium": {
 
                 "nombre": "solarium",
-                "miniatura": "images/proyecto8-3.jpg",
+                "miniatura": "images/proyecto8-20.png",
                 "imagen": "panoramas/proyecto8/solarium.png",
 
                 "yawInicial": 0,
@@ -1045,7 +1045,7 @@
             "pileta": {
 
                 "nombre": "pileta",
-                "miniatura": "images/proyecto8-3.jpg",
+                "miniatura": "images/proyecto8-19.png",
                 "imagen": "panoramas/proyecto8/pileta.png",
 
                 "yawInicial": 0,
@@ -1068,7 +1068,7 @@
             "Garaje": {
 
                 "nombre": "Garaje",
-                "miniatura": "images/proyecto8-3.jpg",
+                "miniatura": "images/proyecto8-18.png",
                 "imagen": "panoramas/proyecto8/Garaje.png",
 
                 "yawInicial": 0,
@@ -1091,7 +1091,7 @@
             "Uni3living": {
 
                 "nombre": "Uni3living",
-                "miniatura": "images/proyecto8-3.jpg",
+                "miniatura": "images/proyecto8-12.png",
                 "imagen": "panoramas/proyecto8/uni3 living.png",
 
                 "yawInicial": 0,
@@ -1132,7 +1132,7 @@
             "Uni3cocina": {
 
                 "nombre": "Uni3cocina",
-                "miniatura": "images/proyecto8-3.jpg",
+                "miniatura": "images/proyecto8-13.png",
                 "imagen": "panoramas/proyecto8/uni3 cocina.png",
 
                 "yawInicial": 0,
@@ -1155,7 +1155,7 @@
             "Uni3baño": {
 
                 "nombre": "Uni3baño",
-                "miniatura": "images/proyecto8-3.jpg",
+                "miniatura": "images/proyecto8-14.png",
                 "imagen": "panoramas/proyecto8/uni3 baño.png",
 
                 "yawInicial": 0,
@@ -1178,7 +1178,7 @@
             "Uni3dormitorio": {
 
                 "nombre": "Uni3dormitorio",
-                "miniatura": "images/proyecto8-3.jpg",
+                "miniatura": "images/proyecto8-15.png",
                 "imagen": "panoramas/proyecto8/uni3 dormitorio.png",
 
                 "yawInicial": 0,
