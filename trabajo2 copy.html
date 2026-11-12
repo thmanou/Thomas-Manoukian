@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>Edificio HITO</title>
+    <title>Puerto HITO</title>
 
     <!-- PRIORIDAD 1: la fachada inicial (= scenes[0].image) arranca a descargarse
          desde el <head>, antes de que corra el JS. Si cambiás esa imagen, cambiá esta ruta. -->
@@ -1750,11 +1750,11 @@
         <div class="project-info">
 
             <div class="project-name">
-                Edificio HITO
+                Puerto HITO
             </div>
 
             <div class="project-subtitle">
-                Edificio de viviendas multifamiliar.
+                Transbordo.
             </div>
 
         </div>
@@ -1764,15 +1764,15 @@
 
             <a class="top-button" id="nav-home" href="index.html">Inicio</a>
 
-            <button class="top-button" id="nav-building">Plan</button>
+            <button class="top-button" id="nav-building">Aerea</button>
 
-            <button class="top-button" id="nav-facades">Programas</button>
+            <button class="top-button" id="nav-facades">Fachadas</button>
 
             <button
                 class="top-button"
                 id="floor-top-button"
             >
-                Plantas
+                Planos
             </button>
 
             <button class="top-button" id="nav-3d" data-mode="3d">3D</button>
@@ -2380,10 +2380,10 @@
     const AEREA = {
         imagen:   "images/proyecto9-1.png",      // ← CAMBIAR por tu imagen aérea
         posicion: "50% 50%",
-        kicker:   "Edificio de viviendas multifamiliar",
-        titulo:   "Edificio HITO",
+        kicker:   "Puerto de transbordo con programa regenerativo",
+        titulo:   "Transbordo HITO",
         texto:    "Implantación y entorno",
-        boton:    "Ingresar al edificio",
+        boton:    "Ingresar al proyecto",
         omitir:   false
     };
 
@@ -2984,6 +2984,12 @@
     ============================================================ */
 
     const GALERIA = [
+        { src: "images/proyecto9-24.png", titulo: "RENDER" },
+        { src: "images/proyecto9-25.png", titulo: "RENDER" },
+        { src: "images/proyecto9-26.png", titulo: "RENDER" },
+        { src: "images/proyecto9-27.png", titulo: "RENDER" },
+        { src: "images/proyecto9-28.png", titulo: "RENDER" },
+        { src: "images/proyecto9-29.png", titulo: "RENDER" },
         { src: "images/proyecto9-1.png", titulo: "Toillete" },
         { src: "images/proyecto9-2.png", titulo: "Unidad Tipo" },
         { src: "images/proyecto9-3.png", titulo: "Baño" },
@@ -3004,7 +3010,9 @@
         { src: "images/proyecto9-18.png", titulo: "Garaje" },
         { src: "images/proyecto9-19.png", titulo: "Pileta" },
         { src: "images/proyecto9-20.png", titulo: "Terraza" },
-        { src: "images/proyecto9-21.png", titulo: "SUM" }
+        { src: "images/proyecto9-21.png", titulo: "RENDER" },
+        { src: "images/proyecto9-22.png", titulo: "RENDER" },
+        { src: "images/proyecto9-23.png", titulo: "RENDER" },
         // , { src: "images/otra-imagen.jpg", titulo: "Hall de acceso" }
     ];
 
@@ -3024,9 +3032,9 @@
 
         /* ---- 1. INFORMACIÓN GENERAL ---- */
         general: {
-            nombre: "Edificio HITO",
+            nombre: "Puerto HITO",
             ubicacion: "",                                    // ← completar: "Calle, número, localidad"
-            tipo: "Edificio de viviendas multifamiliar",
+            tipo: "Puerto de Transbordo",
             descripcion: "HITO es un edificio de viviendas multifamiliar de planta baja, cinco pisos y terraza. " +
                 "En planta baja combina hall de acceso, cafetería y tienda con la vida del barrio; en los pisos 1 a 5 " +
                 "reúne quince viviendas de tres y cuatro ambientes, cada una con su expansión semicubierta; y remata en una " +
