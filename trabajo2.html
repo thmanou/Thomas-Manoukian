@@ -1326,13 +1326,22 @@
             touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none;
         }
         .gv-stage.dragging { cursor: grabbing; }
-        .gv-track {
-            display: flex; height: 100%;
-            transition: transform .7s cubic-bezier(.77,0,.18,1);
+        /* Carrusel circular: cada diapositiva se posiciona por su distancia (--o) a la imagen actual.
+           Las dos más lejanas se esconden; así no hay "final" y el salto última→primera es continuo. */
+        .gv-track { position: absolute; inset: 0; --gv-dx: 0px; }
+        .gv-slide {
+            position: absolute; inset: 0; margin: 0;
+            transform: translate3d(calc(var(--o, 0) * 100% + var(--gv-dx, 0px)), 0, 0);
+            transition: transform .7s cubic-bezier(.77,0,.18,1), visibility 0s linear 0s;
             will-change: transform;
         }
-        .gv-stage.dragging .gv-track { transition: none; }
-        .gv-slide { flex: 0 0 100%; height: 100%; margin: 0; }
+        .gv-slide.far {
+            visibility: hidden;
+            transition: transform .7s cubic-bezier(.77,0,.18,1), visibility 0s linear .7s;
+        }
+        .gv-stage.dragging .gv-slide,
+        .gv-track.instant .gv-slide,
+        .gv-slide.nojump { transition: none !important; }
         .gv-slide img {
             width: 100%; height: 100%; display: block; object-fit: var(--gv-fit);
             pointer-events: none; -webkit-user-drag: none;
@@ -1345,6 +1354,119 @@
             background: linear-gradient(to bottom, rgba(0,0,0,.45), transparent 22%, transparent 68%, rgba(0,0,0,.6));
         }
         .gv-arrow:disabled { opacity: .3; pointer-events: none; }
+
+        /* =========================================================
+           NUEVO · GALERÍA: botón de modo + cuadrícula con miniaturas
+        ========================================================= */
+
+        #gallery-view .gv-stage {
+            transition: opacity .45s ease .05s, transform .45s ease .05s, visibility 0s linear 0s;
+        }
+        #gallery-view.mode-grid .gv-stage {
+            opacity: 0; visibility: hidden; pointer-events: none; transform: scale(.985);
+            transition: opacity .35s ease, transform .35s ease, visibility 0s linear .35s;
+        }
+        #gallery-view .gv-arrow {
+            transition: transform .3s ease, box-shadow .3s ease, background .3s ease, opacity .3s ease, visibility 0s linear 0s;
+        }
+        #gallery-view.mode-grid .gv-arrow {
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity .3s ease, visibility 0s linear .3s;
+        }
+        #gallery-view .gv-caption { transition: opacity .3s ease; }
+        #gallery-view.mode-grid .gv-caption { opacity: 0; }
+
+        .gv-modes {
+            position: absolute; z-index: 4;
+            top: calc(var(--nav-h, 84px) + 14px); right: 28px;
+            display: inline-flex;
+            border: 1px solid rgba(255,255,255,.4); background: rgba(12,12,12,.5);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        }
+        .gv-mode {
+            appearance: none; -webkit-appearance: none; margin: 0; padding: 0; cursor: pointer;
+            width: 44px; height: 42px; display: grid; place-items: center;
+            border: 0; background: transparent; color: #fff; opacity: .55;
+            transition: opacity .25s ease, background .25s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .gv-mode + .gv-mode { border-left: 1px solid rgba(255,255,255,.25); }
+        .gv-mode svg { width: 18px; height: 18px; display: block; }
+        .gv-mode:hover { opacity: 1; background: rgba(255,255,255,.1); }
+        .gv-mode.active { opacity: 1; background: rgba(255,255,255,.2); }
+        .gv-mode:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
+
+        .gv-gridlabel {
+            position: absolute; z-index: 4; pointer-events: none;
+            top: calc(var(--nav-h, 84px) + 14px); left: 28px; height: 42px;
+            display: flex; align-items: center;
+            font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: #fff;
+            opacity: 0; transition: opacity .3s ease;
+        }
+        .gv-gridlabel small { font-size: inherit; opacity: .7; }
+        #gallery-view.mode-grid .gv-gridlabel { opacity: 1; transition-delay: .15s; }
+
+        .gv-grid {
+            position: absolute; left: 0; right: 0; bottom: 0;
+            top: calc(var(--nav-h, 84px) + 70px);
+            overflow-x: hidden; overflow-y: auto;
+            overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y;
+            padding: 4px 28px calc(96px + env(safe-area-inset-bottom, 0px));
+            scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.25) transparent;
+            opacity: 0; visibility: hidden; pointer-events: none; transform: scale(1.025);
+            transition: opacity .35s ease, transform .35s ease, visibility 0s linear .35s;
+        }
+        #gallery-view.mode-grid .gv-grid {
+            opacity: 1; visibility: visible; pointer-events: auto; transform: none;
+            transition: opacity .45s ease .1s, transform .45s ease .1s, visibility 0s linear 0s;
+        }
+        .gv-grid-inner {
+            display: grid; gap: 8px;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+        }
+        .gv-tile {
+            appearance: none; -webkit-appearance: none; margin: 0; padding: 0; border: 0;
+            position: relative; display: block; width: 100%; aspect-ratio: 4 / 3;
+            overflow: hidden; cursor: pointer; background: #1b1b1b; color: #fff;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .gv-tile img {
+            position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+            object-fit: cover; opacity: 0; transform: scale(1);
+            transition: opacity .5s ease, transform .6s cubic-bezier(.2,.7,.2,1);
+            pointer-events: none; -webkit-user-drag: none;
+        }
+        .gv-tile img.loaded { opacity: 1; }
+        .gv-tile::after {
+            content: ""; position: absolute; inset: 0; pointer-events: none;
+            background: linear-gradient(to top, rgba(0,0,0,.7), transparent 55%);
+            opacity: 0; transition: opacity .35s ease;
+        }
+        .gv-tile-cap {
+            position: absolute; left: 10px; right: 10px; bottom: 8px; z-index: 1;
+            font-size: 9px; letter-spacing: .14em; text-transform: uppercase; text-align: left;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            opacity: 0; transform: translateY(4px); transition: opacity .35s ease, transform .35s ease;
+        }
+        @media (hover: hover) {
+            .gv-tile:hover img { transform: scale(1.06); }
+            .gv-tile:hover::after { opacity: 1; }
+            .gv-tile:hover .gv-tile-cap { opacity: 1; transform: none; }
+        }
+        .gv-tile.current { outline: 1px solid rgba(255,255,255,.9); outline-offset: -1px; }
+        .gv-tile:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+
+        @media (max-width: 700px) {
+            .gv-modes { right: 12px; }
+            .gv-mode { width: 46px; height: 44px; }
+            .gv-gridlabel { left: 14px; height: 44px; }
+            .gv-grid { padding: 2px 8px calc(92px + env(safe-area-inset-bottom, 0px)); }
+            .gv-grid-inner { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+            .gv-tile { aspect-ratio: 1 / 1; }
+        }
+        @media (max-width: 340px) {
+            .gv-grid-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
         .gv-arrow[hidden], #nav-gallery[hidden] { display: none !important; }
 
         .gv-caption {
@@ -1695,7 +1817,15 @@
         .ed-surface{position:absolute;inset:0;pointer-events:auto;cursor:crosshair}
         .ed-pt{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:#ff6a00;border:2px solid #fff;color:#fff;font:700 9px/16px Arial;text-align:center;pointer-events:auto;cursor:grab;touch-action:none;z-index:2}
         @media (prefers-reduced-motion:reduce){#aerial-intro .ai-img{animation:none}}
-    </style>
+
+        /* =========================================================
+           MEJORAS DE NAVEGACIÓN (transición aérea → fachadas)
+           Solo agrega estados nuevos; no cambia ningún estilo existente.
+        ========================================================= */
+        #aerial-intro.video-out{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .45s ease,visibility 0s linear .45s}
+        #aerial-intro.busy .ai-btn{pointer-events:none;opacity:.65}
+        #app.aerial-video .scene-arrow,#app.aerial-video #scene-counter{opacity:0;pointer-events:none}
+        </style>
 </head>
 
 <body>
@@ -2122,6 +2252,11 @@
             <div class="gv-track" id="gv-track"></div>
         </div>
 
+        <!-- modo cuadrícula: todas las fotografías en miniatura (se arma al abrirlo por primera vez) -->
+        <div class="gv-grid" id="gv-grid" role="region" aria-label="Todas las fotografías" inert>
+            <div class="gv-grid-inner" id="gv-grid-inner"></div>
+        </div>
+
         <div class="gv-shade"></div>
 
         <button class="scene-arrow left gv-arrow" id="gv-prev" aria-label="Imagen anterior">
@@ -2135,6 +2270,17 @@
         <div class="gv-caption" aria-live="polite">
             <small>Galería · <span id="gv-index">01 / 01</span></small>
             <div class="gv-title" id="gv-title"></div>
+        </div>
+
+        <div class="gv-gridlabel" id="gv-gridlabel" aria-hidden="true"><small>Galería · <span id="gv-count"></span></small></div>
+
+        <div class="gv-modes" role="group" aria-label="Modo de visualización">
+            <button type="button" class="gv-mode active" id="gv-mode-carousel" aria-pressed="true" aria-label="Ver en carrusel" title="Carrusel">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="5" width="11" height="14" rx="1.5"/><path d="M3 9.5v5M21 9.5v5"/></svg>
+            </button>
+            <button type="button" class="gv-mode" id="gv-mode-grid" aria-pressed="false" aria-label="Ver todas las fotos en cuadrícula" title="Cuadrícula">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg>
+            </button>
         </div>
 
         <button class="gv-close" id="gv-close" aria-label="Cerrar galería">← Volver</button>
@@ -2279,6 +2425,7 @@
         titulo:   "Edificio HITO",
         texto:    "Implantación y entorno",
         boton:    "Ingresar al edificio",
+        video:    "videos/Aerea.mp4",      // ← video de transición aérea → fachadas ("" = solo fundido, como antes)
         omitir:   false
     };
 
@@ -2959,6 +3106,22 @@
     ];
 
     /* ============================================================
+       MINIATURAS DE LA GALERÍA (modo cuadrícula)
+       La cuadrícula NO carga las fotos originales: usa una versión liviana de cada una,
+       con el mismo nombre, en esta carpeta (los originales no se tocan):
+         images/PB.png  →  images/miniaturas/PB.webp
+       Se generan todas de una vez con:  python3 generar_miniaturas.py
+       Si una miniatura no existe, esa foto usa el original (la galería no se rompe).
+       Para una miniatura puntual con otro nombre:  { src: "…", miniatura: "images/miniaturas/x.webp", titulo: "…" }
+    ============================================================ */
+
+    const GALERIA_MINIATURAS = {
+        carpeta:   "images/miniaturas/",
+        extension: "webp",
+        ancho:     480       // px de ancho de cada miniatura (lo usa generar_miniaturas.py)
+    };
+
+    /* ============================================================
        EL PROYECTO (sección para inversores, desarrolladores y socios)
 
        TODO el contenido de «El proyecto» sale de este objeto.
@@ -3225,9 +3388,20 @@
        CAMBIO DE ESCENA
     ============================================================ */
 
+    /*
+        SKIP: mientras corre el video de una fachada, un segundo clic sobre la MISMA
+        flecha lo corta y muestra al instante la imagen final de esa fachada.
+        (Una flecha distinta, o el swipe contrario, se ignora igual que antes.)
+    */
+    let skipSceneVideo = null;     // función que corta el video en curso (null = no hay video)
+    let skipSceneDir   = null;     // "next" | "prev": flecha que lo inició
+
     function changeScene(direction) {
 
-        if (isTransitioning) return;
+        if (isTransitioning) {
+            if (skipSceneVideo && direction === skipSceneDir) skipSceneVideo();
+            return;
+        }
 
         const scene = scenes[currentScene];
 
@@ -3245,24 +3419,54 @@
             return;
         }
 
+        const arrow = direction === "next" ? nextButton : prevButton;
+        const arrowLabel = arrow.getAttribute("aria-label");
+
         transitionVideo.src = transition.video;
         transitionVideo.currentTime = 0;
         transitionVideo.classList.add("active");   // fade-in del video
 
-        transitionVideo.onended = async () => {
+        let finished = false;
 
+        const done = async (skipped) => {
+
+            if (finished) return;
+            finished = true;
+
+            skipSceneVideo = null;
+            skipSceneDir = null;
+            arrow.setAttribute("aria-label", arrowLabel);
             transitionVideo.onended = null;
 
-            // 1) cambiamos la imagen DEBAJO del video
+            if (skipped) transitionVideo.pause();
+
+            // 1) cambiamos la imagen DEBAJO del video (ya está precargada y decodificada)
             await showScene(transition.target);
 
-            // 2) recién ahora el video se desvanece
+            // 2) el video se retira: con fundido si terminó solo, de golpe si se omitió
+            if (skipped) transitionVideo.style.transition = "none";
             transitionVideo.classList.remove("active");
+            if (skipped) {
+                requestAnimationFrame(() => requestAnimationFrame(() => { transitionVideo.style.transition = ""; }));
+            }
 
-            setTimeout(() => { isTransitioning = false; }, 600);
+            setTimeout(() => { isTransitioning = false; }, skipped ? 250 : 600);
         };
 
+        skipSceneVideo = () => done(true);
+        skipSceneDir = direction;
+        arrow.setAttribute("aria-label", "Omitir transición");
+
+        transitionVideo.onended = () => done(false);
+
         transitionVideo.play().catch(() => {
+
+            if (finished) return;            // lo cortó el usuario antes de que arrancara
+            finished = true;
+
+            skipSceneVideo = null;
+            skipSceneDir = null;
+            arrow.setAttribute("aria-label", arrowLabel);
             transitionVideo.onended = null;
             fallbackTransition(transition.target);
         });
@@ -3638,6 +3842,7 @@
     const warmVideos = new Map();     // url -> <video> precargando
     let warmToken = 0;
     let entryWarmed = false;
+    let aerialWarmDone = Promise.resolve();   // se resuelve cuando el video aéreo ya está listo (o falló / pasó el tiempo)
 
     function warmImage(url, priority) {
 
@@ -3891,6 +4096,89 @@
         });
     }
 
+    /* ------------------------------------------------------------
+       PRECARGA DE PLANTAS
+       · Las imágenes se guardan en `warmImages` (referencia viva = quedan en memoria).
+       · Orden: vecinas (±1) → resto por cercanía → imágenes alternas de la planta actual.
+       · El resto se baja de a una, cuando el navegador está libre y DESPUÉS del video
+         aéreo (no compiten por la red).
+       · En móvil o con "ahorro de datos" solo se descargan; se decodifican al usarlas.
+    ------------------------------------------------------------ */
+
+    const floorLoads = new Map();      // url -> Promise<Image|null> (descarga en curso o terminada)
+    let floorSeq = 0;                  // detecta clics rápidos: solo gana la última planta pedida
+    let floorWarmToken = 0;
+
+    const idleTick = () => new Promise(r => "requestIdleCallback" in window
+        ? requestIdleCallback(() => r(), { timeout: 1500 })
+        : setTimeout(r, 120));
+
+    function preloadFloorImage(url, priority, decode = true) {
+
+        if (!url) return Promise.resolve(null);
+
+        let p = floorLoads.get(url);
+
+        if (!p) {
+            const im = warmImage(url, priority);
+            p = new Promise(res => {
+                if (im.complete) { res(im.naturalWidth ? im : null); return; }
+                im.addEventListener("load",  () => res(im.naturalWidth ? im : null), { once: true });
+                im.addEventListener("error", () => res(null), { once: true });
+            });
+            floorLoads.set(url, p);
+        }
+
+        return decode
+            ? p.then(im => im ? im.decode().then(() => im, () => im) : im)
+            : p;
+    }
+
+    // ¿la imagen ya está en memoria? (respuesta inmediata, sin esperar nada)
+    function floorImgReady(url) {
+        const im = warmImages.get(url);
+        return im && im.complete && im.naturalWidth ? im : null;
+    }
+
+    function warmFloors(index) {
+
+        const token = ++floorWarmToken;
+        const saveData = !!(navigator.connection && navigator.connection.saveData);
+        const decodeFar = !isMobileLayout();
+
+        // más cercanas primero; ante empate, la de arriba (se suele recorrer hacia arriba)
+        const order = floors.map((f, i) => i)
+            .filter(i => i !== index)
+            .sort((a, b) => Math.abs(a - index) - Math.abs(b - index) || b - a);
+
+        (async () => {
+
+            // 1) vecinas inmediatas: descarga + decodificación
+            const near = order.filter(i => Math.abs(i - index) === 1);
+            await Promise.all(near.map(i => preloadFloorImage(floors[i].imagen, "low", true)));
+
+            if (token !== floorWarmToken || saveData) return;
+
+            // 2) el resto, de a una y sin competir con el video aéreo
+            await aerialWarmDone;
+
+            for (const i of order) {
+                if (Math.abs(i - index) === 1) continue;
+                if (token !== floorWarmToken) return;
+                await idleTick();
+                if (token !== floorWarmToken) return;
+                await preloadFloorImage(floors[i].imagen, "low", decodeFar);
+            }
+
+            // 3) imágenes alternas ("Plano") de la planta actual
+            for (const u of (floors[index].imagenesAlt || [])) {
+                if (token !== floorWarmToken) return;
+                await idleTick();
+                await preloadFloorImage(u, "low", false);
+            }
+        })();
+    }
+
     async function showFloor(index, instant = false) {
 
         const floor = floors[index];
@@ -3898,6 +4186,8 @@
         if (!floor) return;
 
         currentFloor = index;
+
+        const seq = ++floorSeq;
 
         unitPanel.classList.remove("active");
 
@@ -3908,24 +4198,34 @@
         const activeLevel = levelMenu.querySelector(".level-button.active");
         if (activeLevel && activeLevel.scrollIntoView) activeLevel.scrollIntoView({ inline: "center", block: "nearest" });
 
-        if (!instant) {
-            floorStage.style.opacity = "0";
-            await new Promise(r => setTimeout(r, 350));
+        // 1) ¿ya está en memoria? → cambio inmediato (sin fundido, sin espera)
+        let img = floorImgReady(floor.imagen);
+
+        // 2) si todavía no llegó: la planta anterior sigue visible (nunca una pantalla en blanco)
+        if (!img) {
+
+            const spin = setTimeout(() => floorContainer.classList.add("is-loading"), 250);
+            img = await preloadFloorImage(floor.imagen, "high", true);
+            clearTimeout(spin);
+            floorContainer.classList.remove("is-loading");
+
+            if (!img) {                                   // falló la descarga: se permite reintentar
+                floorLoads.delete(floor.imagen);
+                warmImages.delete(floor.imagen);
+            }
+
+            if (seq !== floorSeq) return;                 // el usuario ya pidió otra planta
         }
 
-        const img = new Image();
-        img.src = floor.imagen;
-
-        // indicador discreto solo si la planta tarda en llegar
-        const spin = setTimeout(() => floorContainer.classList.add("is-loading"), 250);
-        try { await img.decode(); } catch (e) {}
-        clearTimeout(spin);
-        floorContainer.classList.remove("is-loading");
-
-        floorAspect = (img.naturalWidth / img.naturalHeight) || 1.5;
+        floorAspect = (img && img.naturalWidth / img.naturalHeight) || 1.5;
 
         floorImage.src = floor.imagen;
         floorImage.alt = floor.nombre;
+
+        // imagen y unidades cambian en el MISMO cuadro: sin parpadeos ni desfasajes
+        try { await floorImage.decode(); } catch (e) {}
+
+        if (seq !== floorSeq) return;
 
         fitStage();
         renderUnits(floor);
@@ -3936,9 +4236,8 @@
         if (typeof syncFloorModel === "function") syncFloorModel();
         if (typeof resetFloorVariant === "function") resetFloorVariant();
 
-        // P3: plantas vecinas en segundo plano, de baja prioridad
-        warmImage(floors[index + 1] && floors[index + 1].imagen, "low");
-        warmImage(floors[index - 1] && floors[index - 1].imagen, "low");
+        // el resto de las plantas se prepara en segundo plano
+        warmFloors(index);
     }
 
     // la primera planta se carga la primera vez que hace falta (no al abrir la página)
@@ -4500,91 +4799,330 @@
     const gvTitleEl   = document.getElementById("gv-title");
     const navGallery  = document.getElementById("nav-gallery");
 
+    const gvGrid      = document.getElementById("gv-grid");
+    const gvGridInner = document.getElementById("gv-grid-inner");
+    const gvCountEl   = document.getElementById("gv-count");
+    const gvModeCar   = document.getElementById("gv-mode-carousel");
+    const gvModeGrd   = document.getElementById("gv-mode-grid");
+
+    // miniatura de una imagen: images/PB.png → images/miniaturas/PB.webp
+    function gvThumbPath(src) {
+        const name = String(src).split("/").pop().replace(/\.[^.]+$/, "");
+        return GALERIA_MINIATURAS.carpeta + name + "." + GALERIA_MINIATURAS.extension;
+    }
+
     // misma lista que GALERIA, resolviendo las escenas a su imagen (sin duplicar rutas)
     const galleryItems = GALERIA.map(g => {
-        const sc = g.escena ? scenes.find(x => x.id === g.escena) : null;
-        return { src: g.src || (sc && sc.image), titulo: g.titulo || (sc && sc.id) || "" };
+        const sc  = g.escena ? scenes.find(x => x.id === g.escena) : null;
+        const src = g.src || (sc && sc.image);
+        return {
+            src,
+            titulo: g.titulo || (sc && sc.id) || "",
+            thumb:  g.miniatura || (src ? gvThumbPath(src) : "")
+        };
     }).filter(g => g.src);
 
+    const GV_N = galleryItems.length;
+
+    // ÚNICO índice de la galería: lo comparten el carrusel y la cuadrícula
     let gvIndex = 0;
+    let gvDir   = 1;               // último sentido de avance (+1 / -1)
+    let gvMode  = "carousel";      // "carousel" | "grid"
     let gvBuilt = false;
+    let gvGridBuilt = false;
+    let gvGridIO = null;
     let gvDrag = null;
     let gvWheelLock = 0;
 
+    const gvPrevOff = [];          // posición anterior de cada diapositiva (detecta saltos de borde a borde)
+    const gvOrig    = new Map();   // originales ya pedidos: no se descargan dos veces
+    const gvThumbOk = new Set();   // miniaturas ya cargadas (sirven de vista previa en el carrusel)
+
     const galleryOpen = () => galleryView.classList.contains("active");
+    const gvMod = n => ((n % GV_N) + GV_N) % GV_N;
+
+    // ---------- CARRUSEL (circular) ----------
 
     function gvBuild() {
 
-        if (gvBuilt) return;
+        if (gvBuilt || !GV_N) return;
         gvBuilt = true;
 
         galleryItems.forEach((g, i) => {
 
             const slide = document.createElement("figure");
-            slide.className = "gv-slide";
+            slide.className = "gv-slide far";
             slide.setAttribute("role", "group");
             slide.setAttribute("aria-roledescription", "diapositiva");
-            slide.setAttribute("aria-label", (i + 1) + " de " + galleryItems.length);
+            slide.setAttribute("aria-label", (i + 1) + " de " + GV_N);
 
             const img = document.createElement("img");
             img.alt = g.titulo;
             img.draggable = false;
             img.decoding = "async";
-            img.dataset.src = g.src;
             img.addEventListener("load",  () => img.classList.add("loaded"));
             img.addEventListener("error", () => img.classList.add("loaded"));
 
             slide.appendChild(img);
             gvTrack.appendChild(slide);
         });
+
+        gvUpdate(true);
     }
 
-    // carga la imagen actual y las vecinas (la actual primero)
-    function gvLoad(i) {
+    // posición de la diapositiva i respecto de la actual, por el camino circular más corto
+    function gvOffset(i) {
+        let d = gvMod(i - gvIndex);
+        if (d * 2 > GV_N) d -= GV_N;
+        else if (d * 2 === GV_N) d = gvDir > 0 ? -d : d;
+        return Math.max(-2, Math.min(2, d));
+    }
 
-        [i, i + 1, i - 1].forEach(k => {
-            const slide = gvTrack.children[k];
-            const img = slide && slide.firstElementChild;
-            if (img && !img.getAttribute("src")) img.src = img.dataset.src;
+    // pide el original una sola vez (queda en memoria: volver a verlo es instantáneo)
+    function gvFetchOriginal(k) {
+
+        if (gvOrig.has(k)) return gvOrig.get(k);
+
+        const p = new Promise(resolve => {
+            const im = new Image();
+            im.decoding = "async";
+            im.onload  = () => (im.decode ? im.decode().catch(() => {}) : Promise.resolve()).then(() => resolve(true));
+            im.onerror = () => { gvOrig.delete(k); resolve(false); };
+            im.src = galleryItems[k].src;
+        });
+
+        gvOrig.set(k, p);
+        return p;
+    }
+
+    function gvLoadOne(k) {
+
+        const slide = gvTrack.children[k];
+        if (!slide || slide.dataset.hi === "1") return;
+
+        const img = slide.firstElementChild;
+        const g   = galleryItems[k];
+
+        // mientras llega el original, se muestra la miniatura si ya estaba cargada
+        if (!img.getAttribute("src") && gvThumbOk.has(k)) img.src = g.thumb;
+
+        gvFetchOriginal(k).then(ok => {
+            if (ok) { img.src = g.src; slide.dataset.hi = "1"; }
+            img.classList.add("loaded");
         });
     }
 
-    function gvRender(dx = 0) {
-        gvTrack.style.transform =
-            "translate3d(calc(" + (-gvIndex * 100) + "% + " + dx + "px),0,0)";
+    // carga la imagen actual y precarga la anterior y la siguiente (la actual primero)
+    function gvLoad(i) {
+        gvLoadOne(i);
+        gvLoadOne(gvMod(i + 1));
+        gvLoadOne(gvMod(i - 1));
     }
 
-    function gvGo(i) {
+    function gvLayout(instant) {
 
-        const last = galleryItems.length - 1;
+        const jumped = [];
 
-        gvIndex = Math.max(0, Math.min(last, i));
+        if (instant) gvTrack.classList.add("instant");
 
-        gvRender(0);
+        for (let i = 0; i < GV_N; i++) {
+
+            const s = gvTrack.children[i];
+            const o = gvOffset(i);
+            const prev = gvPrevOff[i] === undefined ? o : gvPrevOff[i];
+
+            // una diapositiva que "da la vuelta" de un extremo al otro no debe cruzar la pantalla
+            if (Math.abs(o - prev) > 2) { s.classList.add("nojump"); jumped.push(s); }
+
+            gvPrevOff[i] = o;
+            s.style.setProperty("--o", o);
+            s.classList.toggle("far", Math.abs(o) > 1);
+            s.setAttribute("aria-hidden", o === 0 ? "false" : "true");
+        }
+
+        if (instant || jumped.length) {
+            void gvTrack.offsetWidth;                // aplica los cambios sin animar
+            gvTrack.classList.remove("instant");
+            jumped.forEach(s => s.classList.remove("nojump"));
+        }
+    }
+
+    function gvMarkCurrent() {
+
+        if (!gvGridBuilt) return;
+
+        [...gvGridInner.children].forEach((t, i) => {
+            const on = i === gvIndex;
+            t.classList.toggle("current", on);
+            if (on) t.setAttribute("aria-current", "true"); else t.removeAttribute("aria-current");
+        });
+    }
+
+    function gvUpdate(instant) {
+
+        if (!GV_N || !gvBuilt) return;
+
+        gvTrack.style.setProperty("--gv-dx", "0px");
+        gvLayout(instant);
         gvLoad(gvIndex);
 
         const pad = n => String(n).padStart(2, "0");
 
-        gvIndexEl.textContent = pad(gvIndex + 1) + " / " + pad(galleryItems.length);
+        gvIndexEl.textContent = pad(gvIndex + 1) + " / " + pad(GV_N);
         gvTitleEl.textContent = (galleryItems[gvIndex] && galleryItems[gvIndex].titulo) || "";
 
-        gvPrev.disabled = gvIndex === 0;
-        gvNext.disabled = gvIndex === last;
+        gvMarkCurrent();
+    }
+
+    // avanza (+1) o retrocede (-1) sin límites: después de la última viene la primera
+    function gvStep(d) {
+        if (GV_N < 2) return;
+        gvDir = d;
+        gvIndex = gvMod(gvIndex + d);
+        gvUpdate(false);
+    }
+
+    // salta directamente a una imagen (desde la cuadrícula)
+    function gvSet(i, instant) {
+        if (!GV_N) return;
+        const n = gvMod(i);
+        if (n !== gvIndex) gvDir = n > gvIndex ? 1 : -1;
+        gvIndex = n;
+        gvUpdate(!!instant);
+    }
+
+    // ---------- CUADRÍCULA ----------
+
+    function gvGridBuild() {
+
+        if (gvGridBuilt || !GV_N) return;
+        gvGridBuilt = true;
+
+        const frag = document.createDocumentFragment();
+
+        galleryItems.forEach((g, i) => {
+
+            const tile = document.createElement("button");
+            tile.type = "button";
+            tile.className = "gv-tile";
+            tile.dataset.i = i;
+            tile.setAttribute("aria-label", g.titulo || ("Foto " + (i + 1)));
+
+            const img = document.createElement("img");
+            img.alt = "";
+            img.draggable = false;
+            img.decoding = "async";
+            img.dataset.src = g.thumb;     // el src se asigna al acercarse a la pantalla (carga progresiva)
+            img.addEventListener("load", () => {
+                if (!img.dataset.fb) gvThumbOk.add(i);
+                img.classList.add("loaded");
+            });
+            img.addEventListener("error", () => {
+                if (!img.dataset.fb) { img.dataset.fb = "1"; img.src = g.src; }   // sin miniatura: usa el original
+                else img.classList.add("loaded");
+            });
+
+            const cap = document.createElement("span");
+            cap.className = "gv-tile-cap";
+            cap.textContent = g.titulo;
+
+            tile.appendChild(img);
+            tile.appendChild(cap);
+            frag.appendChild(tile);
+        });
+
+        gvGridInner.appendChild(frag);
+        gvCountEl.textContent = GV_N + (GV_N === 1 ? " fotografía" : " fotografías");
+    }
+
+    // lazy loading: cada miniatura se pide cuando está por entrar en pantalla
+    function gvGridObserve() {
+
+        if (gvGridIO) return;
+
+        const load = tile => {
+            const img = tile.firstElementChild;
+            if (img && !img.getAttribute("src")) img.src = img.dataset.src;
+        };
+
+        if (!("IntersectionObserver" in window)) {
+            [...gvGridInner.children].forEach(load);
+            gvGridIO = true;
+            return;
+        }
+
+        gvGridIO = new IntersectionObserver((entries, io) => {
+            entries.forEach(en => {
+                if (!en.isIntersecting) return;
+                load(en.target);
+                io.unobserve(en.target);
+            });
+        }, { root: gvGrid, rootMargin: "320px 0px" });
+
+        [...gvGridInner.children].forEach(t => gvGridIO.observe(t));
+    }
+
+    // deja la foto actual en el centro de la cuadrícula
+    function gvScrollToCurrent() {
+        const t = gvGridInner.children[gvIndex];
+        if (!t) return;
+        gvGrid.scrollTop = Math.max(0, t.offsetTop - (gvGrid.clientHeight - t.offsetHeight) / 2);
+    }
+
+    // ---------- CAMBIO DE MODO ----------
+
+    function gvSetMode(mode) {
+
+        const grid = mode === "grid";
+
+        if (grid) {
+            gvGridBuild();
+            gvMarkCurrent();
+            gvScrollToCurrent();      // primero se posiciona, después se observa: solo se cargan las visibles
+            gvGridObserve();
+        }
+
+        gvMode = grid ? "grid" : "carousel";
+
+        galleryView.classList.toggle("mode-grid", grid);
+        gvStage.inert = grid;
+        gvGrid.inert  = !grid;
+
+        gvModeCar.classList.toggle("active", !grid);
+        gvModeGrd.classList.toggle("active", grid);
+        gvModeCar.setAttribute("aria-pressed", String(!grid));
+        gvModeGrd.setAttribute("aria-pressed", String(grid));
+
+        gvWheelLock = performance.now() + 400;
     }
 
     function openGallery() {
         gvBuild();
+        gvSetMode("carousel");
         galleryView.classList.add("active");
-        gvGo(gvIndex);
+        gvUpdate(true);
     }
 
     function closeGallery() {
         galleryView.classList.remove("active");
     }
 
-    gvPrev.addEventListener("click", () => gvGo(gvIndex - 1));
-    gvNext.addEventListener("click", () => gvGo(gvIndex + 1));
+    gvPrev.addEventListener("click", () => gvStep(-1));
+    gvNext.addEventListener("click", () => gvStep(1));
     gvClose.addEventListener("click", closeGallery);
+
+    gvModeCar.addEventListener("click", () => gvSetMode("carousel"));
+    gvModeGrd.addEventListener("click", () => gvSetMode("grid"));
+
+    // elegir una foto en la cuadrícula → el carrusel se abre en esa misma foto
+    gvGridInner.addEventListener("click", e => {
+
+        const tile = e.target.closest(".gv-tile");
+        if (!tile) return;
+
+        gvSet(parseInt(tile.dataset.i, 10), true);
+        gvSetMode("carousel");
+    });
 
     // "Galería" abre y vuelve a cerrar; cualquier otro botón del menú la cierra primero
     navGallery.addEventListener("click", () => galleryOpen() ? closeGallery() : openGallery());
@@ -4593,7 +5131,7 @@
         if (galleryOpen() && !e.target.closest("#nav-gallery")) closeGallery();
     }, true);
 
-    // teclado: ← → navegan · Esc cierra (sin cerrar también lo que hay debajo)
+    // teclado: ← → navegan (modo carrusel) · Esc cierra (sin cerrar también lo que hay debajo)
     document.addEventListener("keydown", e => {
 
         if (!galleryOpen()) return;
@@ -4601,10 +5139,10 @@
         if (e.key === "Escape") {
             e.stopImmediatePropagation();
             closeGallery();
-        } else if (e.key === "ArrowRight") {
-            gvGo(gvIndex + 1);
-        } else if (e.key === "ArrowLeft") {
-            gvGo(gvIndex - 1);
+        } else if (gvMode === "carousel" && e.key === "ArrowRight") {
+            gvStep(1);
+        } else if (gvMode === "carousel" && e.key === "ArrowLeft") {
+            gvStep(-1);
         }
     }, true);
 
@@ -4620,7 +5158,7 @@
         if (Math.abs(d) < 12) return;
 
         gvWheelLock = now + 650;
-        gvGo(gvIndex + (d > 0 ? 1 : -1));
+        gvStep(d > 0 ? 1 : -1);
 
     }, { passive: false });
 
@@ -4651,11 +5189,7 @@
         }
 
         gvDrag.dx = dx;
-
-        const last = galleryItems.length - 1;
-        const atEdge = (gvIndex === 0 && dx > 0) || (gvIndex === last && dx < 0);
-
-        gvRender(atEdge ? dx * 0.3 : dx);
+        gvTrack.style.setProperty("--gv-dx", dx + "px");     // circular: no hay borde que oponga resistencia
     });
 
     function gvEnd(e) {
@@ -4672,16 +5206,16 @@
         const v  = d.dx / Math.max(1, performance.now() - d.t0);   // px/ms
         const th = Math.min(120, gvStage.clientWidth * 0.15);
 
-        if (d.dx < -th || v < -0.5)     gvGo(gvIndex + 1);
-        else if (d.dx > th || v > 0.5)  gvGo(gvIndex - 1);
-        else                            gvGo(gvIndex);                  // vuelve a su lugar
+        if (d.dx < -th || v < -0.5)     gvStep(1);
+        else if (d.dx > th || v > 0.5)  gvStep(-1);
+        else                            gvUpdate(false);           // vuelve a su lugar
     }
 
     gvStage.addEventListener("pointerup", gvEnd);
     gvStage.addEventListener("pointercancel", gvEnd);
 
     // ocultar flechas si hay una sola imagen
-    if (galleryItems.length < 2) { gvPrev.hidden = true; gvNext.hidden = true; }
+    if (GV_N < 2) { gvPrev.hidden = true; gvNext.hidden = true; }
 
     // si no hay imágenes, el botón no hace nada
     if (!galleryItems.length) navGallery.hidden = true;
@@ -4995,21 +5529,147 @@
         aerial.classList.remove("leaving");
         aerial.classList.add("active");
         sceneImage.style.transform = "scale(1.08)";
+        prepareAerialVideo();
     }
     function hideAerialNow() {
-        aerial.classList.remove("active", "leaving");
+        aerial.classList.remove("active", "leaving", "video-out", "busy");
         sceneImage.style.transform = "";
+    }
+
+    /* Deja el video aéreo → fachadas cargándose en el propio <video> de transición,
+       así al presionar el botón ya está listo (sin esperas ni pantallas vacías). */
+    function prepareAerialVideo() {
+
+        if (!AEREA.video || !aerialOpen() || aerialBusy) return;
+        if (transitionVideo.getAttribute("src") === AEREA.video) return;
+
+        transitionVideo.src = AEREA.video;
+        transitionVideo.load();
+
+        aerialWarmDone = new Promise(res => {
+            const done = () => res();
+            transitionVideo.addEventListener("canplaythrough", done, { once: true });
+            transitionVideo.addEventListener("error", done, { once: true });
+            setTimeout(done, 6000);           // nunca bloquea la precarga de plantas
+        });
     }
 
     if (AEREA.omitir || /[?&]sinaerea/.test(location.search)) hideAerialNow();
     else sceneImage.style.transform = "scale(1.08)";      // la fachada "se aproxima" al entrar
 
-    document.getElementById("aerial-enter").addEventListener("click", () => {
-        if (aerial.classList.contains("leaving")) return;
+    const appRoot = document.getElementById("app");
+    let aerialBusy = false;                               // true mientras corre el video aéreo → fachadas
+    prepareAerialVideo();
+
+    // Salida clásica (fundido): se usa si no hay video configurado o si el video no puede reproducirse
+    function aerialFadeOut() {
         aerial.classList.add("leaving");
         sceneImage.style.transform = "";
         setTimeout(() => { if (aerial.classList.contains("leaving")) hideAerialNow(); }, 1500);
+    }
+
+    /*
+        Transición en video: aérea → fachadas.
+        · La pantalla aérea se queda hasta que el video YA muestra su primer cuadro
+          (no hay pantalla vacía ni negro).
+        · Mientras corre, todo lo de la sección siguiente está bloqueado
+          (flechas, swipe, zonas de pisos, menú).
+        · Al terminar aparecen las fachadas; el bloqueo se libera con el fundido final.
+        · Si el video no existe, no carga a tiempo o falla → fundido clásico de antes.
+    */
+    function aerialEnterWithVideo() {
+
+        aerialBusy = true;
+        isTransitioning = true;
+        appRoot.classList.add("aerial-video");
+        aerial.classList.add("busy");
+        fzHide();
+        hotspot.classList.remove("visible");
+
+        let started = false, finished = false, startTimer = 0, endTimer = 0;
+
+        const release = () => {
+            clearTimeout(startTimer);
+            clearTimeout(endTimer);
+            transitionVideo.onplaying = transitionVideo.onended = transitionVideo.onerror = null;
+        };
+
+        const unlock = () => {
+            appRoot.classList.remove("aerial-video");
+            aerialBusy = false;
+            isTransitioning = false;
+        };
+
+        const fallback = () => {
+            if (finished) return;
+            finished = true;
+            release();
+            transitionVideo.pause();
+            transitionVideo.style.transition = "";
+            transitionVideo.classList.remove("active");
+            aerial.classList.remove("busy", "video-out");
+            fzShow();
+            unlock();
+            aerialFadeOut();
+        };
+
+        const finish = () => {
+            if (finished) return;
+            finished = true;
+            release();
+            transitionVideo.pause();
+            sceneImage.style.transform = "";
+            transitionVideo.classList.remove("active");     // se desvanece sobre la fachada que ya está debajo
+            hideAerialNow();
+            fzShow();
+            updateHotspot();
+            setTimeout(unlock, 600);
+        };
+
+        // primer cuadro ya pintado → recién ahora se va la pantalla aérea
+        const reveal = () => {
+            if (started || finished) return;
+            started = true;
+            clearTimeout(startTimer);
+            transitionVideo.style.transition = "";
+            aerial.classList.add("video-out");
+            sceneImage.style.transform = "";
+            const d = transitionVideo.duration;
+            endTimer = setTimeout(finish, ((isFinite(d) && d) || 20) * 1000 + 3000);   // red de seguridad
+        };
+
+        prepareAerialVideo();
+
+        try { transitionVideo.currentTime = 0; } catch (e) {}
+        transitionVideo.style.transition = "none";          // el video aparece ya opaco, tapado por la aérea
+        transitionVideo.classList.add("active");
+
+        transitionVideo.onplaying = () => {
+            if ("requestVideoFrameCallback" in transitionVideo) transitionVideo.requestVideoFrameCallback(reveal);
+            else reveal();
+        };
+        transitionVideo.onended = finish;
+        transitionVideo.onerror = () => (started ? finish() : fallback());
+
+        startTimer = setTimeout(() => { if (!started) fallback(); }, 4500);
+
+        const p = transitionVideo.play();
+        if (p && p.catch) p.catch(() => { if (!started) fallback(); });
+    }
+
+    document.getElementById("aerial-enter").addEventListener("click", () => {
+        if (aerialBusy || aerial.classList.contains("leaving")) return;
+        if (AEREA.video && !isTransitioning) aerialEnterWithVideo();
+        else aerialFadeOut();
     });
+
+    // mientras corre el video aéreo, el menú no interrumpe la transición (salvo «Inicio», que es un enlace)
+    document.addEventListener("click", e => {
+        if (aerialBusy && e.target.closest && e.target.closest("#site-nav") && !e.target.closest("#nav-home")) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+    }, true);
 
     // Cualquier otro botón del menú cierra la aérea al instante; «Edificio» la abre.
     document.getElementById("site-nav").addEventListener("click", e => {
@@ -5679,6 +6339,536 @@
     })();
 
 </script>
+
+
+    <!-- =========================================================
+         CÓDIGO QR: botón flotante que genera, al apretarlo, el QR del link de la página
+         (el QR se calcula en el navegador: no usa internet ni librerías externas)
+    ========================================================== -->
+
+    <style>
+        #qr-open {
+            position: fixed; z-index: 250;
+            top: calc(var(--nav-h, 84px) + 12px); right: 28px;
+            width: 44px; height: 44px; padding: 0; display: grid; place-items: center;
+            border-radius: 50%; cursor: pointer; color: #fff;
+            border: 1px solid rgba(255,255,255,.28); background: rgba(12,12,12,.58);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 6px 24px rgba(0,0,0,.25);
+            transition: background .25s ease, transform .25s ease, border-color .25s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #qr-open:hover { background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.6); transform: scale(1.06); }
+        #qr-open:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+        #qr-open svg { width: 20px; height: 20px; display: block; }
+
+        #qr-modal {
+            position: fixed; inset: 0; z-index: 950;
+            display: grid; place-items: center; padding: 20px; box-sizing: border-box;
+            background: rgba(0,0,0,.62); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            opacity: 0; visibility: hidden;
+            transition: opacity .3s ease, visibility 0s linear .3s;
+        }
+        #qr-modal.open { opacity: 1; visibility: visible; transition: opacity .3s ease; }
+        .qr-card {
+            position: relative; width: min(340px, 100%); box-sizing: border-box;
+            padding: 26px 22px 20px; text-align: center; color: #fff;
+            background: rgba(14,14,14,.94); border: 1px solid rgba(255,255,255,.18);
+            box-shadow: 0 20px 60px rgba(0,0,0,.5);
+            transform: translateY(12px) scale(.98); transition: transform .35s ease;
+        }
+        #qr-modal.open .qr-card { transform: none; }
+        .qr-title { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+        .qr-sub { margin: 8px 0 0; font-size: 11px; line-height: 1.5; opacity: .65; }
+        .qr-box { margin: 18px auto 12px; width: min(236px, 66vw); aspect-ratio: 1 / 1; background: #fff; }
+        .qr-box canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+        .qr-url { font-size: 10px; line-height: 1.4; opacity: .55; word-break: break-all; user-select: all; -webkit-user-select: all; }
+        .qr-note { margin: 12px 0 0; padding: 8px 10px; font-size: 10px; line-height: 1.5; text-align: left; color: #ffd9a0; border: 1px solid rgba(255,200,120,.4); background: rgba(255,170,60,.08); }
+        .qr-note[hidden], .qr-error[hidden] { display: none; }
+        .qr-error { margin: 18px 0 8px; font-size: 11px; line-height: 1.5; color: #ffb4b4; }
+        .qr-actions { display: flex; gap: 8px; margin-top: 16px; }
+        .qr-btn {
+            flex: 1; min-height: 42px; padding: 0 10px; cursor: pointer; color: #fff;
+            border: 1px solid rgba(255,255,255,.4); background: rgba(255,255,255,.06);
+            font-size: 9px; letter-spacing: .13em; text-transform: uppercase; font-family: inherit;
+            transition: background .25s ease, border-color .25s ease;
+        }
+        .qr-btn:hover { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.8); }
+        .qr-btn:focus-visible, .qr-x:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+        .qr-x {
+            position: absolute; top: 6px; right: 6px; width: 40px; height: 40px; padding: 0;
+            display: grid; place-items: center; cursor: pointer; color: #fff; opacity: .7;
+            border: 0; background: transparent; transition: opacity .25s ease;
+        }
+        .qr-x:hover { opacity: 1; }
+        .qr-x svg { width: 16px; height: 16px; }
+
+        @media (max-width: 700px) { #qr-open { right: 12px; top: calc(var(--nav-h, 66px) + 10px); } }
+        @media (max-height: 520px) and (orientation: landscape) and (pointer: coarse) {
+            #qr-open { right: calc(10px + env(safe-area-inset-right, 0px)); top: calc(var(--nav-h) + 8px); width: 40px; height: 40px; }
+            .qr-card { padding: 16px 18px 14px; }
+            .qr-box { width: min(170px, 44vh); margin: 10px auto 8px; }
+        }
+    </style>
+
+    <button type="button" id="qr-open" aria-label="Mostrar código QR de esta página" title="Código QR">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3.5" y="3.5" width="6" height="6" rx=".8"/><rect x="14.5" y="3.5" width="6" height="6" rx=".8"/><rect x="3.5" y="14.5" width="6" height="6" rx=".8"/>
+            <path d="M14.5 14.5h2.5v2.5h-2.5zM19 14.5h1.5M14.5 19h1.5M18 18h2.5v2.5H18z" stroke-linecap="round"/>
+        </svg>
+    </button>
+
+    <div id="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-title" aria-hidden="true">
+        <div class="qr-card">
+            <button type="button" class="qr-x" id="qr-close" aria-label="Cerrar">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg>
+            </button>
+            <div class="qr-title" id="qr-title">Abrilo en tu celular</div>
+            <p class="qr-sub">Escaneá el código con la cámara para abrir esta página.</p>
+            <div class="qr-box"><canvas id="qr-canvas" width="1" height="1" role="img" aria-label="Código QR con el link de la página"></canvas></div>
+            <div class="qr-error" id="qr-error" hidden></div>
+            <div class="qr-url" id="qr-url"></div>
+            <p class="qr-note" id="qr-note" hidden></p>
+            <div class="qr-actions">
+                <button type="button" class="qr-btn" id="qr-copy">Copiar enlace</button>
+                <button type="button" class="qr-btn" id="qr-download">Descargar QR</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+    /* ============================================================
+       CONFIGURACIÓN DEL QR
+         url:   "" → usa el link de la página en el momento de apretar el botón
+                      (sin los parámetros ?… ni #… para que el cliente reciba el link limpio).
+                "https://tusitio.com/trabajo2.html" → fuerza un link fijo (útil si estás
+                      probando en tu computadora o si querés un dominio corto).
+         nivel: corrección de errores: "L", "M", "Q" o "H" (más alto = QR más denso pero más resistente).
+    ============================================================ */
+
+    const QR_CONFIG = { url: "", nivel: "M" };
+
+    /* ============================================================
+       GENERADOR DE QR (modo byte, versiones 1–25: alcanza para ~1000 caracteres) — sin dependencias
+    ============================================================ */
+
+    const QRGen = (function () {
+
+        const FMT = { L: 1, M: 0, Q: 3, H: 2 };
+        const IDX = { L: 0, M: 1, Q: 2, H: 3 };
+
+        const ECC_CPB = [
+            [-1, 7, 10, 15, 20, 26, 18, 20, 24, 30, 18, 20, 24, 26, 30, 22, 24, 28, 30, 28, 28, 28, 28, 30, 30, 26, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],
+            [-1, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26, 30, 22, 22, 24, 24, 28, 28, 26, 26, 26, 26, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28],
+            [-1, 13, 22, 18, 26, 18, 24, 18, 22, 20, 24, 28, 26, 24, 20, 30, 24, 28, 28, 26, 30, 28, 30, 30, 30, 30, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],
+            [-1, 17, 28, 22, 16, 22, 28, 26, 26, 24, 28, 24, 28, 22, 24, 24, 30, 28, 28, 26, 28, 30, 24, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]
+        ];
+        const N_BLOCKS = [
+            [-1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4, 4, 6, 6, 6, 6, 7, 8, 8, 9, 9, 10, 12, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 20, 21, 22, 24, 25],
+            [-1, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5, 5, 8, 9, 9, 10, 10, 11, 13, 14, 16, 17, 17, 18, 20, 21, 23, 25, 26, 28, 29, 31, 33, 35, 37, 38, 40, 43, 45, 47, 49],
+            [-1, 1, 1, 2, 2, 4, 4, 6, 6, 8, 8, 8, 10, 12, 16, 12, 17, 16, 18, 21, 20, 23, 23, 25, 27, 29, 34, 34, 35, 38, 40, 43, 45, 48, 51, 53, 56, 59, 62, 65, 68],
+            [-1, 1, 1, 2, 4, 4, 4, 5, 6, 8, 8, 11, 11, 16, 16, 18, 16, 19, 21, 25, 25, 25, 34, 30, 32, 35, 37, 40, 42, 45, 48, 51, 54, 57, 60, 63, 66, 70, 74, 77, 81]
+        ];
+
+        const bit = (x, i) => ((x >>> i) & 1) !== 0;
+
+        function rawModules(v) {
+            let r = (16 * v + 128) * v + 64;
+            if (v >= 2) {
+                const a = Math.floor(v / 7) + 2;
+                r -= (25 * a - 10) * a - 55;
+                if (v >= 7) r -= 36;
+            }
+            return r;
+        }
+
+        const dataCodewords = (v, e) => Math.floor(rawModules(v) / 8) - ECC_CPB[e][v] * N_BLOCKS[e][v];
+
+        // Reed-Solomon sobre GF(256)
+        function rsMul(x, y) {
+            let z = 0;
+            for (let i = 7; i >= 0; i--) {
+                z = (z << 1) ^ ((z >>> 7) * 0x11D);
+                z ^= ((y >>> i) & 1) * x;
+            }
+            return z;
+        }
+
+        function rsDivisor(deg) {
+            const res = [];
+            for (let i = 0; i < deg - 1; i++) res.push(0);
+            res.push(1);
+            let root = 1;
+            for (let i = 0; i < deg; i++) {
+                for (let j = 0; j < res.length; j++) {
+                    res[j] = rsMul(res[j], root);
+                    if (j + 1 < res.length) res[j] ^= res[j + 1];
+                }
+                root = rsMul(root, 0x02);
+            }
+            return res;
+        }
+
+        function rsRemainder(data, div) {
+            const res = div.map(() => 0);
+            for (const b of data) {
+                const f = b ^ res.shift();
+                res.push(0);
+                div.forEach((c, i) => { res[i] ^= rsMul(c, f); });
+            }
+            return res;
+        }
+
+        function interleave(data, v, e) {
+            const nb = N_BLOCKS[e][v], eccLen = ECC_CPB[e][v];
+            const raw = Math.floor(rawModules(v) / 8);
+            const nShort = nb - raw % nb, shortLen = Math.floor(raw / nb);
+            const blocks = [], div = rsDivisor(eccLen);
+
+            for (let i = 0, k = 0; i < nb; i++) {
+                const dat = data.slice(k, k + shortLen - eccLen + (i < nShort ? 0 : 1));
+                k += dat.length;
+                const ecc = rsRemainder(dat, div);
+                if (i < nShort) dat.push(0);
+                blocks.push(dat.concat(ecc));
+            }
+
+            const out = [];
+            for (let i = 0; i < blocks[0].length; i++) {
+                blocks.forEach((b, j) => { if (i !== shortLen - eccLen || j >= nShort) out.push(b[i]); });
+            }
+            return out;
+        }
+
+        function alignPositions(v) {
+            if (v === 1) return [];
+            const n = Math.floor(v / 7) + 2;
+            const step = v === 32 ? 26 : Math.ceil((v * 4 + 4) / (n * 2 - 2)) * 2;
+            const res = [6];
+            for (let pos = v * 4 + 17 - 7; res.length < n; pos -= step) res.splice(1, 0, pos);
+            return res;
+        }
+
+        function penalty(m, size) {
+
+            let p = 0, dark = 0;
+            const A = [1,0,1,1,1,0,1,0,0,0,0], B = [0,0,0,0,1,0,1,1,1,0,1];
+
+            for (let dir = 0; dir < 2; dir++) {
+                for (let a = 0; a < size; a++) {
+
+                    const line = [];
+                    for (let b = 0; b < size; b++) line.push((dir ? m[b][a] : m[a][b]) ? 1 : 0);
+
+                    let r = 1;
+                    for (let i = 1; i < size; i++) {
+                        if (line[i] === line[i - 1]) { r++; if (r === 5) p += 3; else if (r > 5) p++; }
+                        else r = 1;
+                    }
+
+                    for (let i = 0; i + 11 <= size; i++) {
+                        let ma = true, mb = true;
+                        for (let k = 0; k < 11 && (ma || mb); k++) {
+                            if (line[i + k] !== A[k]) ma = false;
+                            if (line[i + k] !== B[k]) mb = false;
+                        }
+                        if (ma) p += 40;
+                        if (mb) p += 40;
+                    }
+                }
+            }
+
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    if (m[y][x]) dark++;
+                    if (x < size - 1 && y < size - 1 &&
+                        m[y][x] === m[y][x + 1] && m[y][x] === m[y + 1][x] && m[y][x] === m[y + 1][x + 1]) p += 3;
+                }
+            }
+
+            const total = size * size;
+            p += (Math.ceil(Math.abs(dark * 20 - total * 10) / total) - 1) * 10;
+            return p;
+        }
+
+        function encode(text, nivel) {
+
+            const e = IDX[nivel] === undefined ? 1 : IDX[nivel];
+            const bytes = Array.from(new TextEncoder().encode(String(text)));
+
+            let v = 1;
+            for (; ; v++) {
+                if (v > 25) throw new Error("el link es demasiado largo");
+                const need = 4 + (v < 10 ? 8 : 16) + bytes.length * 8;
+                if (need <= dataCodewords(v, e) * 8) break;
+            }
+
+            // bits de datos
+            const bits = [];
+            const put = (val, len) => { for (let i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1); };
+            put(0x4, 4);
+            put(bytes.length, v < 10 ? 8 : 16);
+            bytes.forEach(b => put(b, 8));
+
+            const cap = dataCodewords(v, e) * 8;
+            put(0, Math.min(4, cap - bits.length));
+            put(0, (8 - bits.length % 8) % 8);
+            for (let pad = 0xEC; bits.length < cap; pad ^= 0xEC ^ 0x11) put(pad, 8);
+
+            const data = [];
+            for (let i = 0; i < bits.length; i += 8) {
+                let b = 0;
+                for (let k = 0; k < 8; k++) b = (b << 1) | bits[i + k];
+                data.push(b);
+            }
+
+            const codewords = interleave(data, v, e);
+
+            // matriz
+            const size = v * 4 + 17;
+            const m  = Array.from({ length: size }, () => new Array(size).fill(false));
+            const fn = Array.from({ length: size }, () => new Array(size).fill(false));
+            const setFn = (x, y, dark) => { m[y][x] = dark; fn[y][x] = true; };
+
+            for (let i = 0; i < size; i++) { setFn(6, i, i % 2 === 0); setFn(i, 6, i % 2 === 0); }
+
+            const finder = (cx, cy) => {
+                for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) {
+                    const d = Math.max(Math.abs(dx), Math.abs(dy)), x = cx + dx, y = cy + dy;
+                    if (x >= 0 && x < size && y >= 0 && y < size) setFn(x, y, d !== 2 && d !== 4);
+                }
+            };
+            finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+
+            const ap = alignPositions(v), last = ap.length - 1;
+            ap.forEach((ax, i) => ap.forEach((ay, j) => {
+                if ((i === 0 && j === 0) || (i === 0 && j === last) || (i === last && j === 0)) return;
+                for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++)
+                    setFn(ax + dx, ay + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);
+            }));
+
+            const drawFormat = mask => {
+                const d = (FMT[nivel] === undefined ? 0 : FMT[nivel]) << 3 | mask;
+                let rem = d;
+                for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+                const f = (d << 10 | rem) ^ 0x5412;
+                for (let i = 0; i <= 5; i++) setFn(8, i, bit(f, i));
+                setFn(8, 7, bit(f, 6)); setFn(8, 8, bit(f, 7)); setFn(7, 8, bit(f, 8));
+                for (let i = 9; i < 15; i++) setFn(14 - i, 8, bit(f, i));
+                for (let i = 0; i < 8; i++) setFn(size - 1 - i, 8, bit(f, i));
+                for (let i = 8; i < 15; i++) setFn(8, size - 15 + i, bit(f, i));
+                setFn(8, size - 8, true);
+            };
+            drawFormat(0);
+
+            if (v >= 7) {
+                let rem = v;
+                for (let i = 0; i < 12; i++) rem = (rem << 1) ^ ((rem >>> 11) * 0x1F25);
+                const vb = v << 12 | rem;
+                for (let i = 0; i < 18; i++) {
+                    const c = bit(vb, i), a = size - 11 + i % 3, b = Math.floor(i / 3);
+                    setFn(a, b, c); setFn(b, a, c);
+                }
+            }
+
+            // datos en zigzag
+            let k = 0;
+            for (let right = size - 1; right >= 1; right -= 2) {
+                if (right === 6) right = 5;
+                for (let vert = 0; vert < size; vert++) {
+                    for (let j = 0; j < 2; j++) {
+                        const x = right - j;
+                        const y = ((right + 1) & 2) === 0 ? size - 1 - vert : vert;
+                        if (!fn[y][x] && k < codewords.length * 8) {
+                            m[y][x] = bit(codewords[k >>> 3], 7 - (k & 7));
+                            k++;
+                        }
+                    }
+                }
+            }
+
+            // máscara: se prueba cada una y se elige la de menor penalización
+            const applyMask = mask => {
+                for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+                    let inv;
+                    switch (mask) {
+                        case 0: inv = (x + y) % 2 === 0; break;
+                        case 1: inv = y % 2 === 0; break;
+                        case 2: inv = x % 3 === 0; break;
+                        case 3: inv = (x + y) % 3 === 0; break;
+                        case 4: inv = (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0; break;
+                        case 5: inv = x * y % 2 + x * y % 3 === 0; break;
+                        case 6: inv = (x * y % 2 + x * y % 3) % 2 === 0; break;
+                        default: inv = ((x + y) % 2 + x * y % 3) % 2 === 0;
+                    }
+                    if (!fn[y][x] && inv) m[y][x] = !m[y][x];
+                }
+            };
+
+            let best = 0, bestP = Infinity;
+            for (let mask = 0; mask < 8; mask++) {
+                applyMask(mask);
+                drawFormat(mask);
+                const p = penalty(m, size);
+                if (p < bestP) { bestP = p; best = mask; }
+                applyMask(mask);
+            }
+            applyMask(best);
+            drawFormat(best);
+
+            return { size, version: v, modules: m };
+        }
+
+        return { encode };
+    })();
+
+    /* ============================================================
+       BOTÓN Y VENTANA DEL QR
+    ============================================================ */
+
+    (function () {
+
+        const openBtn  = document.getElementById("qr-open");
+        const modal    = document.getElementById("qr-modal");
+        const closeBtn = document.getElementById("qr-close");
+        const canvas   = document.getElementById("qr-canvas");
+        const urlEl    = document.getElementById("qr-url");
+        const noteEl   = document.getElementById("qr-note");
+        const errEl    = document.getElementById("qr-error");
+        const copyBtn  = document.getElementById("qr-copy");
+        const dlBtn    = document.getElementById("qr-download");
+
+        let qr = null, currentUrl = "", copyTimer = 0;
+
+        // link de la página en este momento, sin parámetros de edición (?…) ni ancla (#…)
+        function pageUrl() {
+            if (QR_CONFIG.url && QR_CONFIG.url.trim()) return QR_CONFIG.url.trim();
+            try {
+                const u = new URL(location.href);
+                u.search = ""; u.hash = "";
+                return u.href;
+            } catch (e) { return location.href; }
+        }
+
+        function draw(cv, scale) {
+            const quiet = 4, total = qr.size + quiet * 2;
+            cv.width = cv.height = total * scale;
+            const ctx = cv.getContext("2d");
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(0, 0, cv.width, cv.height);
+            ctx.fillStyle = "#000";
+            for (let y = 0; y < qr.size; y++)
+                for (let x = 0; x < qr.size; x++)
+                    if (qr.modules[y][x]) ctx.fillRect((x + quiet) * scale, (y + quiet) * scale, scale, scale);
+        }
+
+        let lastFocus = null;
+
+        function openModal() {
+
+            currentUrl = pageUrl();
+            urlEl.textContent = currentUrl;
+
+            errEl.hidden = true;
+            canvas.parentElement.hidden = false;
+            dlBtn.disabled = false;
+
+            try {
+                qr = QRGen.encode(currentUrl, QR_CONFIG.nivel);
+                const dpr = Math.max(1, window.devicePixelRatio || 1);
+                draw(canvas, Math.max(3, Math.ceil(240 * dpr / (qr.size + 8))));
+            } catch (err) {
+                qr = null;
+                canvas.parentElement.hidden = true;
+                errEl.textContent = "No se pudo generar el QR: " + err.message + ".";
+                errEl.hidden = false;
+                dlBtn.disabled = true;
+            }
+
+            const local = /^(file:|about:)/.test(location.protocol) || /^(localhost|127\.|0\.0\.0\.0|\[::1\])/.test(location.hostname);
+            const forced = QR_CONFIG.url && QR_CONFIG.url.trim();
+
+            if (local && !forced) {
+                noteEl.textContent = "Estás viendo la página desde tu propia computadora: este link solo funciona acá. " +
+                                     "Cuando esté publicada en internet, el QR llevará a la dirección pública.";
+                noteEl.hidden = false;
+            } else {
+                noteEl.hidden = true;
+            }
+
+            lastFocus = document.activeElement;
+            modal.classList.add("open");
+            modal.setAttribute("aria-hidden", "false");
+            closeBtn.focus({ preventScroll: true });
+        }
+
+        function closeModal() {
+            if (!modal.classList.contains("open")) return;
+            modal.classList.remove("open");
+            modal.setAttribute("aria-hidden", "true");
+            if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+        }
+
+        openBtn.addEventListener("click", openModal);
+        closeBtn.addEventListener("click", closeModal);
+        modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+
+        copyBtn.addEventListener("click", async () => {
+
+            let ok = false;
+
+            try { await navigator.clipboard.writeText(currentUrl); ok = true; }
+            catch (e) {
+                const t = document.createElement("textarea");
+                t.value = currentUrl; t.style.cssText = "position:fixed;opacity:0;top:0;left:0";
+                document.body.appendChild(t); t.select();
+                try { ok = document.execCommand("copy"); } catch (err) {}
+                t.remove();
+            }
+
+            copyBtn.textContent = ok ? "¡Copiado!" : "No se pudo copiar";
+            clearTimeout(copyTimer);
+            copyTimer = setTimeout(() => { copyBtn.textContent = "Copiar enlace"; }, 1800);
+        });
+
+        dlBtn.addEventListener("click", () => {
+
+            if (!qr) return;
+
+            const big = document.createElement("canvas");
+            draw(big, Math.max(8, Math.ceil(1024 / (qr.size + 8))));
+
+            big.toBlob(blob => {
+                if (!blob) return;
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = "codigo-qr.png";
+                document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+            }, "image/png");
+        });
+
+        // Esc cierra solo esta ventana (sin cerrar también lo que hay debajo) · Tab no se escapa del cuadro
+        window.addEventListener("keydown", e => {
+
+            if (!modal.classList.contains("open")) return;
+
+            if (e.key === "Escape") {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                closeModal();
+            } else if (e.key === "Tab") {
+                const f = [closeBtn, copyBtn, dlBtn].filter(b => !b.disabled);
+                const i = f.indexOf(document.activeElement);
+                e.preventDefault();
+                f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+            }
+        }, true);
+
+    })();
+
+    </script>
 
 </body>
 </html>
